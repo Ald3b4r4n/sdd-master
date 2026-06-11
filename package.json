@@ -9,13 +9,15 @@
     "sdd": "./dist/cli/main.js"
   },
   "files": [
-    "dist",
+    "dist/",
     "README.md",
     "CHANGELOG.md",
     "LICENSE",
     "CONTRIBUTING.md",
     "SECURITY.md",
-    "CODE_OF_CONDUCT.md"
+    "CODE_OF_CONDUCT.md",
+    "docs/",
+    "assets/"
   ],
   "engines": {
     "node": ">=20"
@@ -25,7 +27,10 @@
     "test": "node --test tests/*.test.mjs",
     "lint": "node scripts/lint.mjs",
     "format": "node scripts/format-check.mjs",
-    "check": "npm run build && npm run lint && npm test"
+    "smoke": "node scripts/smoke-test.mjs",
+    "package:check": "node scripts/package-check.mjs",
+    "pack:dry-run": "node scripts/pack-dry-run.mjs",
+    "check": "npm run build && npm test && npm run lint && npm run format && npm run smoke && npm run package:check && npm run pack:dry-run"
   },
   "keywords": [
     "sdd",

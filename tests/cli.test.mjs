@@ -27,6 +27,16 @@ function runGit(args, cwd) {
   return spawnSync("git", args, { cwd, encoding: "utf8" });
 }
 
+function runNpmScript(script) {
+  const command = process.platform === "win32" ? "cmd.exe" : "npm";
+  const args = process.platform === "win32" ? ["/d", "/s", "/c", `npm run ${script}`] : ["run", script];
+
+  return spawnSync(command, args, {
+    cwd: rootDir,
+    encoding: "utf8"
+  });
+}
+
 function withTempProject(callback) {
   const directory = mkdtempSync(join(tmpdir(), "sdd-master-test-"));
 
@@ -865,6 +875,50 @@ describe("SDD Master package foundation", () => {
     assert.equal(packageJson.bin?.sdd, "./dist/cli/main.js");
   });
 
+  it("has hardened package metadata and files allowlist", () => {
+    const packageJson = JSON.parse(readFileSync(join(rootDir, "package.json"), "utf8"));
+
+    assert.equal(packageJson.license, "MIT");
+    assert.equal(packageJson.version, "0.1.0-prototype");
+    assert.equal(packageJson.bin?.sdd, "./dist/cli/main.js");
+    assert.equal(packageJson.files.includes("dist/"), true);
+    assert.equal(packageJson.files.includes("README.md"), true);
+    assert.equal(packageJson.files.includes("LICENSE"), true);
+    assert.equal(packageJson.files.includes("CHANGELOG.md"), true);
+    assert.equal(packageJson.files.includes("docs/"), true);
+    assert.equal(packageJson.files.includes("assets/"), true);
+    assert.equal(packageJson.files.includes(".sdd-master/"), false);
+    assert.equal(packageJson.files.includes(".env"), false);
+    assert.equal(packageJson.files.some((entry) => entry.toLowerCase().endsWith(".pdf")), false);
+    assert.match(packageJson.scripts.check, /npm run smoke/);
+    assert.match(packageJson.scripts.check, /npm run package:check/);
+    assert.match(packageJson.scripts.check, /npm run pack:dry-run/);
+  });
+
+  it("includes hardening scripts", () => {
+    const scripts = [
+      "scripts/smoke-test.mjs",
+      "scripts/package-check.mjs",
+      "scripts/pack-dry-run.mjs"
+    ];
+
+    for (const script of scripts) {
+      assert.equal(existsSync(join(rootDir, script)), true, `${script} should exist`);
+    }
+  });
+
+  it("runs hardening scripts after build", () => {
+    const smoke = runNpmScript("smoke");
+    const packageCheck = runNpmScript("package:check");
+    const packDryRun = runNpmScript("pack:dry-run");
+
+    assert.equal(smoke.status, 0, smoke.stderr || smoke.stdout);
+    assert.equal(packageCheck.status, 0, packageCheck.stderr || packageCheck.stdout);
+    assert.equal(packDryRun.status, 0, packDryRun.stderr || packDryRun.stdout);
+    assert.equal(existsSync(join(rootDir, ".env")), false);
+    assert.equal(existsSync(join(rootDir, ".sdd-master")), false);
+  });
+
   it("does not depend on untracked PDF files for CLI behavior", () => {
     const expectedPdfs = [
       "SDD Master — Checklist de Implementação v0.1.pdf",
@@ -928,6 +982,8 @@ describe("SDD Master package foundation", () => {
     assert.match(readme, /sdd master doctor/);
     assert.match(readme, /sdd master git --pre-push/);
     assert.match(readme, /sdd master agents --yes/);
+    assert.match(readme, /npm run check/);
+    assert.match(readme, /npm run package:check/);
   });
 
   it("includes required README SVG assets", () => {
@@ -965,8 +1021,12 @@ describe("SDD Master package foundation", () => {
     }
 
     const commands = readFileSync(join(rootDir, "docs/03-codigo/comandos-cli.md"), "utf8");
+    const localDevelopment = readFileSync(join(rootDir, "docs/03-codigo/desenvolvimento-local.md"), "utf8");
     assert.match(commands, /sdd master init/);
     assert.match(commands, /sdd master doctor/);
     assert.match(commands, /sdd master git/);
+    assert.match(localDevelopment, /npm run smoke/);
+    assert.match(localDevelopment, /npm run package:check/);
+    assert.match(localDevelopment, /npm run pack:dry-run/);
   });
 });

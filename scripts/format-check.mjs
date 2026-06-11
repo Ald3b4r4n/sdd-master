@@ -54,7 +54,10 @@ const files = [
   "src/types/node-shims.d.ts",
   "tests/cli.test.mjs",
   "scripts/lint.mjs",
-  "scripts/format-check.mjs"
+  "scripts/format-check.mjs",
+  "scripts/smoke-test.mjs",
+  "scripts/package-check.mjs",
+  "scripts/pack-dry-run.mjs"
 ];
 
 let failed = false;

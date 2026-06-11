@@ -34,6 +34,11 @@
 - Assets SVG próprios para apresentação do SDD Master.
 - Documentação pública inicial em `docs/`.
 - Exemplos de uso, fluxo visual, segurança e compatibilidade multi-IA.
+- Smoke test do CLI buildado.
+- Validação local de pacote npm.
+- Dry-run de empacotamento com bloqueio de arquivos sensíveis.
+- Checks adicionais para documentação e assets.
+- Hardening do script `npm run check`.
 - Atualização segura de README e `.gitignore` em projetos consumidores.
 - Detecção básica de instalação pelo `sdd master status`.
 - Documentação pública inicial.

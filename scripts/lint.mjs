@@ -50,7 +50,12 @@ const requiredFiles = [
   "src/git/git-checks.ts",
   "src/git/git-report.ts",
   "src/git/git.ts",
-  "src/types/node-shims.d.ts"
+  "src/types/node-shims.d.ts",
+  "scripts/lint.mjs",
+  "scripts/format-check.mjs",
+  "scripts/smoke-test.mjs",
+  "scripts/package-check.mjs",
+  "scripts/pack-dry-run.mjs"
 ];
 
 const forbiddenPatterns = [

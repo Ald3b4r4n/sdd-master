@@ -205,6 +205,33 @@ O SDD Master instala templates locais em `.sdd-master/templates/` para requisito
 
 Templates são pontos de partida. Documentos reais devem ser criados a partir deles, revisados e aprovados pelo fluxo SDD Master.
 
+## Qualidade e validação local
+
+Antes de qualquer release ou publicação, execute:
+
+```bash
+npm run check
+```
+
+O check executa:
+
+- build;
+- testes;
+- lint;
+- formatação;
+- smoke test do CLI;
+- validação de pacote;
+- dry-run do npm pack.
+
+## Validação de pacote
+
+```bash
+npm run package:check
+npm run pack:dry-run
+```
+
+Esses scripts verificam se o pacote contém os arquivos necessários para uso via CLI e se arquivos proibidos ficam fora do empacotamento npm.
+
 ## Documentação pública
 
 - [Visão do produto](docs/01-negocio-requisitos/visao-do-produto.md)
