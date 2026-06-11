@@ -33,6 +33,13 @@ function withTempProject(callback) {
   }
 }
 
+function initTempProject(projectDir) {
+  return runCli(
+    ["master", "init", "-y", "--language=pt-BR", "--agent=codex", "--project-name=Projeto Teste"],
+    projectDir
+  );
+}
+
 function collectMarkdownFiles(directory, base = directory) {
   const files = [];
 
@@ -107,6 +114,8 @@ describe("SDD Master package foundation", () => {
     assert.equal(result.status, 0);
     assert.match(result.stdout, /sdd master doctor/);
     assert.match(result.stdout, /Diagnosticar a instalação/);
+    assert.match(result.stdout, /Disponível no BLOCO 05/);
+    assert.match(result.stdout, /sdd master doctor --json/);
     assert.match(result.stdout, /Não deve expor segredos/);
   });
 
@@ -345,10 +354,7 @@ describe("SDD Master package foundation", () => {
 
   it("detects initialized projects in status output", () => {
     withTempProject((projectDir) => {
-      const init = runCli(
-        ["master", "init", "-y", "--language=pt-BR", "--agent=codex", "--project-name=Projeto Teste"],
-        projectDir
-      );
+      const init = initTempProject(projectDir);
       const status = runCli(["master", "status"], projectDir);
 
       assert.equal(init.status, 0);
@@ -361,19 +367,120 @@ describe("SDD Master package foundation", () => {
     });
   });
 
+  it("reports broken doctor status when project is not initialized", () => {
+    withTempProject((projectDir) => {
+      const result = runCli(["master", "doctor"], projectDir);
+
+      assert.equal(result.status, 0);
+      assert.match(result.stdout, /SDD Master — Doctor/);
+      assert.match(result.stdout, /Status geral:\s+broken/);
+      assert.match(result.stdout, /Estrutura \.sdd-master\/ não encontrada/);
+      assert.match(result.stdout, /sdd master init/);
+    });
+  });
+
+  it("reports healthy or warning doctor status after init", () => {
+    withTempProject((projectDir) => {
+      const init = initTempProject(projectDir);
+      const result = runCli(["master", "doctor"], projectDir);
+
+      assert.equal(init.status, 0);
+      assert.equal(result.status, 0);
+      assert.match(result.stdout, /SDD Master — Doctor/);
+      assert.match(result.stdout, /Status geral:\s+(healthy|warning)/);
+      assert.match(result.stdout, /\.sdd-master\/: OK/);
+      assert.match(result.stdout, /constitution.md: OK/);
+      assert.match(result.stdout, /project-state.md: OK/);
+      assert.match(result.stdout, /docs\/01-negocio-requisitos\/: OK/);
+      assert.match(result.stdout, /docs\/02-tecnica-arquitetura\/: OK/);
+      assert.match(result.stdout, /docs\/03-codigo\/: OK/);
+      assert.match(result.stdout, /\.sdd-master\/templates\/: OK/);
+      assert.match(result.stdout, /Templates encontrados: \d+/);
+      assert.match(result.stdout, /Templates mínimos: OK/);
+      assert.match(result.stdout, /\.gitignore: OK/);
+      assert.match(result.stdout, /Próximo passo recomendado:\s+\/sdd-master-discovery/);
+    });
+  });
+
+  it("prints valid doctor JSON with checks and project state", () => {
+    withTempProject((projectDir) => {
+      const init = initTempProject(projectDir);
+      const result = runCli(["master", "doctor", "--json"], projectDir);
+      const report = JSON.parse(result.stdout);
+
+      assert.equal(init.status, 0);
+      assert.equal(result.status, 0);
+      assert.match(report.status, /^(healthy|warning)$/);
+      assert.equal(Array.isArray(report.checks), true);
+      assert.equal(report.checks.some((check) => check.id === "internal-structure"), true);
+      assert.equal(report.projectState.projectName, "Projeto Teste");
+      assert.equal(report.projectState.language, "pt-BR");
+      assert.equal(report.projectState.agent, "codex");
+      assert.equal(report.projectState.currentPhase, "PHASE-01 — Discovery");
+      assert.equal(report.projectState.nextCommand, "/sdd-master-discovery");
+      assert.equal(report.projectState.maturity, "M0 — Ideia");
+      assert.equal(report.projectState.stage, "Prototype");
+      assert.equal(report.recommendation, "/sdd-master-discovery");
+    });
+  });
+
+  it("doctor JSON detects structure, docs, templates, agents and gitignore", () => {
+    withTempProject((projectDir) => {
+      initTempProject(projectDir);
+      const result = runCli(["master", "doctor", "--json"], projectDir);
+      const report = JSON.parse(result.stdout);
+      const byId = Object.fromEntries(report.checks.map((check) => [check.id, check]));
+
+      assert.equal(byId["internal-structure"].status, "pass");
+      assert.equal(byId["public-docs"].status, "pass");
+      assert.equal(byId.agents.status, "pass");
+      assert.equal(byId["official-templates"].status, "pass");
+      assert.equal(byId.gitignore.status, "pass");
+      assert.equal(report.templates.count >= 40, true);
+      assert.equal(report.templates.hasMinimumTemplates, true);
+    });
+  });
+
+  it("doctor marks real .env as critical failure but accepts .env.example", () => {
+    withTempProject((projectDir) => {
+      initTempProject(projectDir);
+      writeFileSync(join(projectDir, ".env.example"), "EXAMPLE_API_KEY=replace-me\n", "utf8");
+      const safe = JSON.parse(runCli(["master", "doctor", "--json"], projectDir).stdout);
+
+      assert.equal(safe.security.hasRealEnv, false);
+      assert.equal(safe.security.sensitiveFiles.includes(".env.example"), false);
+
+      writeFileSync(join(projectDir, ".env"), "SECRET_VALUE=do-not-commit\n", "utf8");
+      const result = runCli(["master", "doctor"], projectDir);
+      const unsafe = JSON.parse(runCli(["master", "doctor", "--json"], projectDir).stdout);
+
+      assert.equal(result.status, 0);
+      assert.match(result.stdout, /Falha crítica/);
+      assert.match(result.stdout, /Arquivo de ambiente real detectado/);
+      assert.match(result.stdout, /\.env/);
+      assert.equal(unsafe.status, "broken");
+      assert.equal(unsafe.security.hasRealEnv, true);
+      assert.equal(unsafe.security.sensitiveFiles.includes(".env"), true);
+    });
+  });
+
+  it("doctor recommends init when not installed and does not create files", () => {
+    withTempProject((projectDir) => {
+      const before = readdirSync(projectDir).sort();
+      const result = runCli(["master", "doctor", "--json"], projectDir);
+      const after = readdirSync(projectDir).sort();
+      const report = JSON.parse(result.stdout);
+
+      assert.equal(result.status, 0);
+      assert.equal(report.status, "broken");
+      assert.equal(report.recommendation, "sdd master init");
+      assert.deepEqual(after, before);
+    });
+  });
+
   it("does not create package-root .sdd-master or .env during init tests", () => {
     assert.equal(existsSync(join(rootDir, ".sdd-master")), false);
     assert.equal(existsSync(join(rootDir, ".env")), false);
-  });
-
-  it("keeps doctor as a safe stub and does not alter root files", () => {
-    const before = readdirSync(rootDir).sort();
-    const result = runCli(["master", "doctor"]);
-    const after = readdirSync(rootDir).sort();
-
-    assert.equal(result.status, 0);
-    assert.match(result.stdout, /Comando planejado: sdd master doctor/);
-    assert.deepEqual(after, before);
   });
 
   it("keeps update as a safe stub", () => {
@@ -405,9 +512,12 @@ describe("SDD Master package foundation", () => {
       "SDD Master Roadmap.pdf"
     ];
     const result = runCli(["master", "help", "status"]);
+    const doctor = runCli(["master", "doctor"]);
 
     assert.equal(result.status, 0);
+    assert.equal(doctor.status, 0);
     assert.match(result.stdout, /sdd master status/);
+    assert.match(doctor.stdout, /SDD Master — Doctor/);
 
     for (const pdf of expectedPdfs) {
       assert.equal(existsSync(join(rootDir, pdf)), true, `${pdf} should remain in place`);

@@ -96,6 +96,30 @@ Esses templates cobrem:
 
 Os templates são instalados localmente no projeto consumidor para permitir retomada por qualquer IA/agente sem depender de estado externo. Eles são pontos de partida: documentos reais devem ser criados a partir dos templates, revisados e aprovados pelo fluxo SDD Master.
 
+## Diagnóstico com doctor
+
+Use:
+
+```bash
+sdd master doctor
+```
+
+Para saída JSON:
+
+```bash
+sdd master doctor --json
+```
+
+O doctor verifica:
+
+- estrutura `.sdd-master/`;
+- documentação pública;
+- templates oficiais;
+- `.gitignore`;
+- arquivos sensíveis;
+- Git básico;
+- estado do projeto.
+
 ## Scripts do Projeto
 
 ```bash

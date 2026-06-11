@@ -1,7 +1,11 @@
 declare module "node:fs" {
   export function existsSync(path: string): boolean;
   export function mkdirSync(path: string, options?: { recursive?: boolean }): void;
+  export function readdirSync(path: string): string[];
   export function readFileSync(path: string, encoding: "utf8"): string;
+  export function statSync(path: string): {
+    isDirectory(): boolean;
+  };
   export function writeFileSync(path: string, data: string, encoding?: "utf8"): void;
   export function appendFileSync(path: string, data: string, encoding?: "utf8"): void;
 }
@@ -20,4 +24,16 @@ declare module "node:readline/promises" {
     question(query: string): Promise<string>;
     close(): void;
   };
+}
+
+declare module "node:child_process" {
+  export function execFileSync(
+    file: string,
+    args: string[],
+    options?: {
+      cwd?: string;
+      encoding?: "utf8";
+      stdio?: ["ignore", "pipe", "ignore"];
+    }
+  ): string;
 }

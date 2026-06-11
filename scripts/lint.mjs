@@ -14,6 +14,7 @@ const requiredFiles = [
   "src/cli/args.ts",
   "src/cli/output.ts",
   "src/cli/command-registry.ts",
+  "src/cli/commands/master-doctor.ts",
   "src/cli/commands/master-init.ts",
   "src/cli/commands/root-help.ts",
   "src/cli/commands/master-help.ts",
@@ -22,6 +23,10 @@ const requiredFiles = [
   "src/cli/commands/planned-command.ts",
   "src/templates/official-templates.ts",
   "src/templates/template-writer.ts",
+  "src/doctor/doctor-types.ts",
+  "src/doctor/doctor-checks.ts",
+  "src/doctor/doctor.ts",
+  "src/doctor/doctor-report.ts",
   "src/types/node-shims.d.ts"
 ];
 

@@ -1,9 +1,8 @@
-const plannedBlocks: Record<"doctor" | "update", string> = {
-  doctor: "um bloco futuro",
+const plannedBlocks: Record<"update", string> = {
   update: "um bloco futuro"
 };
 
-export function getPlannedCommandOutput(command: "doctor" | "update"): string {
+export function getPlannedCommandOutput(command: "update"): string {
   return `Comando planejado: sdd master ${command}
 
 Este comando será implementado no ${plannedBlocks[command]}.

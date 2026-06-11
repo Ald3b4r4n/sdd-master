@@ -16,6 +16,10 @@
 - Biblioteca inicial de templates oficiais do SDD Master.
 - Instalação local dos templates pelo comando `sdd master init`.
 - Estrutura de templates para requisitos, arquitetura, workflow, governança, segurança, UI/UX, operações e agentes.
+- Comando `sdd master doctor`.
+- Diagnóstico estrutural da instalação SDD Master.
+- Saída legível e JSON para automação.
+- Verificações básicas de segurança para `.env` e arquivos sensíveis.
 - Atualização segura de README e `.gitignore` em projetos consumidores.
 - Detecção básica de instalação pelo `sdd master status`.
 - Documentação pública inicial.

@@ -31,11 +31,16 @@ const commandHelps: Record<string, CommandHelp> = {
   },
   doctor: {
     command: "doctor",
-    status: "Planejado.",
-    purpose: "Diagnosticar a instalação, estrutura e requisitos mínimos do SDD Master.",
+    status: "Disponível no BLOCO 05.",
+    purpose: "Diagnosticar a instalação, estrutura, templates, segurança básica e estado do SDD Master.",
     whenUsed: "Será usado antes de implementar ou auditar um projeto.",
     example: "sdd master doctor",
-    security: ["Não deve expor segredos em logs.", "Deve relatar problemas sem alterar arquivos."]
+    security: [
+      "Suporta saída JSON com sdd master doctor --json.",
+      "Verifica .sdd-master/, docs, templates oficiais, .gitignore, arquivos sensíveis e Git básico.",
+      "Não deve expor segredos em logs.",
+      "Deve relatar problemas sem alterar arquivos."
+    ]
   },
   update: {
     command: "update",
@@ -184,9 +189,9 @@ Comandos disponíveis:
   sdd master version    Mostra a versão instalada
   sdd master status     Mostra status básico do projeto
   sdd master init       Inicializa estrutura SDD Master no projeto
+  sdd master doctor     Diagnostica a instalação SDD Master
 
 Comandos planejados:
-  sdd master doctor
   sdd master update
   sdd master discovery
   sdd master requirements
