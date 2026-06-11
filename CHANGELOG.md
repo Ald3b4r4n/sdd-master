@@ -30,6 +30,10 @@
 - Detecção heurística de segredos.
 - Validação de arquivos `.env` e arquivos sensíveis.
 - Modos `--pre-commit`, `--pre-push` e `--json`.
+- README premium com assets visuais.
+- Assets SVG próprios para apresentação do SDD Master.
+- Documentação pública inicial em `docs/`.
+- Exemplos de uso, fluxo visual, segurança e compatibilidade multi-IA.
 - Atualização segura de README e `.gitignore` em projetos consumidores.
 - Detecção básica de instalação pelo `sdd master status`.
 - Documentação pública inicial.

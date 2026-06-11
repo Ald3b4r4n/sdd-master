@@ -912,4 +912,61 @@ describe("SDD Master package foundation", () => {
       assert.equal(statSync(absolutePath).isDirectory(), true, `${directory} should be a directory`);
     }
   });
+
+  it("includes the premium README sections and visual references", () => {
+    const readme = readFileSync(join(rootDir, "README.md"), "utf8");
+
+    assert.match(readme, /^# SDD Master/m);
+    assert.match(readme, /assets\/readme\/sdd-master-hero\.svg/);
+    assert.match(readme, /## Instalação futura via npm/);
+    assert.match(readme, /## Uso local durante desenvolvimento/);
+    assert.match(readme, /## Comandos atuais/);
+    assert.match(readme, /\| `sdd master init` \| Disponível \|/);
+    assert.match(readme, /## Segurança/);
+    assert.match(readme, /## Compatibilidade multi-IA/);
+    assert.match(readme, /```mermaid/);
+    assert.match(readme, /sdd master doctor/);
+    assert.match(readme, /sdd master git --pre-push/);
+    assert.match(readme, /sdd master agents --yes/);
+  });
+
+  it("includes required README SVG assets", () => {
+    const assets = [
+      "assets/readme/sdd-master-hero.svg",
+      "assets/readme/workflow-overview.svg",
+      "assets/readme/multi-ai-support.svg",
+      "assets/readme/safety-gates.svg"
+    ];
+
+    for (const asset of assets) {
+      const content = readFileSync(join(rootDir, asset), "utf8");
+
+      assert.equal(content.trim().length > 0, true, `${asset} should not be empty`);
+      assert.match(content, /<svg/);
+      assert.equal(content.includes(".env"), false, `${asset} should not mention .env`);
+      assert.doesNotMatch(content, /sk-[A-Za-z0-9_-]{20,}/);
+      assert.doesNotMatch(content, /BEGIN (RSA |EC |OPENSSH |)PRIVATE KEY/);
+    }
+  });
+
+  it("includes required public documentation files", () => {
+    const docs = [
+      "docs/01-negocio-requisitos/visao-do-produto.md",
+      "docs/02-tecnica-arquitetura/arquitetura-do-framework.md",
+      "docs/02-tecnica-arquitetura/compatibilidade-multi-ia.md",
+      "docs/02-tecnica-arquitetura/seguranca-e-governanca.md",
+      "docs/03-codigo/comandos-cli.md",
+      "docs/03-codigo/desenvolvimento-local.md"
+    ];
+
+    for (const doc of docs) {
+      const content = readFileSync(join(rootDir, doc), "utf8");
+      assert.equal(content.trim().length > 0, true, `${doc} should not be empty`);
+    }
+
+    const commands = readFileSync(join(rootDir, "docs/03-codigo/comandos-cli.md"), "utf8");
+    assert.match(commands, /sdd master init/);
+    assert.match(commands, /sdd master doctor/);
+    assert.match(commands, /sdd master git/);
+  });
 });

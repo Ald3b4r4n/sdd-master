@@ -1,131 +1,107 @@
 # SDD Master
 
-![Status](https://img.shields.io/badge/status-0.1.0--prototype-blue)
+<p align="center">
+  <img src="./assets/readme/sdd-master-hero.svg" alt="SDD Master — Specification-driven development framework" />
+</p>
+
+<p align="center">
+  <strong>Framework rígido para desenvolvimento de software com especificação, TDD, documentação, auditoria, rastreabilidade, segurança e agentes de IA.</strong>
+</p>
+
+![Version](https://img.shields.io/badge/version-0.1.0--prototype-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
-![Runtime](https://img.shields.io/badge/runtime-Node.js%20%2B%20TypeScript-3178c6)
+![Node.js](https://img.shields.io/badge/Node.js-20%2B-43853d)
+![TypeScript](https://img.shields.io/badge/TypeScript-ready-blue)
+![Status](https://img.shields.io/badge/status-prototype-orange)
+![Security](https://img.shields.io/badge/security-first-critical)
+![AI Agents](https://img.shields.io/badge/AI%20agents-ready-6f42c1)
 
-**SDD Master** é um framework de desenvolvimento orientado por especificação para projetos de software assistidos por IA.
+## O que é o SDD Master?
 
-Ele nasce para ajudar equipes a criarem software com fases claras, documentação obrigatória, TDD, auditoria, rastreabilidade, segurança forte e governança técnica desde o primeiro dia.
+O SDD Master é um framework que guia a criação de software passo a passo.
 
-## Status Atual
+Ele impede que uma IA ou desenvolvedor saia codando sem antes definir:
 
-Versão: `0.1.0-prototype`
+- o que será feito;
+- por que será feito;
+- quais testes validam;
+- quais documentos precisam ser atualizados;
+- quais riscos existem;
+- o que pode ou não ir para o GitHub.
 
-Este projeto está em fundação inicial. A base do pacote npm, o CLI mínimo e a documentação pública inicial já existem, mas os comandos operacionais do framework ainda serão implementados em blocos futuros.
+Em linguagem simples: o SDD Master coloca trilhos, freios e evidências no processo de desenvolvimento assistido por IA.
 
-## Para Que Serve
+## Como funciona tecnicamente?
 
-O SDD Master será usado para conduzir projetos por fases controladas:
+O SDD Master combina:
 
-- especificação antes da implementação;
-- documentação como parte obrigatória do trabalho;
-- testes antes ou junto do código;
-- auditoria e rastreabilidade das decisões;
-- compatibilidade com múltiplas IAs e agentes;
-- proteção contra vazamento de segredos e mudanças sem controle.
+- CLI npm;
+- estrutura `.sdd-master/`;
+- documentação pública em `docs/`;
+- templates oficiais;
+- comandos de diagnóstico;
+- arquivos de instrução para agentes;
+- validações de segurança/Git;
+- governança por fase;
+- TDD obrigatório;
+- auditoria e rastreabilidade.
 
-## Instalação Futura Via npm
-
-Quando o pacote estiver pronto para distribuição, a instalação pretendida será:
+## Instalação futura via npm
 
 ```bash
 npm install -g sdd-master
+sdd master init
 ```
 
-Publicação no npm ainda não faz parte deste estágio.
+O pacote ainda está em prototype e não foi publicado no npm.
 
-## Uso Atual Local
-
-Neste estágio, use o projeto localmente:
+## Uso local durante desenvolvimento
 
 ```bash
 npm install
 npm run build
-node dist/cli/main.js --help
-node dist/cli/main.js --version
-node dist/cli/main.js master --help
 node dist/cli/main.js master help
-node dist/cli/main.js master status
 ```
 
-## Comandos disponíveis no prototype atual
+## Comandos atuais
 
-```bash
-sdd --help
-sdd --version
-sdd master --help
-sdd master help
-sdd master help init
-sdd master status
+| Comando | Status | O que faz |
+|---|---|---|
+| `sdd master help` | Disponível | Mostra ajuda |
+| `sdd master init` | Disponível | Inicializa estrutura SDD Master |
+| `sdd master doctor` | Disponível | Diagnostica instalação |
+| `sdd master agents` | Disponível | Gera instruções multi-IA |
+| `sdd master git` | Disponível | Valida Git e segurança |
+| `sdd master update` | Planejado | Atualizará templates/estrutura |
+
+## Fluxo visual
+
+![Fluxo SDD Master](./assets/readme/workflow-overview.svg)
+
+```mermaid
+flowchart TD
+  A[Discovery] --> B[Requirements]
+  B --> C[Architecture]
+  C --> D[Specification]
+  D --> E[Plan]
+  E --> F[Tasks]
+  F --> G[Tests first]
+  G --> H[Implementation]
+  H --> I[Documentation]
+  I --> J[Quality]
+  J --> K[Audit]
+  K --> L[Commit]
+  L --> M[Delivery]
 ```
-
-Neste prototype, `sdd master init` inicializa a estrutura SDD Master em um projeto consumidor, e `sdd master status` detecta a instalação básica.
-
-O comando `init` pode ser usado em modo não interativo:
-
-```bash
-sdd master init --yes --language=pt-BR --agent=codex --project-name="Projeto Teste"
-```
-
-Ele cria `.sdd-master/`, `docs/`, `.agents/skills/`, atualiza `.gitignore` de forma segura e cria ou complementa o README do projeto consumidor.
-
-Os comandos `doctor` e `update` ainda existem apenas como stubs seguros:
-
-```bash
-sdd master doctor
-sdd master update
-```
-
-## Templates oficiais
-
-O SDD Master instala templates locais em `.sdd-master/templates/`.
-
-Esses templates cobrem:
-
-- requisitos;
-- produto;
-- arquitetura;
-- código;
-- workflow;
-- governança;
-- segurança;
-- UI/UX;
-- operações;
-- agentes/IA.
-
-Os templates são instalados localmente no projeto consumidor para permitir retomada por qualquer IA/agente sem depender de estado externo. Eles são pontos de partida: documentos reais devem ser criados a partir dos templates, revisados e aprovados pelo fluxo SDD Master.
-
-## Diagnóstico com doctor
-
-Use:
-
-```bash
-sdd master doctor
-```
-
-Para saída JSON:
-
-```bash
-sdd master doctor --json
-```
-
-O doctor verifica:
-
-- estrutura `.sdd-master/`;
-- documentação pública;
-- templates oficiais;
-- `.gitignore`;
-- arquivos sensíveis;
-- Git básico;
-- estado do projeto.
 
 ## Compatibilidade multi-IA
+
+![Multi-IA](./assets/readme/multi-ai-support.svg)
 
 O SDD Master pode gerar arquivos de instrução para diferentes agentes de codificação:
 
 - Codex: `AGENTS.md`
-- Claude Code: `CLAUDE.md`
+- Claude: `CLAUDE.md`
 - Cursor: `.cursor/rules/sdd-master.mdc`
 - Gemini: `GEMINI.md`
 - Copilot: `.github/copilot-instructions.md`
@@ -139,7 +115,18 @@ sdd master agents --yes --agents=codex,claude,cursor --language=pt-BR
 
 Esses arquivos orientam cada IA a ler a constituição, respeitar o estado do projeto, não pular fases, não fazer push sem autorização humana e não expor `.env`, segredos, tokens ou credenciais.
 
-## Segurança e Git
+## Segurança
+
+![Safety Gates](./assets/readme/safety-gates.svg)
+
+Regras fortes do SDD Master:
+
+- não commitar `.env`;
+- não expor segredo;
+- não fazer push sem autorização humana;
+- não enviar `.sdd-master/` ao remoto do produto;
+- testar antes de implementar;
+- documentar e auditar antes de avançar.
 
 Use:
 
@@ -149,62 +136,98 @@ sdd master git --pre-commit
 sdd master git --pre-push
 ```
 
-O comando verifica:
+O comando verifica arquivos sensíveis, possíveis segredos, `.gitignore`, risco de envio de `.sdd-master/` e status básico do Git. O SDD Master nunca executa push automaticamente.
 
-- arquivos `.env` reais;
-- arquivos sensíveis;
-- possíveis segredos;
-- `.gitignore`;
-- risco de envio de `.sdd-master/`;
-- status básico do Git.
-
-O SDD Master nunca executa push automaticamente.
-
-## Scripts do Projeto
-
-```bash
-npm run build
-npm test
-npm run lint
-npm run format
-npm run check
-```
-
-## Roadmap Resumido
-
-- Fundação do pacote npm.
-- CLI mínimo expandido.
-- Comando de inicialização em projetos consumidores.
-- Governança por fases SDD.
-- Templates de documentação e arquitetura.
-- Integração com agentes de IA.
-- Auditoria, segurança e rastreabilidade.
-- Preparação para repositório público e publicação.
-
-## Princípios do SDD Master
-
-- Especificar antes de implementar.
-- Documentar decisões relevantes.
-- Validar com testes objetivos.
-- Manter rastreabilidade entre requisito, arquitetura, código e auditoria.
-- Tratar segurança como requisito do produto, não como etapa opcional.
-- Preservar compatibilidade com equipes humanas e agentes de IA.
-
-## Compatibilidade Futura Multi-IA
-
-O framework será desenhado para funcionar com diferentes assistentes e agentes de IA, evitando dependência rígida de um único fornecedor. A meta é que cada agente respeite as mesmas fases, artefatos, contratos de segurança e critérios de conclusão.
-
-## Segurança
-
-Não envie `.env` real, tokens, senhas, chaves privadas, certificados, credenciais ou qualquer dado sensível para o repositório.
-
-Use arquivos de exemplo apenas com placeholders seguros, como:
+## Estrutura gerada no projeto consumidor
 
 ```text
-EXAMPLE_API_KEY=replace-me
+.sdd-master/
+  constitution.md
+  project-state.md
+  templates/
+  audits/
+  traceability/
+  approvals/
+
+docs/
+  01-negocio-requisitos/
+  02-tecnica-arquitetura/
+  03-codigo/
+
+.agents/
+  skills/
 ```
 
-Consulte [SECURITY.md](SECURITY.md) antes de reportar vulnerabilidades ou compartilhar qualquer evidência sensível.
+## Exemplos de saída
+
+```bash
+sdd master doctor
+```
+
+```text
+SDD Master — Doctor
+
+Status geral:
+  healthy
+
+Próximo passo recomendado:
+  /sdd-master-discovery
+```
+
+```bash
+sdd master git --pre-push
+```
+
+```text
+SDD Master — Git/Security Check
+
+Status geral:
+  clean
+
+Decisão:
+  Nenhum bloqueio crítico encontrado.
+```
+
+```bash
+sdd master agents --yes --agents=codex,claude,cursor --language=pt-BR
+```
+
+```text
+SDD Master — Agentes configurados
+
+Agentes:
+  codex, claude, cursor
+```
+
+## Templates oficiais
+
+O SDD Master instala templates locais em `.sdd-master/templates/` para requisitos, produto, arquitetura, código, workflow, governança, segurança, UI/UX, operações e agentes/IA.
+
+Templates são pontos de partida. Documentos reais devem ser criados a partir deles, revisados e aprovados pelo fluxo SDD Master.
+
+## Documentação pública
+
+- [Visão do produto](docs/01-negocio-requisitos/visao-do-produto.md)
+- [Arquitetura do framework](docs/02-tecnica-arquitetura/arquitetura-do-framework.md)
+- [Compatibilidade multi-IA](docs/02-tecnica-arquitetura/compatibilidade-multi-ia.md)
+- [Segurança e governança](docs/02-tecnica-arquitetura/seguranca-e-governanca.md)
+- [Comandos CLI](docs/03-codigo/comandos-cli.md)
+- [Desenvolvimento local](docs/03-codigo/desenvolvimento-local.md)
+
+## Roadmap
+
+- Fundação npm
+- CLI base
+- Init
+- Templates
+- Doctor
+- Multi-IA
+- Git/Security
+- README premium
+- Testes/qualidade
+- GitHub público
+- Release prototype
+- npm package
 
 ## Licença
 

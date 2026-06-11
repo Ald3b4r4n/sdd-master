@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="420" viewBox="0 0 1200 420" role="img" aria-labelledby="title desc">
+  <title id="title">SDD Master hero</title>
+  <desc id="desc">Specification-driven development banner for AI-assisted software projects.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#07111f"/>
+      <stop offset="0.55" stop-color="#123047"/>
+      <stop offset="1" stop-color="#174236"/>
+    </linearGradient>
+    <linearGradient id="line" x1="0" x2="1">
+      <stop offset="0" stop-color="#5eead4"/>
+      <stop offset="1" stop-color="#93c5fd"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="420" rx="28" fill="url(#bg)"/>
+  <path d="M80 302 C250 206 384 342 548 235 C694 140 850 216 1120 106" fill="none" stroke="url(#line)" stroke-width="5" opacity="0.85"/>
+  <g fill="#dbeafe" font-family="Segoe UI, Arial, sans-serif">
+    <text x="78" y="135" font-size="64" font-weight="800">SDD Master</text>
+    <text x="82" y="184" font-size="26" fill="#b7f7e8">Specification-driven development for AI-assisted software projects</text>
+  </g>
+  <g font-family="Segoe UI, Arial, sans-serif" font-size="18" font-weight="700">
+    <rect x="82" y="244" width="142" height="62" rx="12" fill="#0f172a" stroke="#5eead4"/>
+    <text x="111" y="282" fill="#e0f2fe">Spec</text>
+    <rect x="250" y="244" width="142" height="62" rx="12" fill="#0f172a" stroke="#93c5fd"/>
+    <text x="286" y="282" fill="#e0f2fe">Tests</text>
+    <rect x="418" y="244" width="142" height="62" rx="12" fill="#0f172a" stroke="#facc15"/>
+    <text x="449" y="282" fill="#e0f2fe">Docs</text>
+    <rect x="586" y="244" width="142" height="62" rx="12" fill="#0f172a" stroke="#fda4af"/>
+    <text x="615" y="282" fill="#e0f2fe">Audit</text>
+    <rect x="754" y="244" width="142" height="62" rx="12" fill="#0f172a" stroke="#c4b5fd"/>
+    <text x="781" y="282" fill="#e0f2fe">Safety</text>
+    <rect x="922" y="244" width="142" height="62" rx="12" fill="#0f172a" stroke="#86efac"/>
+    <text x="952" y="282" fill="#e0f2fe">Agents</text>
+  </g>
+  <g opacity="0.75" stroke="#dbeafe" stroke-width="2">
+    <circle cx="1040" cy="92" r="38" fill="none"/>
+    <path d="M1022 96 l14 14 l28 -36" fill="none"/>
+  </g>
+</svg>

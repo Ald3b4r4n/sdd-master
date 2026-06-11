@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="340" viewBox="0 0 1100 340" role="img" aria-labelledby="title desc">
+  <title id="title">SDD Master safety gates</title>
+  <desc id="desc">Safety gates for specification, tests, docs, security, audit and human approval.</desc>
+  <rect width="1100" height="340" rx="24" fill="#111827"/>
+  <text x="56" y="62" fill="#f8fafc" font-family="Segoe UI, Arial, sans-serif" font-size="32" font-weight="800">Safety Gates</text>
+  <g font-family="Segoe UI, Arial, sans-serif" font-size="18" font-weight="750">
+    <rect x="58" y="116" width="150" height="80" rx="14" fill="#1e293b" stroke="#5eead4"/><text x="82" y="150" fill="#e0f2fe">Spec</text><text x="82" y="176" fill="#e0f2fe">Approved</text>
+    <rect x="232" y="116" width="150" height="80" rx="14" fill="#1e293b" stroke="#93c5fd"/><text x="263" y="150" fill="#e0f2fe">Tests</text><text x="263" y="176" fill="#e0f2fe">First</text>
+    <rect x="406" y="116" width="150" height="80" rx="14" fill="#1e293b" stroke="#facc15"/><text x="432" y="150" fill="#e0f2fe">Docs</text><text x="432" y="176" fill="#e0f2fe">Updated</text>
+    <rect x="580" y="116" width="150" height="80" rx="14" fill="#1e293b" stroke="#f87171"/><text x="604" y="150" fill="#e0f2fe">Security</text><text x="604" y="176" fill="#e0f2fe">Check</text>
+    <rect x="754" y="116" width="150" height="80" rx="14" fill="#1e293b" stroke="#c4b5fd"/><text x="786" y="150" fill="#e0f2fe">Audit</text><text x="786" y="176" fill="#e0f2fe">Passed</text>
+    <rect x="928" y="116" width="150" height="80" rx="14" fill="#1e293b" stroke="#86efac"/><text x="952" y="150" fill="#e0f2fe">Human</text><text x="952" y="176" fill="#e0f2fe">Approval</text>
+  </g>
+  <path d="M132 238 H1000" stroke="#334155" stroke-width="4" stroke-linecap="round"/>
+  <g fill="#5eead4">
+    <circle cx="132" cy="238" r="8"/><circle cx="306" cy="238" r="8"/><circle cx="480" cy="238" r="8"/><circle cx="654" cy="238" r="8"/><circle cx="828" cy="238" r="8"/><circle cx="1002" cy="238" r="8"/>
+  </g>
+</svg>
