@@ -5,6 +5,13 @@ const rootDir = process.cwd();
 const requiredFiles = [
   "README.md",
   "CHANGELOG.md",
+  ".github/ISSUE_TEMPLATE/bug_report.md",
+  ".github/ISSUE_TEMPLATE/documentation_request.md",
+  ".github/ISSUE_TEMPLATE/feature_request.md",
+  ".github/ISSUE_TEMPLATE/security_notice.md",
+  ".github/ISSUE_TEMPLATE/skill_request.md",
+  ".github/pull_request_template.md",
+  ".github/workflows/ci.yml",
   "docs/01-negocio-requisitos/visao-do-produto.md",
   "docs/02-tecnica-arquitetura/arquitetura-do-framework.md",
   "docs/02-tecnica-arquitetura/compatibilidade-multi-ia.md",

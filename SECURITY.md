@@ -1,10 +1,12 @@
 # Política de Segurança
 
+Security contact: to be defined before the first public release.
+
 ## Reporte Responsável
 
 Não abra issue pública contendo segredo, token, senha, chave privada, certificado, credencial, dado pessoal ou qualquer evidência sensível.
 
-Se encontrar uma vulnerabilidade, reporte de forma responsável ao mantenedor do projeto por um canal privado combinado previamente. Quando o repositório público estiver ativo, este documento será atualizado com o canal oficial de contato.
+Se encontrar uma vulnerabilidade, reporte de forma responsável ao mantenedor do projeto por um canal privado combinado previamente. Antes do primeiro release público, este documento será atualizado com o canal oficial de contato.
 
 ## Segredos e Credenciais
 
@@ -12,6 +14,11 @@ Se encontrar uma vulnerabilidade, reporte de forma responsável ao mantenedor do
 - Nunca versione `.env` real.
 - Use apenas placeholders em arquivos de exemplo.
 - Remova dados sensíveis de logs, prints, relatórios e testes.
+- Não publique dados pessoais, arquivos privados ou conteúdo interno de `.sdd-master/` de projetos consumidores.
+
+## Repositório Público
+
+Issues públicas, Pull Requests e anexos não devem conter `.env`, tokens, credenciais, chaves privadas, certificados, dados pessoais, logs sensíveis ou exemplos copiados de projetos privados. Use placeholders seguros e descreva o risco sem revelar valores.
 
 ## Secret Scanning Futuro
 

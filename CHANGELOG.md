@@ -39,6 +39,10 @@
 - Dry-run de empacotamento com bloqueio de arquivos sensíveis.
 - Checks adicionais para documentação e assets.
 - Hardening do script `npm run check`.
+- Estrutura inicial `.github/` para repositório público.
+- Workflow de CI sem deploy/publicação.
+- Templates de issue e Pull Request.
+- Reforço na documentação de contribuição e segurança.
 - Atualização segura de README e `.gitignore` em projetos consumidores.
 - Detecção básica de instalação pelo `sdd master status`.
 - Documentação pública inicial.

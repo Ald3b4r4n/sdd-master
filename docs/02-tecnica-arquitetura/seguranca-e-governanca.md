@@ -24,6 +24,12 @@ Pode existir localmente para governança, mas não deve ser enviado ao remoto do
 
 Push, mudança de escopo, aceitação de risco e avanço de fase exigem autorização humana.
 
+## GitHub público
+
+O repositório público deve usar templates de issue e Pull Request para reforçar escopo, checks e revisão de segurança. O CI deve validar build, testes, smoke test, package check, dry-run de empacotamento e check completo, sem publicar pacote, criar release ou executar deploy.
+
+Issues públicas e Pull Requests não devem conter `.env`, tokens, credenciais, chaves privadas, certificados, dados pessoais, logs sensíveis ou conteúdo interno de `.sdd-master/` de projetos consumidores.
+
 ## Separação produto/governança
 
 Commits de produto e commits internos de governança devem ser separados quando isso reduzir risco e melhorar revisão.

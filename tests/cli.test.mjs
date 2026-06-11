@@ -1029,4 +1029,86 @@ describe("SDD Master package foundation", () => {
     assert.match(localDevelopment, /npm run package:check/);
     assert.match(localDevelopment, /npm run pack:dry-run/);
   });
+
+  it("includes public GitHub repository templates and safe CI", () => {
+    const ci = readFileSync(join(rootDir, ".github", "workflows", "ci.yml"), "utf8");
+    const prTemplate = readFileSync(join(rootDir, ".github", "pull_request_template.md"), "utf8");
+    const contributing = readFileSync(join(rootDir, "CONTRIBUTING.md"), "utf8");
+    const security = readFileSync(join(rootDir, "SECURITY.md"), "utf8");
+    const readme = readFileSync(join(rootDir, "README.md"), "utf8");
+    const localDevelopment = readFileSync(
+      join(rootDir, "docs", "03-codigo", "desenvolvimento-local.md"),
+      "utf8"
+    );
+
+    const issueTemplates = [
+      ".github/ISSUE_TEMPLATE/bug_report.md",
+      ".github/ISSUE_TEMPLATE/feature_request.md",
+      ".github/ISSUE_TEMPLATE/documentation_request.md",
+      ".github/ISSUE_TEMPLATE/skill_request.md",
+      ".github/ISSUE_TEMPLATE/security_notice.md"
+    ];
+
+    assert.match(ci, /^name: CI/m);
+    assert.match(ci, /pull_request:/);
+    assert.match(ci, /push:/);
+    assert.match(ci, /branches:\n\s+- main/);
+    assert.match(ci, /ubuntu-latest/);
+    assert.match(ci, /node-version: "20"/);
+    assert.match(ci, /run: npm ci/);
+    assert.match(ci, /run: npm run build/);
+    assert.match(ci, /run: npm test/);
+    assert.match(ci, /run: npm run smoke/);
+    assert.match(ci, /run: npm run package:check/);
+    assert.match(ci, /run: npm run pack:dry-run/);
+    assert.match(ci, /run: npm run check/);
+    assert.match(ci, /permissions:\n\s+contents: read/);
+    assert.doesNotMatch(ci, /npm publish/);
+    assert.doesNotMatch(ci, /\bdeploy\b/i);
+    assert.doesNotMatch(ci, /secrets\./i);
+    assert.doesNotMatch(ci, /contents: write/);
+
+    assert.equal(existsSync(join(rootDir, ".github", "pull_request_template.md")), true);
+    assert.match(prTemplate, /npm run check/);
+    assert.match(prTemplate, /real `\.env`/);
+    assert.match(prTemplate, /secrets, tokens, credentials/);
+
+    for (const template of issueTemplates) {
+      const content = readFileSync(join(rootDir, template), "utf8");
+      assert.equal(content.trim().length > 0, true, `${template} should not be empty`);
+      assert.match(content, /Do not|Não|do not/i);
+      assert.match(content, /tokens|segredo|Secret|secret/i);
+    }
+
+    assert.match(contributing, /npm run check/);
+    assert.match(contributing, /tipo\(phase-XX\): descrição/);
+    assert.match(security, /Security contact: to be defined before the first public release\./);
+    assert.match(security, /\.env/);
+    assert.match(security, /tokens/);
+    assert.match(security, /dados sensíveis|dados pessoais/);
+    assert.match(readme, /## Contribuição e GitHub/);
+    assert.match(readme, /Nunca publique `.env`, tokens, credenciais/);
+    assert.match(localDevelopment, /## Simulando o CI localmente/);
+    assert.match(localDevelopment, /npm run check/);
+
+    assert.equal(existsSync(join(rootDir, "SDD Master Roadmap.pdf")), true);
+    assert.equal(
+      existsSync(join(rootDir, "SDD Master — Checklist de Implementação v0.1.pdf")),
+      true
+    );
+    assert.equal(existsSync(join(rootDir, "SDD Master — Documento Mestre v0.1.pdf")), true);
+
+    const reviewedFiles = [
+      ci,
+      prTemplate,
+      contributing,
+      security,
+      readme,
+      localDevelopment,
+      ...issueTemplates.map((template) => readFileSync(join(rootDir, template), "utf8"))
+    ].join("\n");
+
+    assert.doesNotMatch(reviewedFiles, /sk-[A-Za-z0-9_-]{20,}/);
+    assert.doesNotMatch(reviewedFiles, /BEGIN (RSA |EC |OPENSSH |)PRIVATE KEY/);
+  });
 });

@@ -232,6 +232,12 @@ npm run pack:dry-run
 
 Esses scripts verificam se o pacote contém os arquivos necessários para uso via CLI e se arquivos proibidos ficam fora do empacotamento npm.
 
+## Contribuição e GitHub
+
+Contribuições devem usar os templates de issue e Pull Request do repositório. Antes de enviar uma mudança para revisão, execute `npm run check` e registre os checks relevantes no Pull Request.
+
+Nunca publique `.env`, tokens, credenciais, chaves privadas, certificados, dados pessoais, logs sensíveis ou conteúdo interno de `.sdd-master/` de projetos consumidores. Issues públicas devem descrever problemas sem expor valores ou arquivos privados.
+
 ## Documentação pública
 
 - [Visão do produto](docs/01-negocio-requisitos/visao-do-produto.md)

@@ -50,6 +50,19 @@ npm run check
 
 Executa build, testes, lint, formatação, smoke test, package check e dry-run de empacotamento.
 
+## Simulando o CI localmente
+
+O workflow público executa a mesma sequência básica esperada antes de revisão:
+
+```bash
+npm run build
+npm test
+npm run smoke
+npm run package:check
+npm run pack:dry-run
+npm run check
+```
+
 ## Executar CLI local
 
 ```bash
