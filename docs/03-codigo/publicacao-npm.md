@@ -9,12 +9,12 @@ Execute:
 ```bash
 npm run check
 npm run release:check
-npm publish --dry-run --access public
+npm publish --dry-run --access public --tag prototype
 ```
 
 O dry-run ajuda a confirmar quais arquivos entrariam no pacote e se a configuração npm está coerente, sem publicar a versão real.
 
-Como `0.1.0-prototype` é uma versão prerelease, a configuração do pacote usa a tag npm `prototype` para evitar publicação acidental como `latest`.
+Como `0.1.0-prototype.1` é uma versão prerelease, a configuração do pacote usa a tag npm `prototype` para evitar publicação acidental como `latest`. O comando deve informar `--tag prototype` explicitamente.
 
 ## Antes da primeira publicação npm
 
@@ -22,7 +22,7 @@ Antes de publicar de verdade:
 
 ```bash
 npm run check
-npm publish --dry-run --access public
+npm publish --dry-run --access public --tag prototype
 ```
 
 A publicação real exige:
@@ -48,7 +48,8 @@ Antes de uma publicação real:
 - Confirmar a tag npm de prerelease.
 - Confirmar autenticação npm.
 - Confirmar acesso ao pacote ou escopo npm.
-- Confirmar que `npm publish --dry-run --access public` passou.
+- Confirmar que `npm publish --dry-run --access public --tag prototype` passou.
+- Confirmar que o output do dry-run não aponta para `latest`.
 - Confirmar aprovação humana explícita.
 
 ## Publicação real

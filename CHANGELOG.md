@@ -1,5 +1,22 @@
 # Changelog
 
+## [0.1.0-prototype.1] - 2026-06-11
+
+### Alterado
+
+- Atualizada versão prerelease para consolidar os ajustes finais após `v0.1.0-prototype`.
+- Alinhada documentação pública de release, GitHub Release e publicação npm futura para `v0.1.0-prototype.1`.
+
+### Corrigido
+
+- Mantida a tag `v0.1.0-prototype` sem reescrita.
+- Preparada nova tag `v0.1.0-prototype.1` para refletir o estado atual do projeto.
+
+### Segurança
+
+- Nenhum segredo, `.env` real, credencial ou dado sensível foi incluído.
+- npm publish real ainda não foi executado.
+
 ## [0.1.0-prototype] - 2026-06-11
 
 ### Adicionado

@@ -31,6 +31,12 @@ const failures = [];
 if (!packageJson.name) failures.push("package.json must have name.");
 if (!packageJson.version) failures.push("package.json must have version.");
 if (packageJson.license !== "MIT") failures.push("package.json license must be MIT.");
+if (packageJson.publishConfig?.access !== "public") {
+  failures.push("package.json publishConfig.access must be public.");
+}
+if (packageJson.publishConfig?.tag !== "prototype") {
+  failures.push("package.json publishConfig.tag must be prototype.");
+}
 if (!["./dist/cli/main.js", "dist/cli/main.js"].includes(packageJson.bin?.sdd)) {
   failures.push("package.json bin.sdd must point to dist/cli/main.js.");
 }

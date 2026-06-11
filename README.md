@@ -8,7 +8,7 @@
   <strong>Framework rígido para desenvolvimento de software com especificação, TDD, documentação, auditoria, rastreabilidade, segurança e agentes de IA.</strong>
 </p>
 
-![Version](https://img.shields.io/badge/version-0.1.0--prototype-blue)
+![Version](https://img.shields.io/badge/version-0.1.0--prototype.1-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
 ![Node.js](https://img.shields.io/badge/Node.js-20%2B-43853d)
 ![TypeScript](https://img.shields.io/badge/TypeScript-ready-blue)
@@ -237,18 +237,20 @@ Esses scripts verificam se o pacote contém os arquivos necessários para uso vi
 A versão atual é:
 
 ```text
-0.1.0-prototype
+0.1.0-prototype.1
 ```
+
+Esta versão consolida ajustes finais após a tag inicial `v0.1.0-prototype`, sem reescrever o histórico Git nem mover a tag já publicada.
 
 Antes de qualquer publicação:
 
 ```bash
 npm run check
 npm run release:check
-npm publish --dry-run --access public
+npm publish --dry-run --access public --tag prototype
 ```
 
-Esta versão prototype usa a tag npm `prototype`, não `latest`.
+Esta versão prototype usa a tag npm `prototype`, não `latest`. Use `--tag prototype` explicitamente em dry-runs e em qualquer publicação futura aprovada.
 
 A publicação real no npm e o push para GitHub exigem aprovação humana explícita.
 
@@ -257,12 +259,13 @@ A publicação real no npm e o push para GitHub exigem aprovação humana explí
 A primeira versão pública preparada é:
 
 ```text
-v0.1.0-prototype
+v0.1.0-prototype.1
 ```
 
 Status:
 
-- Tag enviada ao GitHub.
+- Tag inicial `v0.1.0-prototype` preservada sem reescrita.
+- Nova tag `v0.1.0-prototype.1` preparada para alinhar versão, documentação e release draft futura.
 - GitHub Release final ainda não publicada.
 - npm publish real ainda não executado.
 
@@ -274,7 +277,7 @@ O SDD Master possui preparação para:
 
 - GitHub Release draft;
 - publicação npm futura;
-- validação local com `npm publish --dry-run --access public`.
+- validação local com `npm publish --dry-run --access public --tag prototype`.
 
 A publicação real no npm e a publicação final da GitHub Release exigem aprovação humana explícita.
 
