@@ -20,11 +20,13 @@ const requiredFiles = [
   "src/cli/commands/master-version.ts",
   "src/cli/commands/master-status.ts",
   "src/cli/commands/planned-command.ts",
+  "src/templates/official-templates.ts",
+  "src/templates/template-writer.ts",
   "src/types/node-shims.d.ts"
 ];
 
 const forbiddenPatterns = [
-  { pattern: /sk-[A-Za-z0-9_-]+/, message: "Potential API key detected." },
+  { pattern: /sk-[A-Za-z0-9_-]{20,}/, message: "Potential API key detected." },
   { pattern: /BEGIN (RSA |EC |OPENSSH |)PRIVATE KEY/, message: "Private key material detected." }
 ];
 

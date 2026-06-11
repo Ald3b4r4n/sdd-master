@@ -77,7 +77,24 @@ sdd master doctor
 sdd master update
 ```
 
-Os templates oficiais completos ainda serão implementados no BLOCO 04.
+## Templates oficiais
+
+O SDD Master instala templates locais em `.sdd-master/templates/`.
+
+Esses templates cobrem:
+
+- requisitos;
+- produto;
+- arquitetura;
+- código;
+- workflow;
+- governança;
+- segurança;
+- UI/UX;
+- operações;
+- agentes/IA.
+
+Os templates são instalados localmente no projeto consumidor para permitir retomada por qualquer IA/agente sem depender de estado externo. Eles são pontos de partida: documentos reais devem ser criados a partir dos templates, revisados e aprovados pelo fluxo SDD Master.
 
 ## Scripts do Projeto
 

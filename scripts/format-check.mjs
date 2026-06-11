@@ -21,6 +21,8 @@ const files = [
   "src/cli/commands/master-version.ts",
   "src/cli/commands/master-status.ts",
   "src/cli/commands/planned-command.ts",
+  "src/templates/official-templates.ts",
+  "src/templates/template-writer.ts",
   "src/types/node-shims.d.ts",
   "tests/cli.test.mjs",
   "scripts/lint.mjs",

@@ -33,6 +33,25 @@ function withTempProject(callback) {
   }
 }
 
+function collectMarkdownFiles(directory, base = directory) {
+  const files = [];
+
+  for (const entry of readdirSync(directory, { withFileTypes: true })) {
+    const fullPath = join(directory, entry.name);
+
+    if (entry.isDirectory()) {
+      files.push(...collectMarkdownFiles(fullPath, base));
+      continue;
+    }
+
+    if (entry.name.endsWith(".md")) {
+      files.push(fullPath.slice(base.length + 1).replace(/\\/g, "/"));
+    }
+  }
+
+  return files;
+}
+
 describe("SDD Master package foundation", () => {
   it("responds to the root help command", () => {
     const result = runCli(["--help"]);
@@ -117,6 +136,7 @@ describe("SDD Master package foundation", () => {
       assert.equal(result.status, 0);
       assert.match(result.stdout, /SDD Master inicializado com sucesso/);
       assert.match(result.stdout, /Projeto Teste/);
+      assert.match(result.stdout, /Templates oficiais:\s+Criados: \d+\s+Já existentes: 0/);
 
       const requiredDirectories = [
         ".sdd-master/discovery",
@@ -146,6 +166,18 @@ describe("SDD Master package foundation", () => {
         "docs/03-codigo",
         ".agents/skills"
       ];
+      const templateCategories = [
+        "requirements",
+        "product",
+        "architecture",
+        "code",
+        "workflow",
+        "governance",
+        "security",
+        "uiux",
+        "operations",
+        "agents"
+      ];
 
       assert.equal(existsSync(join(projectDir, ".sdd-master")), true);
       assert.equal(existsSync(join(projectDir, ".sdd-master", "constitution.md")), true);
@@ -157,6 +189,14 @@ describe("SDD Master package foundation", () => {
         assert.equal(statSync(join(projectDir, directory)).isDirectory(), true);
       }
 
+      for (const category of templateCategories) {
+        assert.equal(
+          existsSync(join(projectDir, ".sdd-master", "templates", category)),
+          true,
+          `${category} template category should exist`
+        );
+      }
+
       const projectState = readFileSync(join(projectDir, ".sdd-master", "project-state.md"), "utf8");
       assert.match(projectState, /Nome do projeto: Projeto Teste/);
       assert.match(projectState, /Idioma operacional: pt-BR/);
@@ -166,7 +206,60 @@ describe("SDD Master package foundation", () => {
         join(projectDir, ".sdd-master", "templates", "README.md"),
         "utf8"
       );
-      assert.match(templatesReadme, /Templates completos pendentes/);
+      assert.match(templatesReadme, /biblioteca local de templates oficiais/);
+      assert.match(templatesReadme, /Templates não são documentação aprovada/);
+
+      const templateRoot = join(projectDir, ".sdd-master", "templates");
+      const markdownTemplates = collectMarkdownFiles(templateRoot);
+      assert.equal(markdownTemplates.length >= 40, true);
+
+      const requiredTemplates = [
+        "requirements/functional-requirement-template.md",
+        "architecture/adr-template.md",
+        "workflow/task-template.md",
+        "workflow/audit-template.md",
+        "uiux/design-system-template.md",
+        "security/secret-scan-template.md",
+        "workflow/release-template.md"
+      ];
+
+      for (const template of requiredTemplates) {
+        assert.equal(markdownTemplates.includes(template), true, `${template} should exist`);
+        const content = readFileSync(join(templateRoot, template), "utf8");
+        assert.equal(content.trim().length > 0, true, `${template} should not be empty`);
+        assert.match(content, /## Metadados/);
+        assert.match(content, /## Rastreabilidade/);
+        assert.match(content, /## Histórico de alterações/);
+      }
+
+      assert.match(
+        readFileSync(join(templateRoot, "requirements", "functional-requirement-template.md"), "utf8"),
+        /## Critérios de aceite/
+      );
+      assert.match(
+        readFileSync(join(templateRoot, "architecture", "adr-template.md"), "utf8"),
+        /## Alternativas consideradas/
+      );
+      assert.match(
+        readFileSync(join(templateRoot, "workflow", "task-template.md"), "utf8"),
+        /## Testes obrigatórios/
+      );
+      assert.match(
+        readFileSync(join(templateRoot, "workflow", "audit-template.md"), "utf8"),
+        /## Relação com requisito\/tarefa\/documento\/teste\/commit/
+      );
+      assert.match(
+        readFileSync(join(templateRoot, "uiux", "design-system-template.md"), "utf8"),
+        /## Microcopy/
+      );
+      assert.match(
+        readFileSync(join(templateRoot, "security", "secret-scan-template.md"), "utf8"),
+        /## Achados sem expor valores sensíveis/
+      );
+      assert.match(
+        readFileSync(join(templateRoot, "workflow", "release-template.md"), "utf8"),
+        /## Aprovação humana/
+      );
 
       const gitignore = readFileSync(join(projectDir, ".gitignore"), "utf8");
       assert.match(gitignore, /node_modules\//);
@@ -209,6 +302,14 @@ describe("SDD Master package foundation", () => {
       );
       const statePath = join(projectDir, ".sdd-master", "project-state.md");
       writeFileSync(statePath, "estado preservado\n", "utf8");
+      const templatePath = join(
+        projectDir,
+        ".sdd-master",
+        "templates",
+        "requirements",
+        "functional-requirement-template.md"
+      );
+      writeFileSync(templatePath, "template preservado\n", "utf8");
 
       const second = runCli(
         ["master", "init", "-y", "--language=en", "--agent=claude", "--project-name=Other"],
@@ -218,7 +319,9 @@ describe("SDD Master package foundation", () => {
       assert.equal(first.status, 0);
       assert.equal(second.status, 0);
       assert.match(second.stdout, /Projeto já parece inicializado/);
+      assert.match(second.stdout, /Templates oficiais:/);
       assert.equal(readFileSync(statePath, "utf8"), "estado preservado\n");
+      assert.equal(readFileSync(templatePath, "utf8"), "template preservado\n");
     });
   });
 
@@ -253,6 +356,7 @@ describe("SDD Master package foundation", () => {
       assert.match(status.stdout, /Instalação SDD Master:\s+Detectada/);
       assert.match(status.stdout, /\.sdd-master\/constitution.md: OK/);
       assert.match(status.stdout, /docs\/03-codigo\/: OK/);
+      assert.match(status.stdout, /\.sdd-master\/templates\/: OK/);
       assert.match(status.stdout, /\/sdd-master-discovery/);
     });
   });

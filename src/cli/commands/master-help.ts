@@ -17,12 +17,17 @@ const commandHelps: Record<string, CommandHelp> = {
     example: "sdd master init",
     creates: [
       ".sdd-master/",
+      ".sdd-master/templates/",
       "docs/01-negocio-requisitos/",
       "docs/02-tecnica-arquitetura/",
       "docs/03-codigo/",
       ".agents/skills/"
     ],
-    security: ["Não deve criar .env real.", "Não deve enviar .sdd-master/ para remoto."]
+    security: [
+      "Instala templates oficiais em .sdd-master/templates/.",
+      "Não deve criar .env real.",
+      "Não deve enviar .sdd-master/ para remoto."
+    ]
   },
   doctor: {
     command: "doctor",

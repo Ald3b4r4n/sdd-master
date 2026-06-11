@@ -13,6 +13,9 @@
 - Stubs seguros para doctor e update.
 - Comando funcional `sdd master init`.
 - Criação segura da estrutura inicial `.sdd-master/`.
+- Biblioteca inicial de templates oficiais do SDD Master.
+- Instalação local dos templates pelo comando `sdd master init`.
+- Estrutura de templates para requisitos, arquitetura, workflow, governança, segurança, UI/UX, operações e agentes.
 - Atualização segura de README e `.gitignore` em projetos consumidores.
 - Detecção básica de instalação pelo `sdd master status`.
 - Documentação pública inicial.

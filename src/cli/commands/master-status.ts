@@ -39,6 +39,9 @@ Documentação:
   docs/02-tecnica-arquitetura/: ${formatStatus(existsSync(join(cwd, "docs", "02-tecnica-arquitetura")))}
   docs/03-codigo/: ${formatStatus(existsSync(join(cwd, "docs", "03-codigo")))}
 
+Templates:
+  .sdd-master/templates/: ${formatStatus(existsSync(join(cwd, ".sdd-master", "templates")))}
+
 Próximo comando recomendado:
   /sdd-master-discovery
 `;

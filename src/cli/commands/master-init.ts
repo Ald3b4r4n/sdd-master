@@ -2,6 +2,7 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { basename, join } from "node:path";
 import { createInterface } from "node:readline/promises";
 import { version } from "../../index.js";
+import { writeOfficialTemplates } from "../../templates/template-writer.js";
 import type { CliOutput, CliRuntime } from "../output.js";
 
 type Language = "pt-BR" | "en" | "es";
@@ -269,11 +270,17 @@ function initializeSddMaster(
   options: Required<Pick<InitOptions, "language" | "agent" | "projectName">>
 ): string {
   if (existsSync(join(cwd, ".sdd-master"))) {
+    const templates = writeOfficialTemplates(cwd);
+
     return `Projeto já parece inicializado com SDD Master.
 
 A pasta .sdd-master/ já existe.
 
-Nenhuma alteração foi feita no projeto.
+Templates oficiais:
+  Criados: ${templates.created}
+  Já existentes: ${templates.existing}
+
+Nenhuma estrutura existente foi sobrescrita.
 
 Recomendação:
   sdd master status
@@ -290,10 +297,7 @@ Recomendação:
     join(cwd, ".sdd-master", "project-state.md"),
     getProjectStateContent(cwd, options)
   );
-  writeFileIfMissing(
-    join(cwd, ".sdd-master", "templates", "README.md"),
-    getTemplatesReadmeContent()
-  );
+  const templates = writeOfficialTemplates(cwd);
   ensureGitignore(cwd);
   ensureReadme(cwd, options.projectName);
 
@@ -314,6 +318,10 @@ Estruturas criadas:
   docs/02-tecnica-arquitetura/
   docs/03-codigo/
   .agents/skills/
+
+Templates oficiais:
+  Criados: ${templates.created}
+  Já existentes: ${templates.existing}
 
 Próximo comando recomendado:
   /sdd-master-discovery
@@ -439,17 +447,6 @@ function getProjectStateContent(
 1. Executar /sdd-master-discovery.
 2. Levantar objetivo, tipo de software, perfis, riscos e restrições.
 3. Aprovar discovery antes de requisitos.
-`;
-}
-
-function getTemplatesReadmeContent(): string {
-  return `# SDD Master — Templates
-
-Os templates oficiais completos serão instalados/atualizados em fase posterior do framework.
-
-Status atual:
-- Diretório criado pelo \`sdd master init\`
-- Templates completos pendentes
 `;
 }
 
