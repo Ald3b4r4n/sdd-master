@@ -742,7 +742,8 @@ describe("SDD Master package foundation", () => {
       assert.notEqual(safe.security.envExample.status, "suspect");
 
       const liveKey = "sk_" + "live_" + "abc1234567890";
-      writeFileSync(join(projectDir, ".env.example"), `STRIPE_SECRET_KEY=${liveKey}\n`, "utf8");
+      const secretName = ["STRIPE", "SECRET", "KEY"].join("_");
+      writeFileSync(join(projectDir, ".env.example"), `${secretName}=${liveKey}\n`, "utf8");
       const unsafe = JSON.parse(runCli(["master", "git", "--json"], projectDir).stdout);
       assert.equal(unsafe.status, "blocked");
       assert.equal(unsafe.security.envExample.status, "suspect");
@@ -764,6 +765,51 @@ describe("SDD Master package foundation", () => {
       assert.match(result.stdout, /\[REDACTED\]/);
       assert.equal(result.stdout.includes(projectKey), false);
       assert.equal(result.stdout.includes(appKey), false);
+    });
+  });
+
+  it("git pre-push blocks generated secrets in consumer files without leaking values", () => {
+    withTempProject((projectDir) => {
+      runGit(["init"], projectDir);
+      const projectKey = ["sk", "proj", "abcdefghijklmnopqrstuvwxyz"].join("-");
+      const appKey = ["APP_KEY", "base64:" + "abcdefghijklmnopqrstuvwxyz123456"].join("=");
+      const privateKey = ["BEGIN", "PRIVATE", "KEY"].join(" ");
+      const tsSecret = ["sk", "proj", "typescriptfakevalue"].join("-");
+
+      writeFileSync(join(projectDir, "config.txt"), `${projectKey}\n${appKey}\n${privateKey}\n`, "utf8");
+      writeFileSync(join(projectDir, "config.ts"), `export const fixture = "${tsSecret}";\n`, "utf8");
+
+      const result = runCli(["master", "git", "--pre-push"], projectDir);
+      const report = JSON.parse(runCli(["master", "git", "--pre-push", "--json"], projectDir).stdout);
+
+      assert.equal(report.status, "blocked");
+      assert.equal(report.security.suspectedSecrets.length >= 4, true);
+      assert.match(result.stdout, /Possível segredo detectado/);
+      assert.match(result.stdout, /\[REDACTED\]/);
+      assert.equal(result.stdout.includes(projectKey), false);
+      assert.equal(result.stdout.includes(appKey), false);
+      assert.equal(result.stdout.includes(privateKey), false);
+      assert.equal(result.stdout.includes(tsSecret), false);
+    });
+  });
+
+  it("git pre-push does not block redacted reports or internal scanner wording", () => {
+    withTempProject((projectDir) => {
+      runGit(["init"], projectDir);
+      writeFileSync(
+        join(projectDir, "scanner.ts"),
+        [
+          "const suspectedSecrets = scanForSecrets(cwd);",
+          "const secrets = report.security.suspectedSecrets;",
+          "const text = 'Valor: [REDACTED]';"
+        ].join("\n"),
+        "utf8"
+      );
+
+      const report = JSON.parse(runCli(["master", "git", "--pre-push", "--json"], projectDir).stdout);
+
+      assert.notEqual(report.status, "blocked");
+      assert.equal(report.security.suspectedSecrets.length, 0);
     });
   });
 

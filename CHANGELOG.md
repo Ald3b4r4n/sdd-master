@@ -54,3 +54,7 @@
 - Adicionado `release:check`.
 - Adicionada documentação de release local e publicação npm futura.
 - Preparação para tag local sem push remoto.
+
+### Corrigido
+
+- Ajustado secret scanning heurístico para evitar falsos positivos em padrões internos e fixtures controladas, sem reduzir bloqueios para segredos reais.
