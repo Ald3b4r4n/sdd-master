@@ -10,7 +10,15 @@ const requiredFiles = [
   "SECURITY.md",
   "CODE_OF_CONDUCT.md",
   "src/index.ts",
-  "src/cli/main.ts"
+  "src/cli/main.ts",
+  "src/cli/args.ts",
+  "src/cli/output.ts",
+  "src/cli/command-registry.ts",
+  "src/cli/commands/root-help.ts",
+  "src/cli/commands/master-help.ts",
+  "src/cli/commands/master-version.ts",
+  "src/cli/commands/master-status.ts",
+  "src/cli/commands/planned-command.ts"
 ];
 
 const forbiddenPatterns = [

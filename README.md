@@ -43,25 +43,34 @@ Neste estágio, use o projeto localmente:
 npm install
 npm run build
 node dist/cli/main.js --help
+node dist/cli/main.js --version
 node dist/cli/main.js master --help
 node dist/cli/main.js master help
+node dist/cli/main.js master status
 ```
 
-## Comandos Disponíveis Neste Estágio
+## Comandos disponíveis no prototype atual
 
 ```bash
 sdd --help
+sdd --version
 sdd master --help
 sdd master help
+sdd master help init
+sdd master status
 ```
 
-Comandos planejados para fases futuras:
+Neste prototype, `sdd master status` mostra um status básico sem depender de uma instalação operacional do SDD Master no projeto consumidor.
+
+Os comandos `init`, `doctor` e `update` já existem apenas como stubs seguros:
 
 ```bash
 sdd master init
 sdd master doctor
 sdd master update
 ```
+
+Eles ainda não executam lógica real, não criam `.sdd-master/` e não alteram arquivos do projeto. O `init` real será implementado no próximo bloco.
 
 ## Scripts do Projeto
 
