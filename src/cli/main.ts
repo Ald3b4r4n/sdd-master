@@ -4,6 +4,8 @@ import { runCommand } from "./command-registry.js";
 
 declare const process: {
   argv: string[];
+  cwd(): string;
+  stdin: unknown;
   stdout: { write(message: string): void };
   stderr: { write(message: string): void };
   exitCode?: number;
@@ -12,4 +14,10 @@ declare const process: {
 const args = process.argv.slice(2);
 const output = createConsoleOutput(process.stdout, process.stderr);
 
-process.exitCode = runCommand(args, output);
+runCommand(args, output, {
+  cwd: process.cwd(),
+  stdin: process.stdin,
+  stdoutStream: process.stdout
+}).then((exitCode) => {
+  process.exitCode = exitCode;
+});

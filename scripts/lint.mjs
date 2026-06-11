@@ -14,11 +14,13 @@ const requiredFiles = [
   "src/cli/args.ts",
   "src/cli/output.ts",
   "src/cli/command-registry.ts",
+  "src/cli/commands/master-init.ts",
   "src/cli/commands/root-help.ts",
   "src/cli/commands/master-help.ts",
   "src/cli/commands/master-version.ts",
   "src/cli/commands/master-status.ts",
-  "src/cli/commands/planned-command.ts"
+  "src/cli/commands/planned-command.ts",
+  "src/types/node-shims.d.ts"
 ];
 
 const forbiddenPatterns = [

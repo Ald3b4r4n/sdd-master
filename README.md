@@ -60,17 +60,24 @@ sdd master help init
 sdd master status
 ```
 
-Neste prototype, `sdd master status` mostra um status básico sem depender de uma instalação operacional do SDD Master no projeto consumidor.
+Neste prototype, `sdd master init` inicializa a estrutura SDD Master em um projeto consumidor, e `sdd master status` detecta a instalação básica.
 
-Os comandos `init`, `doctor` e `update` já existem apenas como stubs seguros:
+O comando `init` pode ser usado em modo não interativo:
 
 ```bash
-sdd master init
+sdd master init --yes --language=pt-BR --agent=codex --project-name="Projeto Teste"
+```
+
+Ele cria `.sdd-master/`, `docs/`, `.agents/skills/`, atualiza `.gitignore` de forma segura e cria ou complementa o README do projeto consumidor.
+
+Os comandos `doctor` e `update` ainda existem apenas como stubs seguros:
+
+```bash
 sdd master doctor
 sdd master update
 ```
 
-Eles ainda não executam lógica real, não criam `.sdd-master/` e não alteram arquivos do projeto. O `init` real será implementado no próximo bloco.
+Os templates oficiais completos ainda serão implementados no BLOCO 04.
 
 ## Scripts do Projeto
 

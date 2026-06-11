@@ -1,17 +1,36 @@
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
-import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
+import {
+  existsSync,
+  mkdtempSync,
+  readdirSync,
+  readFileSync,
+  rmSync,
+  statSync,
+  writeFileSync
+} from "node:fs";
+import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, it } from "node:test";
 
 const rootDir = process.cwd();
 const cliPath = join(rootDir, "dist", "cli", "main.js");
 
-function runCli(args) {
+function runCli(args, cwd = rootDir) {
   return spawnSync(process.execPath, [cliPath, ...args], {
-    cwd: rootDir,
+    cwd,
     encoding: "utf8"
   });
+}
+
+function withTempProject(callback) {
+  const directory = mkdtempSync(join(tmpdir(), "sdd-master-test-"));
+
+  try {
+    callback(directory);
+  } finally {
+    rmSync(directory, { recursive: true, force: true });
+  }
 }
 
 describe("SDD Master package foundation", () => {
@@ -59,7 +78,7 @@ describe("SDD Master package foundation", () => {
 
     assert.equal(result.status, 0);
     assert.match(result.stdout, /sdd master init/);
-    assert.match(result.stdout, /Planejado para BLOCO 03/);
+    assert.match(result.stdout, /Disponível no BLOCO 03/);
     assert.match(result.stdout, /Não deve criar \.env real/);
   });
 
@@ -81,14 +100,166 @@ describe("SDD Master package foundation", () => {
     assert.match(result.stdout, /\.sdd-master\/ não existe/);
   });
 
-  it("keeps init as a safe stub and does not create .sdd-master", () => {
-    const sddMasterPath = join(rootDir, ".sdd-master");
-    const result = runCli(["master", "init"]);
+  it("initializes SDD Master structure in a temporary project", () => {
+    withTempProject((projectDir) => {
+      const result = runCli(
+        [
+          "master",
+          "init",
+          "--yes",
+          "--language=pt-BR",
+          "--agent=codex",
+          "--project-name=Projeto Teste"
+        ],
+        projectDir
+      );
 
-    assert.equal(result.status, 0);
-    assert.match(result.stdout, /Comando planejado: sdd master init/);
-    assert.match(result.stdout, /Nenhuma alteração foi feita/);
-    assert.equal(existsSync(sddMasterPath), false);
+      assert.equal(result.status, 0);
+      assert.match(result.stdout, /SDD Master inicializado com sucesso/);
+      assert.match(result.stdout, /Projeto Teste/);
+
+      const requiredDirectories = [
+        ".sdd-master/discovery",
+        ".sdd-master/requirements",
+        ".sdd-master/specs",
+        ".sdd-master/plans",
+        ".sdd-master/tasks",
+        ".sdd-master/tests",
+        ".sdd-master/audits",
+        ".sdd-master/quality",
+        ".sdd-master/reports",
+        ".sdd-master/traceability",
+        ".sdd-master/approvals",
+        ".sdd-master/risks",
+        ".sdd-master/pendings",
+        ".sdd-master/blockers",
+        ".sdd-master/backlog",
+        ".sdd-master/scope",
+        ".sdd-master/skills",
+        ".sdd-master/releases",
+        ".sdd-master/deliveries",
+        ".sdd-master/db",
+        ".sdd-master/privacy",
+        ".sdd-master/rollback",
+        "docs/01-negocio-requisitos",
+        "docs/02-tecnica-arquitetura",
+        "docs/03-codigo",
+        ".agents/skills"
+      ];
+
+      assert.equal(existsSync(join(projectDir, ".sdd-master")), true);
+      assert.equal(existsSync(join(projectDir, ".sdd-master", "constitution.md")), true);
+      assert.equal(existsSync(join(projectDir, ".sdd-master", "project-state.md")), true);
+      assert.equal(existsSync(join(projectDir, ".sdd-master", "templates", "README.md")), true);
+
+      for (const directory of requiredDirectories) {
+        assert.equal(existsSync(join(projectDir, directory)), true, `${directory} should exist`);
+        assert.equal(statSync(join(projectDir, directory)).isDirectory(), true);
+      }
+
+      const projectState = readFileSync(join(projectDir, ".sdd-master", "project-state.md"), "utf8");
+      assert.match(projectState, /Nome do projeto: Projeto Teste/);
+      assert.match(projectState, /Idioma operacional: pt-BR/);
+      assert.match(projectState, /IA\/agente principal: codex/);
+
+      const templatesReadme = readFileSync(
+        join(projectDir, ".sdd-master", "templates", "README.md"),
+        "utf8"
+      );
+      assert.match(templatesReadme, /Templates completos pendentes/);
+
+      const gitignore = readFileSync(join(projectDir, ".gitignore"), "utf8");
+      assert.match(gitignore, /node_modules\//);
+      assert.match(gitignore, /\.env\.\*/);
+      assert.match(gitignore, /must never be pushed to product remotes/);
+
+      const readme = readFileSync(join(projectDir, "README.md"), "utf8");
+      assert.match(readme, /# Projeto Teste/);
+      assert.match(readme, /Projeto inicializado com SDD Master/);
+      assert.equal(existsSync(join(projectDir, ".env")), false);
+    });
+  });
+
+  it("does not duplicate README governance section when README already exists", () => {
+    withTempProject((projectDir) => {
+      writeFileSync(
+        join(projectDir, "README.md"),
+        "# Existing Project\n\n## Governança SDD Master\n\nTexto existente.\n",
+        "utf8"
+      );
+
+      const result = runCli(
+        ["master", "init", "-y", "--language=pt-BR", "--agent=codex", "--project-name=Projeto Teste"],
+        projectDir
+      );
+
+      assert.equal(result.status, 0);
+      const readme = readFileSync(join(projectDir, "README.md"), "utf8");
+      const matches = readme.match(/## Governança SDD Master/g) ?? [];
+      assert.equal(matches.length, 1);
+      assert.match(readme, /Texto existente/);
+    });
+  });
+
+  it("does not overwrite an existing initialization", () => {
+    withTempProject((projectDir) => {
+      const first = runCli(
+        ["master", "init", "-y", "--language=pt-BR", "--agent=codex", "--project-name=Projeto Teste"],
+        projectDir
+      );
+      const statePath = join(projectDir, ".sdd-master", "project-state.md");
+      writeFileSync(statePath, "estado preservado\n", "utf8");
+
+      const second = runCli(
+        ["master", "init", "-y", "--language=en", "--agent=claude", "--project-name=Other"],
+        projectDir
+      );
+
+      assert.equal(first.status, 0);
+      assert.equal(second.status, 0);
+      assert.match(second.stdout, /Projeto já parece inicializado/);
+      assert.equal(readFileSync(statePath, "utf8"), "estado preservado\n");
+    });
+  });
+
+  it("rejects invalid language and invalid agent", () => {
+    withTempProject((projectDir) => {
+      const invalidLanguage = runCli(
+        ["master", "init", "-y", "--language=fr", "--agent=codex", "--project-name=Projeto Teste"],
+        projectDir
+      );
+      const invalidAgent = runCli(
+        ["master", "init", "-y", "--language=pt-BR", "--agent=unknown", "--project-name=Projeto Teste"],
+        projectDir
+      );
+
+      assert.notEqual(invalidLanguage.status, 0);
+      assert.match(invalidLanguage.stderr, /Idioma inválido: fr/);
+      assert.notEqual(invalidAgent.status, 0);
+      assert.match(invalidAgent.stderr, /Agente inválido: unknown/);
+    });
+  });
+
+  it("detects initialized projects in status output", () => {
+    withTempProject((projectDir) => {
+      const init = runCli(
+        ["master", "init", "-y", "--language=pt-BR", "--agent=codex", "--project-name=Projeto Teste"],
+        projectDir
+      );
+      const status = runCli(["master", "status"], projectDir);
+
+      assert.equal(init.status, 0);
+      assert.equal(status.status, 0);
+      assert.match(status.stdout, /Instalação SDD Master:\s+Detectada/);
+      assert.match(status.stdout, /\.sdd-master\/constitution.md: OK/);
+      assert.match(status.stdout, /docs\/03-codigo\/: OK/);
+      assert.match(status.stdout, /\/sdd-master-discovery/);
+    });
+  });
+
+  it("does not create package-root .sdd-master or .env during init tests", () => {
+    assert.equal(existsSync(join(rootDir, ".sdd-master")), false);
+    assert.equal(existsSync(join(rootDir, ".env")), false);
   });
 
   it("keeps doctor as a safe stub and does not alter root files", () => {
@@ -124,10 +295,19 @@ describe("SDD Master package foundation", () => {
   });
 
   it("does not depend on untracked PDF files for CLI behavior", () => {
+    const expectedPdfs = [
+      "SDD Master — Checklist de Implementação v0.1.pdf",
+      "SDD Master — Documento Mestre v0.1.pdf",
+      "SDD Master Roadmap.pdf"
+    ];
     const result = runCli(["master", "help", "status"]);
 
     assert.equal(result.status, 0);
     assert.match(result.stdout, /sdd master status/);
+
+    for (const pdf of expectedPdfs) {
+      assert.equal(existsSync(join(rootDir, pdf)), true, `${pdf} should remain in place`);
+    }
   });
 
   it("includes mandatory public project files", () => {

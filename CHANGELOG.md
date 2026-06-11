@@ -10,6 +10,10 @@
 - Registro inicial de comandos do CLI.
 - Ajuda contextual para comandos planejados.
 - Status básico do projeto.
-- Stubs seguros para init, doctor e update.
+- Stubs seguros para doctor e update.
+- Comando funcional `sdd master init`.
+- Criação segura da estrutura inicial `.sdd-master/`.
+- Atualização segura de README e `.gitignore` em projetos consumidores.
+- Detecção básica de instalação pelo `sdd master status`.
 - Documentação pública inicial.
 - Licença MIT.

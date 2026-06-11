@@ -7,6 +7,12 @@ export type CliOutput = {
   stderr(message: string): void;
 };
 
+export type CliRuntime = {
+  cwd: string;
+  stdin?: unknown;
+  stdoutStream?: unknown;
+};
+
 export function createConsoleOutput(stdout: WritableStream, stderr: WritableStream): CliOutput {
   return {
     stdout(message: string): void {

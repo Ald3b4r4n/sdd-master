@@ -11,7 +11,7 @@ type CommandHelp = {
 const commandHelps: Record<string, CommandHelp> = {
   init: {
     command: "init",
-    status: "Planejado para BLOCO 03.",
+    status: "Disponível no BLOCO 03.",
     purpose: "Inicializar a estrutura SDD Master dentro de um projeto.",
     whenUsed: "Será usado no início da adoção do SDD Master em um projeto consumidor.",
     example: "sdd master init",
@@ -178,9 +178,9 @@ Comandos disponíveis:
   sdd master help       Mostra esta ajuda
   sdd master version    Mostra a versão instalada
   sdd master status     Mostra status básico do projeto
+  sdd master init       Inicializa estrutura SDD Master no projeto
 
 Comandos planejados:
-  sdd master init
   sdd master doctor
   sdd master update
   sdd master discovery

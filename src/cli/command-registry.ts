@@ -1,12 +1,17 @@
 import { parseArgs } from "./args.js";
-import type { CliOutput } from "./output.js";
+import type { CliOutput, CliRuntime } from "./output.js";
+import { runInitCommand } from "./commands/master-init.js";
 import { getMasterCommandHelp } from "./commands/master-help.js";
 import { getPlannedCommandOutput } from "./commands/planned-command.js";
 import { getRootHelp } from "./commands/root-help.js";
 import { getStatusOutput } from "./commands/master-status.js";
 import { getVersionOutput } from "./commands/master-version.js";
 
-export function runCommand(args: string[], output: CliOutput): number {
+export async function runCommand(
+  args: string[],
+  output: CliOutput,
+  runtime: CliRuntime
+): Promise<number> {
   const command = parseArgs(args);
 
   switch (command.kind) {
@@ -23,8 +28,10 @@ export function runCommand(args: string[], output: CliOutput): number {
       output.stdout(getMasterCommandHelp(command.command));
       return 0;
     case "master-status":
-      output.stdout(getStatusOutput());
+      output.stdout(getStatusOutput(runtime.cwd));
       return 0;
+    case "master-init":
+      return runInitCommand(command.args, output, runtime);
     case "planned-command":
       output.stdout(getPlannedCommandOutput(command.command));
       return 0;

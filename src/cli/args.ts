@@ -4,12 +4,13 @@ export type ParsedCommand =
   | { kind: "master-help" }
   | { kind: "master-command-help"; command: string }
   | { kind: "master-status" }
-  | { kind: "planned-command"; command: "init" | "doctor" | "update" }
+  | { kind: "master-init"; args: string[] }
+  | { kind: "planned-command"; command: "doctor" | "update" }
   | { kind: "unknown"; command: string; scope: "root" | "master" };
 
 const rootHelpFlags = new Set(["--help", "-h"]);
 const versionFlags = new Set(["--version", "-v"]);
-const plannedCommands = new Set(["init", "doctor", "update"]);
+const plannedCommands = new Set(["doctor", "update"]);
 
 export function parseArgs(args: string[]): ParsedCommand {
   const [first, second, third] = args;
@@ -42,8 +43,12 @@ export function parseArgs(args: string[]): ParsedCommand {
     return { kind: "master-status" };
   }
 
+  if (second === "init") {
+    return { kind: "master-init", args: args.slice(2) };
+  }
+
   if (plannedCommands.has(second)) {
-    return { kind: "planned-command", command: second as "init" | "doctor" | "update" };
+    return { kind: "planned-command", command: second as "doctor" | "update" };
   }
 
   return { kind: "unknown", command: second, scope: "master" };
