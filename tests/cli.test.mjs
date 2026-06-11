@@ -872,7 +872,7 @@ describe("SDD Master package foundation", () => {
   it("declares the sdd binary in package.json", () => {
     const packageJson = JSON.parse(readFileSync(join(rootDir, "package.json"), "utf8"));
 
-    assert.equal(packageJson.bin?.sdd, "./dist/cli/main.js");
+    assert.equal(packageJson.bin?.sdd, "dist/cli/main.js");
   });
 
   it("has hardened package metadata and files allowlist", () => {
@@ -880,7 +880,7 @@ describe("SDD Master package foundation", () => {
 
     assert.equal(packageJson.license, "MIT");
     assert.equal(packageJson.version, "0.1.0-prototype");
-    assert.equal(packageJson.bin?.sdd, "./dist/cli/main.js");
+    assert.equal(packageJson.bin?.sdd, "dist/cli/main.js");
     assert.equal(packageJson.files.includes("dist/"), true);
     assert.equal(packageJson.files.includes("README.md"), true);
     assert.equal(packageJson.files.includes("LICENSE"), true);
@@ -1012,7 +1012,9 @@ describe("SDD Master package foundation", () => {
       "docs/02-tecnica-arquitetura/compatibilidade-multi-ia.md",
       "docs/02-tecnica-arquitetura/seguranca-e-governanca.md",
       "docs/03-codigo/comandos-cli.md",
-      "docs/03-codigo/desenvolvimento-local.md"
+      "docs/03-codigo/desenvolvimento-local.md",
+      "docs/03-codigo/publicacao-npm.md",
+      "docs/03-codigo/release-local.md"
     ];
 
     for (const doc of docs) {
@@ -1028,6 +1030,76 @@ describe("SDD Master package foundation", () => {
     assert.match(localDevelopment, /npm run smoke/);
     assert.match(localDevelopment, /npm run package:check/);
     assert.match(localDevelopment, /npm run pack:dry-run/);
+  });
+
+  it("includes local prototype release checks and documentation", () => {
+    const packageJson = JSON.parse(readFileSync(join(rootDir, "package.json"), "utf8"));
+    const releaseDoc = readFileSync(join(rootDir, "releases", "v0.1.0-prototype.md"), "utf8");
+    const releaseLocal = readFileSync(join(rootDir, "docs", "03-codigo", "release-local.md"), "utf8");
+    const npmPublish = readFileSync(join(rootDir, "docs", "03-codigo", "publicacao-npm.md"), "utf8");
+    const readme = readFileSync(join(rootDir, "README.md"), "utf8");
+    const changelog = readFileSync(join(rootDir, "CHANGELOG.md"), "utf8");
+
+    assert.equal(existsSync(join(rootDir, "scripts", "release-check.mjs")), true);
+    assert.equal(packageJson.scripts["release:check"], "node scripts/release-check.mjs");
+    assert.equal(packageJson.version, "0.1.0-prototype");
+    assert.equal(packageJson.publishConfig?.access, "public");
+    assert.equal(packageJson.publishConfig?.tag, "prototype");
+    assert.match(packageJson.scripts.check, /npm run release:check/);
+
+    assert.equal(existsSync(join(rootDir, "releases", "v0.1.0-prototype.md")), true);
+    assert.match(releaseDoc, /Prototype/);
+    assert.match(releaseDoc, /Push: não realizado/);
+    assert.match(releaseDoc, /npm publish: não realizado/);
+    assert.match(releaseDoc, /v0\.1\.0-prototype/);
+
+    assert.match(releaseLocal, /release local/i);
+    assert.match(releaseLocal, /não publicar automaticamente/i);
+    assert.match(releaseLocal, /tag npm configurada é `prototype`/);
+    assert.match(releaseLocal, /aprovação humana/i);
+    assert.match(npmPublish, /npm publish --dry-run --access public/);
+    assert.match(npmPublish, /tag npm `prototype`/);
+    assert.match(npmPublish, /aprovação humana/i);
+    assert.match(readme, /0\.1\.0-prototype/);
+    assert.match(readme, /npm run release:check/);
+    assert.match(readme, /aprovação humana explícita/);
+    assert.match(changelog, /### Release local/);
+
+    const reviewedFiles = [releaseDoc, releaseLocal, npmPublish, readme, changelog].join("\n");
+    assert.doesNotMatch(reviewedFiles, /sk-[A-Za-z0-9_-]{20,}/);
+    assert.doesNotMatch(reviewedFiles, /BEGIN (RSA |EC |OPENSSH |)PRIVATE KEY/);
+  });
+
+  it("release check passes after build and blocks wrong package versions", () => {
+    const releaseCheck = runNpmScript("release:check");
+
+    assert.equal(releaseCheck.status, 0, releaseCheck.stderr || releaseCheck.stdout);
+    assert.match(releaseCheck.stdout, /Release check passed/);
+
+    withTempProject((projectDir) => {
+      writeFileSync(
+        join(projectDir, "package.json"),
+        JSON.stringify(
+          {
+            name: "sdd-master-test",
+            version: "0.0.0",
+            license: "MIT",
+            bin: { sdd: "./dist/cli/main.js" }
+          },
+          null,
+          2
+        ),
+        "utf8"
+      );
+
+      const result = spawnSync(process.execPath, [join(rootDir, "scripts", "release-check.mjs")], {
+        cwd: projectDir,
+        encoding: "utf8"
+      });
+
+      assert.notEqual(result.status, 0);
+      assert.match(result.stderr, /version must be 0\.1\.0-prototype/);
+    });
   });
 
   it("includes public GitHub repository templates and safe CI", () => {

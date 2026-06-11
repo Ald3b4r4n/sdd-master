@@ -47,3 +47,10 @@
 - Detecção básica de instalação pelo `sdd master status`.
 - Documentação pública inicial.
 - Licença MIT.
+
+### Release local
+
+- Preparada release local `v0.1.0-prototype`.
+- Adicionado `release:check`.
+- Adicionada documentação de release local e publicação npm futura.
+- Preparação para tag local sem push remoto.

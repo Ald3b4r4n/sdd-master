@@ -20,6 +20,9 @@ const files = [
   "docs/02-tecnica-arquitetura/seguranca-e-governanca.md",
   "docs/03-codigo/comandos-cli.md",
   "docs/03-codigo/desenvolvimento-local.md",
+  "docs/03-codigo/publicacao-npm.md",
+  "docs/03-codigo/release-local.md",
+  "releases/v0.1.0-prototype.md",
   "assets/readme/sdd-master-hero.svg",
   "assets/readme/workflow-overview.svg",
   "assets/readme/multi-ai-support.svg",
@@ -64,7 +67,8 @@ const files = [
   "scripts/format-check.mjs",
   "scripts/smoke-test.mjs",
   "scripts/package-check.mjs",
-  "scripts/pack-dry-run.mjs"
+  "scripts/pack-dry-run.mjs",
+  "scripts/release-check.mjs"
 ];
 
 let failed = false;

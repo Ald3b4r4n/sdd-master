@@ -6,7 +6,7 @@
   "author": "Mike honor",
   "type": "module",
   "bin": {
-    "sdd": "./dist/cli/main.js"
+    "sdd": "dist/cli/main.js"
   },
   "files": [
     "dist/",
@@ -19,6 +19,10 @@
     "docs/",
     "assets/"
   ],
+  "publishConfig": {
+    "access": "public",
+    "tag": "prototype"
+  },
   "engines": {
     "node": ">=20"
   },
@@ -30,7 +34,8 @@
     "smoke": "node scripts/smoke-test.mjs",
     "package:check": "node scripts/package-check.mjs",
     "pack:dry-run": "node scripts/pack-dry-run.mjs",
-    "check": "npm run build && npm test && npm run lint && npm run format && npm run smoke && npm run package:check && npm run pack:dry-run"
+    "release:check": "node scripts/release-check.mjs",
+    "check": "npm run build && npm test && npm run lint && npm run format && npm run smoke && npm run package:check && npm run pack:dry-run && npm run release:check"
   },
   "keywords": [
     "sdd",

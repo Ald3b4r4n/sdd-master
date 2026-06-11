@@ -19,7 +19,9 @@ const requiredFiles = [
   "docs/02-tecnica-arquitetura/compatibilidade-multi-ia.md",
   "docs/02-tecnica-arquitetura/seguranca-e-governanca.md",
   "docs/03-codigo/comandos-cli.md",
-  "docs/03-codigo/desenvolvimento-local.md"
+  "docs/03-codigo/desenvolvimento-local.md",
+  "docs/03-codigo/publicacao-npm.md",
+  "docs/03-codigo/release-local.md"
 ];
 const forbiddenFilesEntries = [".env", ".env.*", ".sdd-master/", "node_modules/", "*.pdf"];
 const failures = [];
@@ -27,8 +29,8 @@ const failures = [];
 if (!packageJson.name) failures.push("package.json must have name.");
 if (!packageJson.version) failures.push("package.json must have version.");
 if (packageJson.license !== "MIT") failures.push("package.json license must be MIT.");
-if (packageJson.bin?.sdd !== "./dist/cli/main.js") {
-  failures.push("package.json bin.sdd must point to ./dist/cli/main.js.");
+if (!["./dist/cli/main.js", "dist/cli/main.js"].includes(packageJson.bin?.sdd)) {
+  failures.push("package.json bin.sdd must point to dist/cli/main.js.");
 }
 if (!existsSync(join(rootDir, "dist", "cli", "main.js"))) {
   failures.push("Missing dist/cli/main.js. Run npm run build first.");
