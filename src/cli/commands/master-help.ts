@@ -142,11 +142,16 @@ const commandHelps: Record<string, CommandHelp> = {
   },
   git: {
     command: "git",
-    status: "Planejado.",
-    purpose: "Apoiar fluxos locais de versionamento com governança SDD.",
-    whenUsed: "Será usado para validar escopo antes de commits e branches.",
+    status: "Disponível no BLOCO 07.",
+    purpose: "Diagnosticar Git e segurança local sem executar commit, push, tag ou release.",
+    whenUsed: "Use antes de commit ou push para detectar .env, segredos e risco de .sdd-master/ remoto.",
     example: "sdd master git",
-    security: ["Não deve fazer push sem comando explícito.", "Não deve configurar remoto automaticamente."]
+    details: [
+      "Suporta --json, --pre-commit e --pre-push.",
+      "Bloqueia .env real, arquivos sensíveis, segredos suspeitos e .sdd-master/ pendente em pre-push.",
+      "Não executa git add, commit, push, tag ou release."
+    ],
+    security: ["Não faz commit automaticamente.", "Não faz push automaticamente.", "Push exige autorização humana explícita."]
   },
   release: {
     command: "release",
@@ -204,6 +209,7 @@ Comandos disponíveis:
   sdd master init       Inicializa estrutura SDD Master no projeto
   sdd master doctor     Diagnostica a instalação SDD Master
   sdd master agents     Gera arquivos de instrução para IAs/agentes
+  sdd master git        Diagnostica Git e segurança local
 
 Comandos planejados:
   sdd master update
@@ -217,7 +223,6 @@ Comandos planejados:
   sdd master quality
   sdd master audit
   sdd master docs
-  sdd master git
   sdd master release
   sdd master deploy
   sdd master agents

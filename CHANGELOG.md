@@ -25,6 +25,11 @@
 - Integração do agente principal no `sdd master init`.
 - Registro de agentes no `project-state.md`.
 - Checks de agentes no `status` e `doctor`.
+- Comando `sdd master git`.
+- Diagnóstico inicial de Git e segurança.
+- Detecção heurística de segredos.
+- Validação de arquivos `.env` e arquivos sensíveis.
+- Modos `--pre-commit`, `--pre-push` e `--json`.
 - Atualização segura de README e `.gitignore` em projetos consumidores.
 - Detecção básica de instalação pelo `sdd master status`.
 - Documentação pública inicial.

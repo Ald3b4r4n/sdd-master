@@ -139,6 +139,27 @@ sdd master agents --yes --agents=codex,claude,cursor --language=pt-BR
 
 Esses arquivos orientam cada IA a ler a constituição, respeitar o estado do projeto, não pular fases, não fazer push sem autorização humana e não expor `.env`, segredos, tokens ou credenciais.
 
+## Segurança e Git
+
+Use:
+
+```bash
+sdd master git
+sdd master git --pre-commit
+sdd master git --pre-push
+```
+
+O comando verifica:
+
+- arquivos `.env` reais;
+- arquivos sensíveis;
+- possíveis segredos;
+- `.gitignore`;
+- risco de envio de `.sdd-master/`;
+- status básico do Git.
+
+O SDD Master nunca executa push automaticamente.
+
 ## Scripts do Projeto
 
 ```bash

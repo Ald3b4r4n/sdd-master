@@ -7,6 +7,7 @@ export type ParsedCommand =
   | { kind: "master-init"; args: string[] }
   | { kind: "master-agents"; args: string[] }
   | { kind: "master-doctor"; args: string[] }
+  | { kind: "master-git"; args: string[] }
   | { kind: "planned-command"; command: "update" }
   | { kind: "unknown"; command: string; scope: "root" | "master" };
 
@@ -55,6 +56,10 @@ export function parseArgs(args: string[]): ParsedCommand {
 
   if (second === "agents") {
     return { kind: "master-agents", args: args.slice(2) };
+  }
+
+  if (second === "git") {
+    return { kind: "master-git", args: args.slice(2) };
   }
 
   if (plannedCommands.has(second)) {

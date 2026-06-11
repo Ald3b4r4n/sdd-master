@@ -23,6 +23,10 @@ function runCli(args, cwd = rootDir) {
   });
 }
 
+function runGit(args, cwd) {
+  return spawnSync("git", args, { cwd, encoding: "utf8" });
+}
+
 function withTempProject(callback) {
   const directory = mkdtempSync(join(tmpdir(), "sdd-master-test-"));
 
@@ -650,7 +654,7 @@ describe("SDD Master package foundation", () => {
       assert.equal(safe.security.hasRealEnv, false);
       assert.equal(safe.security.sensitiveFiles.includes(".env.example"), false);
 
-      writeFileSync(join(projectDir, ".env"), "SECRET_VALUE=do-not-commit\n", "utf8");
+      writeFileSync(join(projectDir, ".env"), "PLACEHOLDER=local-only\n", "utf8");
       const result = runCli(["master", "doctor"], projectDir);
       const unsafe = JSON.parse(runCli(["master", "doctor", "--json"], projectDir).stdout);
 
@@ -675,6 +679,162 @@ describe("SDD Master package foundation", () => {
       assert.equal(report.status, "broken");
       assert.equal(report.recommendation, "sdd master init");
       assert.deepEqual(after, before);
+    });
+  });
+
+  it("git command prints a readable report in a git repository", () => {
+    withTempProject((projectDir) => {
+      runGit(["init"], projectDir);
+      writeFileSync(join(projectDir, "README.md"), "# Test\n", "utf8");
+      const result = runCli(["master", "git"], projectDir);
+
+      assert.equal(result.status, 0);
+      assert.match(result.stdout, /SDD Master — Git\/Security Check/);
+      assert.match(result.stdout, /Git:/);
+      assert.match(result.stdout, /Segurança:/);
+      assert.equal(existsSync(join(projectDir, ".env")), false);
+    });
+  });
+
+  it("git command prints valid JSON with git and security sections", () => {
+    withTempProject((projectDir) => {
+      runGit(["init"], projectDir);
+      const result = runCli(["master", "git", "--json"], projectDir);
+      const report = JSON.parse(result.stdout);
+
+      assert.equal(result.status, 0);
+      assert.equal(typeof report.status, "string");
+      assert.equal(typeof report.git, "object");
+      assert.equal(typeof report.security, "object");
+      assert.equal(Array.isArray(report.git.stagedFiles), true);
+      assert.equal(Array.isArray(report.security.forbiddenFiles), true);
+    });
+  });
+
+  it("git command detects forbidden env and key files", () => {
+    withTempProject((projectDir) => {
+      writeFileSync(join(projectDir, ".env"), "PLACEHOLDER=local-only\n", "utf8");
+      writeFileSync(join(projectDir, "certificate.pem"), "placeholder\n", "utf8");
+      writeFileSync(join(projectDir, "private.key"), "placeholder\n", "utf8");
+      const report = JSON.parse(runCli(["master", "git", "--json"], projectDir).stdout);
+
+      assert.equal(report.status, "blocked");
+      assert.equal(report.security.forbiddenFiles.includes(".env"), true);
+      assert.equal(report.security.forbiddenFiles.includes("certificate.pem"), true);
+      assert.equal(report.security.forbiddenFiles.includes("private.key"), true);
+    });
+  });
+
+  it("git command accepts safe .env.example and blocks suspicious .env.example", () => {
+    withTempProject((projectDir) => {
+      writeFileSync(join(projectDir, ".env.example"), "API_KEY=your-api-key-here\nDATABASE_URL=placeholder\n", "utf8");
+      const safe = JSON.parse(runCli(["master", "git", "--json"], projectDir).stdout);
+      assert.notEqual(safe.security.envExample.status, "suspect");
+
+      const liveKey = "sk_" + "live_" + "abc1234567890";
+      writeFileSync(join(projectDir, ".env.example"), `STRIPE_SECRET_KEY=${liveKey}\n`, "utf8");
+      const unsafe = JSON.parse(runCli(["master", "git", "--json"], projectDir).stdout);
+      assert.equal(unsafe.status, "blocked");
+      assert.equal(unsafe.security.envExample.status, "suspect");
+    });
+  });
+
+  it("git command detects heuristic secret patterns without printing values", () => {
+    withTempProject((projectDir) => {
+      const projectKey = "sk-" + "proj-" + "abcdefghijklmnopqrstuvwxyz";
+      const appKey = "APP_" + "KEY=base64:" + "abcdefghijklmnopqrstuvwxyz123456";
+      const privateKey = "BEGIN " + "PRIVATE KEY";
+      writeFileSync(join(projectDir, "config.txt"), `${projectKey}\n${appKey}\n${privateKey}\n`, "utf8");
+      const result = runCli(["master", "git"], projectDir);
+      const report = JSON.parse(runCli(["master", "git", "--json"], projectDir).stdout);
+
+      assert.equal(report.status, "blocked");
+      assert.equal(report.security.suspectedSecrets.length >= 3, true);
+      assert.match(result.stdout, /Possível segredo detectado/);
+      assert.match(result.stdout, /\[REDACTED\]/);
+      assert.equal(result.stdout.includes(projectKey), false);
+      assert.equal(result.stdout.includes(appKey), false);
+    });
+  });
+
+  it("git command validates complete and incomplete gitignore", () => {
+    withTempProject((projectDir) => {
+      writeFileSync(
+        join(projectDir, ".gitignore"),
+        ".env\n.env.*\n!.env.example\nnode_modules/\ndist/\ncoverage/\nsecrets/\nprivate/\ncredentials/\n*.pem\n*.key\n",
+        "utf8"
+      );
+      const complete = JSON.parse(runCli(["master", "git", "--json"], projectDir).stdout);
+      assert.equal(complete.security.gitignore.missingEntries.length, 0);
+
+      writeFileSync(join(projectDir, ".gitignore"), "node_modules/\n", "utf8");
+      const incomplete = JSON.parse(runCli(["master", "git", "--json"], projectDir).stdout);
+      assert.equal(incomplete.status === "warning" || incomplete.status === "blocked", true);
+      assert.equal(incomplete.security.gitignore.missingEntries.length > 0, true);
+    });
+  });
+
+  it("git pre-commit blocks suspected secrets", () => {
+    withTempProject((projectDir) => {
+      const suspiciousValue = "sk-" + "proj-" + "abcdefghijklmnopqrstuvwxyz";
+      writeFileSync(join(projectDir, "config.txt"), suspiciousValue, "utf8");
+      const report = JSON.parse(runCli(["master", "git", "--pre-commit", "--json"], projectDir).stdout);
+
+      assert.equal(report.mode, "pre-commit");
+      assert.equal(report.status, "blocked");
+    });
+  });
+
+  it("git pre-push blocks staged or pending .sdd-master files", () => {
+    withTempProject((projectDir) => {
+      runGit(["init"], projectDir);
+      initTempProject(projectDir);
+      runGit(["add", ".sdd-master/constitution.md"], projectDir);
+      const report = JSON.parse(runCli(["master", "git", "--pre-push", "--json"], projectDir).stdout);
+      const text = runCli(["master", "git", "--pre-push"], projectDir);
+
+      assert.equal(report.mode, "pre-push");
+      assert.equal(report.status, "blocked");
+      assert.equal(report.sddMaster.internalFilesStaged.includes(".sdd-master/constitution.md"), true);
+      assert.match(text.stdout, /Este comando não executa push/);
+      assert.match(text.stdout, /Push exige autorização humana explícita/);
+    });
+  });
+
+  it("git help works", () => {
+    const contextual = runCli(["master", "help", "git"]);
+    const direct = runCli(["master", "git", "--help"]);
+
+    assert.equal(contextual.status, 0);
+    assert.equal(direct.status, 0);
+    assert.match(contextual.stdout, /Disponível no BLOCO 07/);
+    assert.match(direct.stdout, /--pre-commit/);
+    assert.match(direct.stdout, /não executa commit/i);
+  });
+
+  it("doctor JSON and status include git security summary", () => {
+    withTempProject((projectDir) => {
+      initTempProject(projectDir);
+      const doctor = JSON.parse(runCli(["master", "doctor", "--json"], projectDir).stdout);
+      const status = runCli(["master", "status"], projectDir);
+
+      assert.equal(typeof doctor.gitSecurity, "object");
+      assert.equal(typeof doctor.gitSecurity.status, "string");
+      assert.match(status.stdout, /Git\/Security:/);
+      assert.match(status.stdout, /Segredos suspeitos:/);
+    });
+  });
+
+  it("git command does not alter project files", () => {
+    withTempProject((projectDir) => {
+      writeFileSync(join(projectDir, "README.md"), "# Stable\n", "utf8");
+      const before = readdirSync(projectDir).sort();
+      const result = runCli(["master", "git"], projectDir);
+      const after = readdirSync(projectDir).sort();
+
+      assert.equal(result.status, 0);
+      assert.deepEqual(after, before);
+      assert.equal(readFileSync(join(projectDir, "README.md"), "utf8"), "# Stable\n");
     });
   });
 

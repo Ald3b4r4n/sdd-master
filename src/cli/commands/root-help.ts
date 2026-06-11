@@ -13,6 +13,7 @@ Comandos principais:
   sdd master init       Inicializa o SDD Master no projeto
   sdd master doctor     Diagnostica a instalação
   sdd master agents     Gera instruções para IAs/agentes
+  sdd master git        Diagnostica Git e segurança local
   sdd master update     Planejado: atualiza templates e estrutura
 
 Use:

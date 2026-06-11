@@ -16,6 +16,7 @@ const requiredFiles = [
   "src/cli/command-registry.ts",
   "src/cli/commands/master-agents.ts",
   "src/cli/commands/master-doctor.ts",
+  "src/cli/commands/master-git.ts",
   "src/cli/commands/master-init.ts",
   "src/cli/commands/root-help.ts",
   "src/cli/commands/master-help.ts",
@@ -32,6 +33,13 @@ const requiredFiles = [
   "src/doctor/doctor-checks.ts",
   "src/doctor/doctor.ts",
   "src/doctor/doctor-report.ts",
+  "src/security/sensitive-files.ts",
+  "src/security/secret-patterns.ts",
+  "src/security/secret-scan.ts",
+  "src/git/git-types.ts",
+  "src/git/git-checks.ts",
+  "src/git/git-report.ts",
+  "src/git/git.ts",
   "src/types/node-shims.d.ts"
 ];
 

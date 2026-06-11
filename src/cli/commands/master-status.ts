@@ -1,6 +1,7 @@
 import { existsSync } from "node:fs";
 import { join } from "node:path";
 import { getRecognizedAgentFiles } from "../../agents/agent-writer.js";
+import { runGitSecurityCheck } from "../../git/git-checks.js";
 
 export function getStatusOutput(cwd: string): string {
   const hasSddMaster = existsSync(join(cwd, ".sdd-master"));
@@ -27,6 +28,7 @@ Observação:
 
 function getInstalledStatus(cwd: string): string {
   const agentFiles = getRecognizedAgentFiles(cwd);
+  const gitSecurity = runGitSecurityCheck(cwd, "default");
 
   return `SDD Master — Status
 
@@ -48,6 +50,11 @@ Templates:
 Agentes / IAs:
 ${formatAgentFiles(agentFiles)}
   .agents/skills/: ${formatStatus(existsSync(join(cwd, ".agents", "skills")))}
+
+Git/Security:
+  .env real detectado: ${gitSecurity.security.forbiddenFiles.some((file) => file === ".env" || file.startsWith(".env.")) ? "Sim" : "Não"}
+  Segredos suspeitos: ${gitSecurity.security.suspectedSecrets.length > 0 ? "Sim" : "Não"}
+  .gitignore: ${gitSecurity.security.gitignore.missingEntries.length === 0 ? "OK" : "Atenção"}
 
 Próximo comando recomendado:
   /sdd-master-discovery

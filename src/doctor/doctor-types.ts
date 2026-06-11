@@ -48,5 +48,12 @@ export type DoctorReport = {
   security: DoctorSecurityInfo;
   templates: DoctorTemplateInfo;
   agents: DoctorAgentInfo;
+  gitSecurity: {
+    status: "clean" | "warning" | "blocked";
+    forbiddenFiles: string[];
+    suspectedSecrets: number;
+    gitignoreMissingEntries: string[];
+    internalFilesStaged: string[];
+  };
   recommendation: string;
 };

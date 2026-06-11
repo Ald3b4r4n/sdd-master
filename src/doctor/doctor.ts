@@ -8,6 +8,7 @@ import {
   getGitInfo,
   readProjectState
 } from "./doctor-checks.js";
+import { runGitSecurityCheck } from "../git/git-checks.js";
 import type { DoctorCheck, DoctorReport, DoctorStatus } from "./doctor-types.js";
 
 export function runDoctor(cwd: string): DoctorReport {
@@ -18,6 +19,20 @@ export function runDoctor(cwd: string): DoctorReport {
   const gitignore = checkGitignore(cwd);
   const security = checkSensitiveFiles(cwd);
   const git = getGitInfo(cwd);
+  const gitSecurity = runGitSecurityCheck(cwd, "default");
+  const gitSecurityCheck: DoctorCheck = {
+    id: "git-security",
+    label: "Git/Security",
+    status: gitSecurity.status === "blocked" ? "fail" : gitSecurity.status === "warning" ? "warn" : "pass",
+    details: [
+      ...gitSecurity.security.forbiddenFiles.map((file) => `Arquivo sensível: ${file}`),
+      ...gitSecurity.security.suspectedSecrets.map(
+        (finding) => `Segredo suspeito: ${finding.file}:${finding.line} (${finding.type})`
+      ),
+      ...gitSecurity.security.gitignore.missingEntries.map((entry) => `.gitignore ausente: ${entry}`),
+      ...gitSecurity.sddMaster.internalFilesStaged.map((file) => `.sdd-master staged: ${file}`)
+    ]
+  };
   const checks = [
     internal,
     publicDocs,
@@ -25,7 +40,8 @@ export function runDoctor(cwd: string): DoctorReport {
     templates.check,
     gitignore,
     security.check,
-    git.check
+    git.check,
+    gitSecurityCheck
   ];
   const projectState = readProjectState(cwd);
   const status = getOverallStatus(checks);
@@ -39,6 +55,13 @@ export function runDoctor(cwd: string): DoctorReport {
     security: security.info,
     templates: templates.info,
     agents: agents.info,
+    gitSecurity: {
+      status: gitSecurity.status,
+      forbiddenFiles: gitSecurity.security.forbiddenFiles,
+      suspectedSecrets: gitSecurity.security.suspectedSecrets.length,
+      gitignoreMissingEntries: gitSecurity.security.gitignore.missingEntries,
+      internalFilesStaged: gitSecurity.sddMaster.internalFilesStaged
+    },
     recommendation
   };
 }

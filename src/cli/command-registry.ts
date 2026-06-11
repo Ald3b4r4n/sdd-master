@@ -2,6 +2,7 @@ import { parseArgs } from "./args.js";
 import type { CliOutput, CliRuntime } from "./output.js";
 import { runAgentsCommand } from "./commands/master-agents.js";
 import { runDoctorCommand } from "./commands/master-doctor.js";
+import { runMasterGitCommand } from "./commands/master-git.js";
 import { runInitCommand } from "./commands/master-init.js";
 import { getMasterCommandHelp } from "./commands/master-help.js";
 import { getPlannedCommandOutput } from "./commands/planned-command.js";
@@ -38,6 +39,8 @@ export async function runCommand(
       return runDoctorCommand(command.args, output, runtime);
     case "master-agents":
       return runAgentsCommand(command.args, output, runtime);
+    case "master-git":
+      return runMasterGitCommand(command.args, output, runtime);
     case "planned-command":
       output.stdout(getPlannedCommandOutput(command.command));
       return 0;
