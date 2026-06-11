@@ -268,6 +268,16 @@ Status:
 
 A release atual é um prototype e não representa versão final estável.
 
+## Publicação
+
+O SDD Master possui preparação para:
+
+- GitHub Release draft;
+- publicação npm futura;
+- validação local com `npm publish --dry-run --access public`.
+
+A publicação real no npm e a publicação final da GitHub Release exigem aprovação humana explícita.
+
 ## Contribuição e GitHub
 
 Contribuições devem usar os templates de issue e Pull Request do repositório. Antes de enviar uma mudança para revisão, execute `npm run check` e registre os checks relevantes no Pull Request.

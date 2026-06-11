@@ -1057,6 +1057,8 @@ describe("SDD Master package foundation", () => {
       "docs/02-tecnica-arquitetura/arquitetura-do-framework.md",
       "docs/02-tecnica-arquitetura/compatibilidade-multi-ia.md",
       "docs/02-tecnica-arquitetura/seguranca-e-governanca.md",
+      "docs/03-codigo/checklist-github-release.md",
+      "docs/03-codigo/checklist-publicacao-npm.md",
       "docs/03-codigo/comandos-cli.md",
       "docs/03-codigo/desenvolvimento-local.md",
       "docs/03-codigo/publicacao-npm.md",
@@ -1086,6 +1088,15 @@ describe("SDD Master package foundation", () => {
       join(rootDir, "releases", "github-v0.1.0-prototype-notes.md"),
       "utf8"
     );
+    const githubReleaseChecklist = readFileSync(
+      join(rootDir, "docs", "03-codigo", "checklist-github-release.md"),
+      "utf8"
+    );
+    const npmPublishChecklist = readFileSync(
+      join(rootDir, "docs", "03-codigo", "checklist-publicacao-npm.md"),
+      "utf8"
+    );
+    const releaseAudit = readFileSync(join(rootDir, "releases", "v0.1.0-prototype-audit.md"), "utf8");
     const releaseLocal = readFileSync(join(rootDir, "docs", "03-codigo", "release-local.md"), "utf8");
     const npmPublish = readFileSync(join(rootDir, "docs", "03-codigo", "publicacao-npm.md"), "utf8");
     const readme = readFileSync(join(rootDir, "README.md"), "utf8");
@@ -1106,6 +1117,9 @@ describe("SDD Master package foundation", () => {
     assert.equal(existsSync(join(rootDir, "releases", "v0.1.0-prototype.md")), true);
     assert.equal(existsSync(join(rootDir, "releases", "github-v0.1.0-prototype.md")), true);
     assert.equal(existsSync(join(rootDir, "releases", "github-v0.1.0-prototype-notes.md")), true);
+    assert.equal(existsSync(join(rootDir, "releases", "v0.1.0-prototype-audit.md")), true);
+    assert.equal(existsSync(join(rootDir, "docs", "03-codigo", "checklist-github-release.md")), true);
+    assert.equal(existsSync(join(rootDir, "docs", "03-codigo", "checklist-publicacao-npm.md")), true);
     assert.match(releaseDoc, /Prototype/);
     assert.match(releaseDoc, /Push: não realizado/);
     assert.match(releaseDoc, /npm publish: não realizado/);
@@ -1120,6 +1134,13 @@ describe("SDD Master package foundation", () => {
     assert.match(githubReleaseNotes, /Real npm publication/);
     assert.doesNotMatch(githubReleaseNotes, /\.env/);
     assert.doesNotMatch(githubReleaseNotes, /tokens|segredos/i);
+    assert.match(githubReleaseChecklist, /gh release edit/);
+    assert.match(githubReleaseChecklist, /aprovação humana explícita/);
+    assert.match(npmPublishChecklist, /npm publish --access public/);
+    assert.match(npmPublishChecklist, /aprovação humana explícita/);
+    assert.match(releaseAudit, /v0\.1\.0-prototype/);
+    assert.match(releaseAudit, /npm publish dry-run/);
+    assert.match(releaseAudit, /npm publish real: não executado/);
 
     assert.match(releaseLocal, /release local/i);
     assert.match(releaseLocal, /não publicar automaticamente/i);
@@ -1133,14 +1154,20 @@ describe("SDD Master package foundation", () => {
     assert.match(readme, /npm run release:check/);
     assert.match(readme, /## GitHub Release/);
     assert.match(readme, /npm publish real ainda não executado/);
+    assert.match(readme, /publicação npm futura/);
+    assert.match(readme, /GitHub Release draft/);
     assert.match(readme, /aprovação humana explícita/);
     assert.match(changelog, /### Release local/);
     assert.match(changelog, /Release notes públicas/);
+    assert.match(changelog, /Auditoria da release draft/);
 
     const reviewedFiles = [
       releaseDoc,
       githubReleaseDoc,
       githubReleaseNotes,
+      githubReleaseChecklist,
+      npmPublishChecklist,
+      releaseAudit,
       releaseLocal,
       npmPublish,
       readme,

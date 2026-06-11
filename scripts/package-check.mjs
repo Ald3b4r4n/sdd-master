@@ -18,6 +18,8 @@ const requiredFiles = [
   "docs/02-tecnica-arquitetura/arquitetura-do-framework.md",
   "docs/02-tecnica-arquitetura/compatibilidade-multi-ia.md",
   "docs/02-tecnica-arquitetura/seguranca-e-governanca.md",
+  "docs/03-codigo/checklist-github-release.md",
+  "docs/03-codigo/checklist-publicacao-npm.md",
   "docs/03-codigo/comandos-cli.md",
   "docs/03-codigo/desenvolvimento-local.md",
   "docs/03-codigo/publicacao-npm.md",

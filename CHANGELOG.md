@@ -51,6 +51,9 @@
 - Preparação de GitHub Release draft.
 - Metadados públicos de repositório, bugs, homepage e keywords no `package.json`.
 - Documentação complementar para futura publicação npm.
+- Checklist final para publicação npm futura.
+- Checklist final para publicação da GitHub Release.
+- Auditoria da release draft `v0.1.0-prototype`.
 
 ### Release local
 
