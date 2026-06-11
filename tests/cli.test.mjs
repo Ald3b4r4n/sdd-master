@@ -1081,6 +1081,11 @@ describe("SDD Master package foundation", () => {
   it("includes local prototype release checks and documentation", () => {
     const packageJson = JSON.parse(readFileSync(join(rootDir, "package.json"), "utf8"));
     const releaseDoc = readFileSync(join(rootDir, "releases", "v0.1.0-prototype.md"), "utf8");
+    const githubReleaseDoc = readFileSync(join(rootDir, "releases", "github-v0.1.0-prototype.md"), "utf8");
+    const githubReleaseNotes = readFileSync(
+      join(rootDir, "releases", "github-v0.1.0-prototype-notes.md"),
+      "utf8"
+    );
     const releaseLocal = readFileSync(join(rootDir, "docs", "03-codigo", "release-local.md"), "utf8");
     const npmPublish = readFileSync(join(rootDir, "docs", "03-codigo", "publicacao-npm.md"), "utf8");
     const readme = readFileSync(join(rootDir, "README.md"), "utf8");
@@ -1091,27 +1096,56 @@ describe("SDD Master package foundation", () => {
     assert.equal(packageJson.version, "0.1.0-prototype");
     assert.equal(packageJson.publishConfig?.access, "public");
     assert.equal(packageJson.publishConfig?.tag, "prototype");
+    assert.equal(packageJson.repository?.url, "git+https://github.com/Ald3b4r4n/sdd-master.git");
+    assert.equal(packageJson.bugs?.url, "https://github.com/Ald3b4r4n/sdd-master/issues");
+    assert.equal(packageJson.homepage, "https://github.com/Ald3b4r4n/sdd-master#readme");
+    assert.equal(packageJson.keywords.includes("sdd"), true);
+    assert.equal(packageJson.keywords.includes("ai-agents"), true);
     assert.match(packageJson.scripts.check, /npm run release:check/);
 
     assert.equal(existsSync(join(rootDir, "releases", "v0.1.0-prototype.md")), true);
+    assert.equal(existsSync(join(rootDir, "releases", "github-v0.1.0-prototype.md")), true);
+    assert.equal(existsSync(join(rootDir, "releases", "github-v0.1.0-prototype-notes.md")), true);
     assert.match(releaseDoc, /Prototype/);
     assert.match(releaseDoc, /Push: não realizado/);
     assert.match(releaseDoc, /npm publish: não realizado/);
     assert.match(releaseDoc, /v0\.1\.0-prototype/);
+    assert.match(githubReleaseDoc, /v0\.1\.0-prototype/);
+    assert.match(githubReleaseDoc, /Prototype/);
+    assert.match(githubReleaseDoc, /Real npm publication/);
+    assert.doesNotMatch(githubReleaseDoc, /\.env/);
+    assert.doesNotMatch(githubReleaseDoc, /tokens|segredos/i);
+    assert.match(githubReleaseNotes, /v0\.1\.0-prototype/);
+    assert.match(githubReleaseNotes, /Draft prepared/);
+    assert.match(githubReleaseNotes, /Real npm publication/);
+    assert.doesNotMatch(githubReleaseNotes, /\.env/);
+    assert.doesNotMatch(githubReleaseNotes, /tokens|segredos/i);
 
     assert.match(releaseLocal, /release local/i);
     assert.match(releaseLocal, /não publicar automaticamente/i);
     assert.match(releaseLocal, /tag npm configurada é `prototype`/);
+    assert.match(releaseLocal, /gh release create/);
     assert.match(releaseLocal, /aprovação humana/i);
     assert.match(npmPublish, /npm publish --dry-run --access public/);
     assert.match(npmPublish, /tag npm `prototype`/);
     assert.match(npmPublish, /aprovação humana/i);
     assert.match(readme, /0\.1\.0-prototype/);
     assert.match(readme, /npm run release:check/);
+    assert.match(readme, /## GitHub Release/);
+    assert.match(readme, /npm publish real ainda não executado/);
     assert.match(readme, /aprovação humana explícita/);
     assert.match(changelog, /### Release local/);
+    assert.match(changelog, /Release notes públicas/);
 
-    const reviewedFiles = [releaseDoc, releaseLocal, npmPublish, readme, changelog].join("\n");
+    const reviewedFiles = [
+      releaseDoc,
+      githubReleaseDoc,
+      githubReleaseNotes,
+      releaseLocal,
+      npmPublish,
+      readme,
+      changelog
+    ].join("\n");
     assert.doesNotMatch(reviewedFiles, /sk-[A-Za-z0-9_-]{20,}/);
     assert.doesNotMatch(reviewedFiles, /BEGIN (RSA |EC |OPENSSH |)PRIVATE KEY/);
   });

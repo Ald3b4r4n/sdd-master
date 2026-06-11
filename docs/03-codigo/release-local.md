@@ -41,6 +41,25 @@ npm publish --dry-run --access public
 
 Para a versão prerelease `0.1.0-prototype`, a tag npm configurada é `prototype`.
 
+## GitHub Release draft
+
+A criação de uma GitHub Release deve ser feita somente após:
+
+1. tag local existir;
+2. tag remota existir;
+3. `npm run check` passar;
+4. `npm publish --dry-run --access public` passar;
+5. `sdd master git --pre-push` não retornar bloqueio;
+6. aprovação humana explícita.
+
+A primeira release pode ser criada como draft usando:
+
+```bash
+gh release create v0.1.0-prototype --draft --title "v0.1.0-prototype" --notes-file releases/github-v0.1.0-prototype-notes.md
+```
+
+Não publicar release final sem aprovação humana.
+
 ## Regras de segurança
 
 - Não fazer push sem autorização humana.

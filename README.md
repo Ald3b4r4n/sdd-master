@@ -252,6 +252,22 @@ Esta versão prototype usa a tag npm `prototype`, não `latest`.
 
 A publicação real no npm e o push para GitHub exigem aprovação humana explícita.
 
+## GitHub Release
+
+A primeira versão pública preparada é:
+
+```text
+v0.1.0-prototype
+```
+
+Status:
+
+- Tag enviada ao GitHub.
+- GitHub Release final ainda não publicada.
+- npm publish real ainda não executado.
+
+A release atual é um prototype e não representa versão final estável.
+
 ## Contribuição e GitHub
 
 Contribuições devem usar os templates de issue e Pull Request do repositório. Antes de enviar uma mudança para revisão, execute `npm run check` e registre os checks relevantes no Pull Request.

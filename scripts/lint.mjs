@@ -20,6 +20,8 @@ const requiredFiles = [
   "docs/03-codigo/desenvolvimento-local.md",
   "docs/03-codigo/publicacao-npm.md",
   "docs/03-codigo/release-local.md",
+  "releases/github-v0.1.0-prototype.md",
+  "releases/github-v0.1.0-prototype-notes.md",
   "releases/v0.1.0-prototype.md",
   "assets/readme/sdd-master-hero.svg",
   "assets/readme/workflow-overview.svg",

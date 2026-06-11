@@ -47,6 +47,10 @@
 - Detecção básica de instalação pelo `sdd master status`.
 - Documentação pública inicial.
 - Licença MIT.
+- Release notes públicas para `v0.1.0-prototype`.
+- Preparação de GitHub Release draft.
+- Metadados públicos de repositório, bugs, homepage e keywords no `package.json`.
+- Documentação complementar para futura publicação npm.
 
 ### Release local
 

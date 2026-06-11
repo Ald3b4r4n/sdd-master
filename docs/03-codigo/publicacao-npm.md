@@ -16,6 +16,23 @@ O dry-run ajuda a confirmar quais arquivos entrariam no pacote e se a configura�
 
 Como `0.1.0-prototype` é uma versão prerelease, a configuração do pacote usa a tag npm `prototype` para evitar publicação acidental como `latest`.
 
+## Antes da primeira publicação npm
+
+Antes de publicar de verdade:
+
+```bash
+npm run check
+npm publish --dry-run --access public
+```
+
+A publicação real exige:
+
+- login npm confirmado;
+- nome do pacote validado;
+- tag/release alinhada;
+- autorização humana explícita;
+- ausência de `.env`, segredos, credenciais e dados sensíveis.
+
 ## Segurança
 
 Nunca publique com `.env`, segredo, token, credencial, chave privada, certificado, dado pessoal, log sensível ou conteúdo interno de `.sdd-master/` de projetos consumidores.

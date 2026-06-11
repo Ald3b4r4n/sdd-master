@@ -23,6 +23,14 @@
     "access": "public",
     "tag": "prototype"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Ald3b4r4n/sdd-master.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Ald3b4r4n/sdd-master/issues"
+  },
+  "homepage": "https://github.com/Ald3b4r4n/sdd-master#readme",
   "engines": {
     "node": ">=20"
   },
@@ -40,10 +48,14 @@
   "keywords": [
     "sdd",
     "specification-driven-development",
+    "ai-agents",
     "cli",
-    "ai",
+    "typescript",
+    "documentation",
     "tdd",
-    "audit"
+    "audit",
+    "traceability",
+    "developer-tools"
   ],
   "devDependencies": {
     "typescript": "^5.8.3"
