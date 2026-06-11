@@ -21,7 +21,7 @@ export function runDoctor(cwd: string): DoctorReport {
   const checks = [
     internal,
     publicDocs,
-    agents,
+    agents.check,
     templates.check,
     gitignore,
     security.check,
@@ -38,6 +38,7 @@ export function runDoctor(cwd: string): DoctorReport {
     git: git.info,
     security: security.info,
     templates: templates.info,
+    agents: agents.info,
     recommendation
   };
 }

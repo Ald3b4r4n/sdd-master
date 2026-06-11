@@ -5,6 +5,7 @@ export type ParsedCommand =
   | { kind: "master-command-help"; command: string }
   | { kind: "master-status" }
   | { kind: "master-init"; args: string[] }
+  | { kind: "master-agents"; args: string[] }
   | { kind: "master-doctor"; args: string[] }
   | { kind: "planned-command"; command: "update" }
   | { kind: "unknown"; command: string; scope: "root" | "master" };
@@ -50,6 +51,10 @@ export function parseArgs(args: string[]): ParsedCommand {
 
   if (second === "doctor") {
     return { kind: "master-doctor", args: args.slice(2) };
+  }
+
+  if (second === "agents") {
+    return { kind: "master-agents", args: args.slice(2) };
   }
 
   if (plannedCommands.has(second)) {

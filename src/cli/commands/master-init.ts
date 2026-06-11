@@ -1,23 +1,15 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { basename, join } from "node:path";
 import { createInterface } from "node:readline/promises";
+import { parseAgent as parseSupportedAgent, parseLanguage as parseSupportedLanguage } from "../../agents/agent-registry.js";
+import { updateProjectStateAgentsBlock, writeAgentFiles } from "../../agents/agent-writer.js";
+import type { AgentLanguage, SupportedAgent } from "../../agents/agent-types.js";
 import { version } from "../../index.js";
 import { writeOfficialTemplates } from "../../templates/template-writer.js";
 import type { CliOutput, CliRuntime } from "../output.js";
 
-type Language = "pt-BR" | "en" | "es";
-type Agent =
-  | "codex"
-  | "claude"
-  | "cursor"
-  | "gemini"
-  | "copilot"
-  | "windsurf"
-  | "cline"
-  | "roo"
-  | "aider"
-  | "continue"
-  | "other";
+type Language = AgentLanguage;
+type Agent = SupportedAgent | "other";
 
 type InitOptions = {
   yes: boolean;
@@ -26,8 +18,7 @@ type InitOptions = {
   projectName?: string;
 };
 
-const languages = new Set<Language>(["pt-BR", "en", "es"]);
-const agents = new Set<Agent>([
+const initAgents = new Set<Agent>([
   "codex",
   "claude",
   "cursor",
@@ -38,6 +29,7 @@ const agents = new Set<Agent>([
   "roo",
   "aider",
   "continue",
+  "generic",
   "other"
 ]);
 
@@ -300,6 +292,18 @@ Recomendação:
   const templates = writeOfficialTemplates(cwd);
   ensureGitignore(cwd);
   ensureReadme(cwd, options.projectName);
+  const agent = normalizeInitAgent(options.agent);
+  const agents = writeAgentFiles(cwd, {
+    agents: [agent],
+    language: options.language,
+    force: false
+  });
+  updateProjectStateAgentsBlock(
+    cwd,
+    agent,
+    [],
+    agents.files.map((file) => file.path)
+  );
 
   return `SDD Master inicializado com sucesso.
 
@@ -322,6 +326,10 @@ Estruturas criadas:
 Templates oficiais:
   Criados: ${templates.created}
   Já existentes: ${templates.existing}
+
+Agentes / IAs:
+  Arquivos criados: ${agents.created.length}
+  Arquivos preservados: ${agents.preserved.length}
 
 Próximo comando recomendado:
   /sdd-master-discovery
@@ -470,11 +478,24 @@ Executar discovery do projeto.
 }
 
 function parseLanguage(value: string | undefined): Language | undefined {
-  return value && languages.has(value as Language) ? (value as Language) : undefined;
+  return parseSupportedLanguage(value);
 }
 
 function parseAgent(value: string | undefined): Agent | undefined {
-  return value && agents.has(value as Agent) ? (value as Agent) : undefined;
+  if (!value) {
+    return undefined;
+  }
+
+  if (value === "other") {
+    return "other";
+  }
+
+  const agent = parseSupportedAgent(value);
+  return agent && initAgents.has(agent) ? agent : undefined;
+}
+
+function normalizeInitAgent(agent: Agent): SupportedAgent {
+  return agent === "other" ? "generic" : agent;
 }
 
 function normalizeProjectName(value: string | undefined, cwd: string): string {
@@ -510,5 +531,6 @@ Valores aceitos:
   roo
   aider
   continue
+  generic
   other`;
 }

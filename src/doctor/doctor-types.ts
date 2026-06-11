@@ -34,6 +34,12 @@ export type DoctorTemplateInfo = {
   hasMinimumTemplates: boolean;
 };
 
+export type DoctorAgentInfo = {
+  files: string[];
+  hasSkillsDirectory: boolean;
+  hasProjectStateBlock: boolean;
+};
+
 export type DoctorReport = {
   status: DoctorStatus;
   checks: DoctorCheck[];
@@ -41,5 +47,6 @@ export type DoctorReport = {
   git: DoctorGitInfo;
   security: DoctorSecurityInfo;
   templates: DoctorTemplateInfo;
+  agents: DoctorAgentInfo;
   recommendation: string;
 };

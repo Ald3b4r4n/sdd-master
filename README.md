@@ -120,6 +120,25 @@ O doctor verifica:
 - Git básico;
 - estado do projeto.
 
+## Compatibilidade multi-IA
+
+O SDD Master pode gerar arquivos de instrução para diferentes agentes de codificação:
+
+- Codex: `AGENTS.md`
+- Claude Code: `CLAUDE.md`
+- Cursor: `.cursor/rules/sdd-master.mdc`
+- Gemini: `GEMINI.md`
+- Copilot: `.github/copilot-instructions.md`
+- Windsurf, Cline, Roo, Aider, Continue e genéricos
+
+Exemplo:
+
+```bash
+sdd master agents --yes --agents=codex,claude,cursor --language=pt-BR
+```
+
+Esses arquivos orientam cada IA a ler a constituição, respeitar o estado do projeto, não pular fases, não fazer push sem autorização humana e não expor `.env`, segredos, tokens ou credenciais.
+
 ## Scripts do Projeto
 
 ```bash

@@ -4,6 +4,7 @@ type CommandHelp = {
   purpose: string;
   whenUsed: string;
   example: string;
+  details?: string[];
   security?: string[];
   creates?: string[];
 };
@@ -25,6 +26,7 @@ const commandHelps: Record<string, CommandHelp> = {
     ],
     security: [
       "Instala templates oficiais em .sdd-master/templates/.",
+      "Gera automaticamente o arquivo do agente principal escolhido.",
       "Não deve criar .env real.",
       "Não deve enviar .sdd-master/ para remoto."
     ]
@@ -164,11 +166,22 @@ const commandHelps: Record<string, CommandHelp> = {
   },
   agents: {
     command: "agents",
-    status: "Planejado.",
-    purpose: "Organizar compatibilidade futura com agentes de IA.",
-    whenUsed: "Será usado para padronizar instruções e responsabilidades entre agentes.",
-    example: "sdd master agents",
-    security: ["Agentes não devem receber segredos sem controle explícito."]
+    status: "Disponível no BLOCO 06.",
+    purpose: "Gerar arquivos de instrução para múltiplas IAs/agentes de codificação.",
+    whenUsed: "Use após sdd master init para configurar agentes adicionais.",
+    example: "sdd master agents --yes --agents=codex,claude,cursor --language=pt-BR",
+    details: [
+      "Agentes suportados: codex, claude, cursor, gemini, copilot, windsurf, cline, roo, aider, continue, generic.",
+      "Flags: --agents, --language, --yes, -y, --force.",
+      "Use --force somente quando quiser sobrescrever arquivos de agente existentes.",
+      "Use sdd master agents --list para listar agentes."
+    ],
+    security: [
+      "Exige projeto inicializado com sdd master init.",
+      "Não cria .env real.",
+      "Não instala skills externas.",
+      "Reforça constituição, project-state e aprovação humana antes de push."
+    ]
   },
   skills: {
     command: "skills",
@@ -190,6 +203,7 @@ Comandos disponíveis:
   sdd master status     Mostra status básico do projeto
   sdd master init       Inicializa estrutura SDD Master no projeto
   sdd master doctor     Diagnostica a instalação SDD Master
+  sdd master agents     Gera arquivos de instrução para IAs/agentes
 
 Comandos planejados:
   sdd master update
@@ -241,6 +255,12 @@ Segurança:
 ${help.security.map((item) => `  ${item}`).join("\n")}
 `
     : "";
+  const details = help.details
+    ? `
+Detalhes:
+${help.details.map((item) => `  ${item}`).join("\n")}
+`
+    : "";
 
   return `sdd master ${help.command}
 
@@ -255,5 +275,5 @@ Quando será usado:
 
 Uso futuro:
   ${help.example}
-${creates}${security}`;
+${creates}${details}${security}`;
 }

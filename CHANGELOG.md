@@ -20,6 +20,11 @@
 - Diagnóstico estrutural da instalação SDD Master.
 - Saída legível e JSON para automação.
 - Verificações básicas de segurança para `.env` e arquivos sensíveis.
+- Comando `sdd master agents`.
+- Geração de arquivos de instrução para múltiplas IAs/agentes.
+- Integração do agente principal no `sdd master init`.
+- Registro de agentes no `project-state.md`.
+- Checks de agentes no `status` e `doctor`.
 - Atualização segura de README e `.gitignore` em projetos consumidores.
 - Detecção básica de instalação pelo `sdd master status`.
 - Documentação pública inicial.

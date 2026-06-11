@@ -1,5 +1,6 @@
 import { existsSync } from "node:fs";
 import { join } from "node:path";
+import { getRecognizedAgentFiles } from "../../agents/agent-writer.js";
 
 export function getStatusOutput(cwd: string): string {
   const hasSddMaster = existsSync(join(cwd, ".sdd-master"));
@@ -25,6 +26,8 @@ Observação:
 }
 
 function getInstalledStatus(cwd: string): string {
+  const agentFiles = getRecognizedAgentFiles(cwd);
+
   return `SDD Master — Status
 
 Instalação SDD Master:
@@ -42,6 +45,10 @@ Documentação:
 Templates:
   .sdd-master/templates/: ${formatStatus(existsSync(join(cwd, ".sdd-master", "templates")))}
 
+Agentes / IAs:
+${formatAgentFiles(agentFiles)}
+  .agents/skills/: ${formatStatus(existsSync(join(cwd, ".agents", "skills")))}
+
 Próximo comando recomendado:
   /sdd-master-discovery
 `;
@@ -49,4 +56,12 @@ Próximo comando recomendado:
 
 function formatStatus(isPresent: boolean): string {
   return isPresent ? "OK" : "Ausente";
+}
+
+function formatAgentFiles(files: string[]): string {
+  if (files.length === 0) {
+    return "  Nenhum arquivo de agente reconhecido: Ausente\n";
+  }
+
+  return `${files.map((file) => `  ${file}: OK`).join("\n")}\n`;
 }

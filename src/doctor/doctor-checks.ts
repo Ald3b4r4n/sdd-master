@@ -1,8 +1,10 @@
 import { execFileSync } from "node:child_process";
 import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
+import { getRecognizedAgentFiles } from "../agents/agent-writer.js";
 import { officialTemplates } from "../templates/official-templates.js";
 import type {
+  DoctorAgentInfo,
   DoctorCheck,
   DoctorGitInfo,
   DoctorProjectState,
@@ -92,8 +94,33 @@ export function checkPublicDocs(cwd: string): DoctorCheck {
   return checkRequiredPaths("public-docs", "Documentação pública", cwd, publicDocs);
 }
 
-export function checkAgents(cwd: string): DoctorCheck {
-  return checkRequiredPaths("agents", "Agents/skills", cwd, agentPaths, "warn");
+export function checkAgents(cwd: string): { check: DoctorCheck; info: DoctorAgentInfo } {
+  const base = checkRequiredPaths("agents", "Agents/skills", cwd, agentPaths, "warn");
+  const files = getRecognizedAgentFiles(cwd);
+  const hasProjectStateBlock = hasAgentsProjectStateBlock(cwd);
+  const details = [...base.details];
+
+  if (files.length === 0) {
+    details.push("Nenhum arquivo de agente reconhecido.");
+  }
+
+  if (!hasProjectStateBlock) {
+    details.push("Bloco de agentes ausente em .sdd-master/project-state.md.");
+  }
+
+  return {
+    check: {
+      id: "agents",
+      label: "Agents/skills",
+      status: details.length === 0 ? "pass" : "warn",
+      details
+    },
+    info: {
+      files,
+      hasSkillsDirectory: existsSync(join(cwd, ".agents", "skills")),
+      hasProjectStateBlock
+    }
+  };
 }
 
 export function checkTemplates(cwd: string): { check: DoctorCheck; info: DoctorTemplateInfo } {
@@ -211,6 +238,16 @@ export function readProjectState(cwd: string): DoctorProjectState {
 
 export function getOfficialTemplateCount(): number {
   return officialTemplates.length;
+}
+
+function hasAgentsProjectStateBlock(cwd: string): boolean {
+  const path = join(cwd, ".sdd-master", "project-state.md");
+
+  if (!existsSync(path)) {
+    return false;
+  }
+
+  return readFileSync(path, "utf8").includes("## Agentes / IAs configuradas");
 }
 
 function checkRequiredPaths(

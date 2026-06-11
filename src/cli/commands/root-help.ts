@@ -11,7 +11,8 @@ Comandos principais:
   sdd master version    Mostra a versão instalada
   sdd master status     Mostra status básico do projeto
   sdd master init       Inicializa o SDD Master no projeto
-  sdd master doctor     Planejado: diagnostica a instalação
+  sdd master doctor     Diagnostica a instalação
+  sdd master agents     Gera instruções para IAs/agentes
   sdd master update     Planejado: atualiza templates e estrutura
 
 Use:

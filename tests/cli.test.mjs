@@ -119,6 +119,19 @@ describe("SDD Master package foundation", () => {
     assert.match(result.stdout, /Não deve expor segredos/);
   });
 
+  it("shows contextual help for agents and command help", () => {
+    const contextual = runCli(["master", "help", "agents"]);
+    const direct = runCli(["master", "agents", "--help"]);
+
+    assert.equal(contextual.status, 0);
+    assert.equal(direct.status, 0);
+    assert.match(contextual.stdout, /Disponível no BLOCO 06/);
+    assert.match(contextual.stdout, /--agents/);
+    assert.match(contextual.stdout, /--force/);
+    assert.match(direct.stdout, /Agentes suportados/);
+    assert.match(direct.stdout, /codex/);
+  });
+
   it("shows basic status without requiring .sdd-master", () => {
     const result = runCli(["master", "status"]);
 
@@ -192,6 +205,7 @@ describe("SDD Master package foundation", () => {
       assert.equal(existsSync(join(projectDir, ".sdd-master", "constitution.md")), true);
       assert.equal(existsSync(join(projectDir, ".sdd-master", "project-state.md")), true);
       assert.equal(existsSync(join(projectDir, ".sdd-master", "templates", "README.md")), true);
+      assert.equal(existsSync(join(projectDir, "AGENTS.md")), true);
 
       for (const directory of requiredDirectories) {
         assert.equal(existsSync(join(projectDir, directory)), true, `${directory} should exist`);
@@ -210,6 +224,9 @@ describe("SDD Master package foundation", () => {
       assert.match(projectState, /Nome do projeto: Projeto Teste/);
       assert.match(projectState, /Idioma operacional: pt-BR/);
       assert.match(projectState, /IA\/agente principal: codex/);
+      assert.match(projectState, /## Agentes \/ IAs configuradas/);
+      assert.match(projectState, /IA principal: codex/);
+      assert.match(projectState, /AGENTS\.md/);
 
       const templatesReadme = readFileSync(
         join(projectDir, ".sdd-master", "templates", "README.md"),
@@ -278,7 +295,34 @@ describe("SDD Master package foundation", () => {
       const readme = readFileSync(join(projectDir, "README.md"), "utf8");
       assert.match(readme, /# Projeto Teste/);
       assert.match(readme, /Projeto inicializado com SDD Master/);
+      const agentsMd = readFileSync(join(projectDir, "AGENTS.md"), "utf8");
+      assert.match(agentsMd, /Não enviar `.env` real/);
+      assert.match(agentsMd, /Não fazer push sem autorização humana/);
+      assert.match(agentsMd, /\.sdd-master\/constitution.md/);
+      assert.match(agentsMd, /\.sdd-master\/project-state.md/);
       assert.equal(existsSync(join(projectDir, ".env")), false);
+    });
+  });
+
+  it("init creates the selected primary agent file", () => {
+    withTempProject((projectDir) => {
+      const claude = runCli(
+        ["master", "init", "-y", "--language=pt-BR", "--agent=claude", "--project-name=Claude Project"],
+        projectDir
+      );
+
+      assert.equal(claude.status, 0);
+      assert.equal(existsSync(join(projectDir, "CLAUDE.md")), true);
+    });
+
+    withTempProject((projectDir) => {
+      const cursor = runCli(
+        ["master", "init", "-y", "--language=pt-BR", "--agent=cursor", "--project-name=Cursor Project"],
+        projectDir
+      );
+
+      assert.equal(cursor.status, 0);
+      assert.equal(existsSync(join(projectDir, ".cursor", "rules", "sdd-master.mdc")), true);
     });
   });
 
@@ -363,7 +407,163 @@ describe("SDD Master package foundation", () => {
       assert.match(status.stdout, /\.sdd-master\/constitution.md: OK/);
       assert.match(status.stdout, /docs\/03-codigo\/: OK/);
       assert.match(status.stdout, /\.sdd-master\/templates\/: OK/);
+      assert.match(status.stdout, /AGENTS\.md: OK/);
+      assert.match(status.stdout, /\.agents\/skills\/: OK/);
       assert.match(status.stdout, /\/sdd-master-discovery/);
+    });
+  });
+
+  it("agents command requires initialized project", () => {
+    withTempProject((projectDir) => {
+      const result = runCli(
+        ["master", "agents", "--yes", "--agents=codex", "--language=pt-BR"],
+        projectDir
+      );
+
+      assert.notEqual(result.status, 0);
+      assert.match(result.stderr, /SDD Master não inicializado/);
+      assert.match(result.stderr, /sdd master init/);
+    });
+  });
+
+  it("agents command creates codex, claude and cursor files", () => {
+    withTempProject((projectDir) => {
+      initTempProject(projectDir);
+      const result = runCli(
+        ["master", "agents", "--yes", "--agents=codex,claude,cursor", "--language=pt-BR"],
+        projectDir
+      );
+
+      assert.equal(result.status, 0);
+      assert.equal(existsSync(join(projectDir, "AGENTS.md")), true);
+      assert.equal(existsSync(join(projectDir, "CLAUDE.md")), true);
+      assert.equal(existsSync(join(projectDir, ".cursor", "rules", "sdd-master.mdc")), true);
+      assert.match(readFileSync(join(projectDir, "CLAUDE.md"), "utf8"), /Não enviar `.env` real/);
+      assert.match(readFileSync(join(projectDir, "CLAUDE.md"), "utf8"), /Não fazer push sem autorização humana/);
+      assert.match(readFileSync(join(projectDir, "CLAUDE.md"), "utf8"), /\.sdd-master\/constitution.md/);
+      assert.match(readFileSync(join(projectDir, "CLAUDE.md"), "utf8"), /\.sdd-master\/project-state.md/);
+    });
+  });
+
+  it("agents command creates gemini and copilot files in English", () => {
+    withTempProject((projectDir) => {
+      initTempProject(projectDir);
+      const result = runCli(
+        ["master", "agents", "--yes", "--agents=gemini,copilot", "--language=en"],
+        projectDir
+      );
+
+      assert.equal(result.status, 0);
+      assert.equal(existsSync(join(projectDir, "GEMINI.md")), true);
+      assert.equal(existsSync(join(projectDir, ".github", "copilot-instructions.md")), true);
+      assert.match(readFileSync(join(projectDir, "GEMINI.md"), "utf8"), /Do not commit real `.env` files/);
+    });
+  });
+
+  it("agents command creates windsurf, cline and roo files", () => {
+    withTempProject((projectDir) => {
+      initTempProject(projectDir);
+      const result = runCli(
+        ["master", "agents", "--yes", "--agents=windsurf,cline,roo", "--language=pt-BR"],
+        projectDir
+      );
+
+      assert.equal(result.status, 0);
+      assert.equal(existsSync(join(projectDir, ".windsurf", "rules", "sdd-master.md")), true);
+      assert.equal(existsSync(join(projectDir, ".cline", "rules", "sdd-master.md")), true);
+      assert.equal(existsSync(join(projectDir, ".roo", "rules", "sdd-master.md")), true);
+    });
+  });
+
+  it("agents command creates aider and continue files", () => {
+    withTempProject((projectDir) => {
+      initTempProject(projectDir);
+      const result = runCli(
+        ["master", "agents", "--yes", "--agents=aider,continue", "--language=pt-BR"],
+        projectDir
+      );
+
+      assert.equal(result.status, 0);
+      assert.equal(existsSync(join(projectDir, ".aider.conf.yml")), true);
+      assert.equal(existsSync(join(projectDir, ".continue", "sdd-master.md")), true);
+    });
+  });
+
+  it("agents command preserves existing files unless force is used", () => {
+    withTempProject((projectDir) => {
+      initTempProject(projectDir);
+      const agentsPath = join(projectDir, "AGENTS.md");
+      writeFileSync(agentsPath, "manual content\n", "utf8");
+
+      const preserved = runCli(
+        ["master", "agents", "--yes", "--agents=codex", "--language=pt-BR"],
+        projectDir
+      );
+      assert.equal(preserved.status, 0);
+      assert.equal(readFileSync(agentsPath, "utf8"), "manual content\n");
+      assert.match(preserved.stdout, /Arquivos preservados:\s+- AGENTS\.md/);
+
+      const forced = runCli(
+        ["master", "agents", "--yes", "--agents=codex", "--language=pt-BR", "--force"],
+        projectDir
+      );
+      assert.equal(forced.status, 0);
+      assert.notEqual(readFileSync(agentsPath, "utf8"), "manual content\n");
+      assert.match(forced.stdout, /Arquivos sobrescritos:\s+- AGENTS\.md/);
+    });
+  });
+
+  it("agents command updates project-state and doctor JSON", () => {
+    withTempProject((projectDir) => {
+      initTempProject(projectDir);
+      const agents = runCli(
+        ["master", "agents", "--yes", "--agents=codex,claude,cursor", "--language=pt-BR"],
+        projectDir
+      );
+      const state = readFileSync(join(projectDir, ".sdd-master", "project-state.md"), "utf8");
+      const doctor = JSON.parse(runCli(["master", "doctor", "--json"], projectDir).stdout);
+
+      assert.equal(agents.status, 0);
+      assert.match(state, /IA principal: codex/);
+      assert.match(state, /IAs adicionais: claude, cursor/);
+      assert.match(state, /CLAUDE\.md/);
+      assert.equal(doctor.checks.some((check) => check.id === "agents"), true);
+      assert.equal(doctor.agents.files.includes("AGENTS.md"), true);
+      assert.equal(doctor.agents.files.includes("CLAUDE.md"), true);
+      assert.equal(doctor.agents.files.includes(".cursor/rules/sdd-master.mdc"), true);
+      assert.equal(doctor.agents.hasProjectStateBlock, true);
+    });
+  });
+
+  it("agents command rejects invalid language and invalid agent", () => {
+    withTempProject((projectDir) => {
+      initTempProject(projectDir);
+      const invalidLanguage = runCli(
+        ["master", "agents", "--yes", "--agents=codex", "--language=fr"],
+        projectDir
+      );
+      const invalidAgent = runCli(
+        ["master", "agents", "--yes", "--agents=banana", "--language=pt-BR"],
+        projectDir
+      );
+
+      assert.notEqual(invalidLanguage.status, 0);
+      assert.match(invalidLanguage.stderr, /Idioma inválido: fr/);
+      assert.notEqual(invalidAgent.status, 0);
+      assert.match(invalidAgent.stderr, /Agente inválido: banana/);
+    });
+  });
+
+  it("agents command does not create .env", () => {
+    withTempProject((projectDir) => {
+      initTempProject(projectDir);
+      const result = runCli(
+        ["master", "agents", "--yes", "--agents=codex", "--language=pt-BR"],
+        projectDir
+      );
+
+      assert.equal(result.status, 0);
+      assert.equal(existsSync(join(projectDir, ".env")), false);
     });
   });
 
