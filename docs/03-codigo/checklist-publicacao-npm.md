@@ -2,9 +2,31 @@
 
 ## Status
 
-Publicação real ainda não executada.
+Publicação real executada para `sdd-master@0.1.0-prototype.1`.
 
 Versão prerelease atual: `0.1.0-prototype.1`.
+
+## npm
+
+Publicado no npm:
+
+```bash
+npm install -g sdd-master@prototype
+```
+
+Versão publicada:
+
+```text
+sdd-master@0.1.0-prototype.1
+```
+
+Dist-tag:
+
+```text
+prototype
+```
+
+Observação: por ser a primeira versão publicada, o npm também manteve `latest` apontando para `0.1.0-prototype.1`. A instalação recomendada neste estágio permanece `sdd-master@prototype`.
 
 ## Antes de publicar
 

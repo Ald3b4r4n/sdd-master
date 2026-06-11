@@ -1018,7 +1018,7 @@ describe("SDD Master package foundation", () => {
 
     assert.match(readme, /^# SDD Master/m);
     assert.match(readme, /assets\/readme\/sdd-master-hero\.svg/);
-    assert.match(readme, /## Instalação futura via npm/);
+    assert.match(readme, /## Instalação via npm/);
     assert.match(readme, /## Uso local durante desenvolvimento/);
     assert.match(readme, /## Comandos atuais/);
     assert.match(readme, /\| `sdd master init` \| Disponível \|/);
@@ -1149,6 +1149,9 @@ describe("SDD Master package foundation", () => {
     assert.match(releaseDocCurrent, /0\.1\.0-prototype\.1/);
     assert.match(releaseDocCurrent, /v0\.1\.0-prototype\.1/);
     assert.match(releaseDocCurrent, /sem mover ou reescrever histórico Git/);
+    assert.match(releaseDocCurrent, /npm install -g sdd-master@prototype/);
+    assert.match(releaseDocCurrent, /npm publish: realizado/);
+    assert.match(releaseDocCurrent, /latest.*0\.1\.0-prototype\.1/);
     assert.match(githubReleaseDocCurrent, /v0\.1\.0-prototype\.1/);
     assert.match(githubReleaseDocCurrent, /v0\.1\.0-prototype/);
     assert.match(githubReleaseDocCurrent, /Real npm publication/);
@@ -1166,7 +1169,8 @@ describe("SDD Master package foundation", () => {
     assert.match(npmPublishChecklist, /npm publish --access public --tag prototype/);
     assert.match(npmPublishChecklist, /aprovação humana explícita/);
     assert.match(npmPublishChecklist, /0\.1\.0-prototype\.1/);
-    assert.match(npmPublishChecklist, /não `latest`/);
+    assert.match(npmPublishChecklist, /npm install -g sdd-master@prototype/);
+    assert.match(npmPublishChecklist, /latest.*0\.1\.0-prototype\.1/);
     assert.match(releaseAudit, /v0\.1\.0-prototype/);
     assert.match(releaseAudit, /npm publish dry-run/);
     assert.match(releaseAudit, /npm publish real: não executado/);
@@ -1180,14 +1184,18 @@ describe("SDD Master package foundation", () => {
     assert.match(npmPublish, /tag npm `prototype`/);
     assert.match(npmPublish, /0\.1\.0-prototype\.1/);
     assert.match(npmPublish, /--tag prototype/);
+    assert.match(npmPublish, /npm install -g sdd-master@prototype/);
+    assert.match(npmPublish, /latest.*0\.1\.0-prototype\.1/);
     assert.match(npmPublish, /aprovação humana/i);
     assert.match(readme, /0\.1\.0-prototype\.1/);
     assert.match(readme, /histórico Git/);
     assert.match(readme, /sem reescrita/);
     assert.match(readme, /npm run release:check/);
     assert.match(readme, /## GitHub Release/);
-    assert.match(readme, /npm publish real ainda não executado/);
-    assert.match(readme, /publicação npm futura/);
+    assert.match(readme, /npm install -g sdd-master@prototype/);
+    assert.match(readme, /npm publish real executado/);
+    assert.match(readme, /publicação npm prototype/);
+    assert.match(readme, /latest.*0\.1\.0-prototype\.1/);
     assert.match(readme, /--tag prototype/);
     assert.match(readme, /GitHub Release draft/);
     assert.match(readme, /aprovação humana explícita/);

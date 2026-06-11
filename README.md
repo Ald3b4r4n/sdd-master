@@ -46,14 +46,20 @@ O SDD Master combina:
 - TDD obrigatório;
 - auditoria e rastreabilidade.
 
-## Instalação futura via npm
+## Instalação via npm
 
 ```bash
-npm install -g sdd-master
-sdd master init
+npm install -g sdd-master@prototype
+sdd master help
 ```
 
-O pacote ainda está em prototype e não foi publicado no npm.
+O pacote está publicado como prototype e ainda não representa uma release estável. Use a dist-tag `prototype` para instalar esta versão.
+
+```text
+sdd-master@0.1.0-prototype.1
+```
+
+Como esta é a primeira versão publicada no npm, o registry também mantém `latest` apontando para `0.1.0-prototype.1`. A instalação recomendada para este estágio continua sendo `sdd-master@prototype`.
 
 ## Uso local durante desenvolvimento
 
@@ -267,19 +273,20 @@ Status:
 - Tag inicial `v0.1.0-prototype` preservada sem reescrita.
 - Nova tag `v0.1.0-prototype.1` preparada para alinhar versão, documentação e release draft futura.
 - GitHub Release final ainda não publicada.
-- npm publish real ainda não executado.
+- npm publish real executado para `sdd-master@0.1.0-prototype.1` com dist-tag `prototype`.
+- npm `latest` também aponta para `0.1.0-prototype.1` por comportamento automático da primeira publicação.
 
 A release atual é um prototype e não representa versão final estável.
 
 ## Publicação
 
-O SDD Master possui preparação para:
+O SDD Master possui:
 
 - GitHub Release draft;
-- publicação npm futura;
+- publicação npm prototype;
 - validação local com `npm publish --dry-run --access public --tag prototype`.
 
-A publicação real no npm e a publicação final da GitHub Release exigem aprovação humana explícita.
+A publicação final da GitHub Release exige aprovação humana explícita.
 
 ## Contribuição e GitHub
 

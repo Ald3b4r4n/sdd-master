@@ -6,6 +6,7 @@
 
 - Atualizada versão prerelease para consolidar os ajustes finais após `v0.1.0-prototype`.
 - Alinhada documentação pública de release, GitHub Release e publicação npm futura para `v0.1.0-prototype.1`.
+- Documentada a publicação npm prototype de `sdd-master@0.1.0-prototype.1`.
 
 ### Corrigido
 
@@ -15,7 +16,8 @@
 ### Segurança
 
 - Nenhum segredo, `.env` real, credencial ou dado sensível foi incluído.
-- npm publish real ainda não foi executado.
+- npm publish real foi executado com a dist-tag `prototype`.
+- A dist-tag `latest` também aponta para `0.1.0-prototype.1` por comportamento automático da primeira publicação npm.
 
 ## [0.1.0-prototype] - 2026-06-11
 
