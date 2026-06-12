@@ -212,27 +212,59 @@ const commandHelps: Record<string, CommandHelp> = {
   },
   quality: {
     command: "quality",
-    status: "Planejado.",
+    status: "Disponível no BLOCO 19.",
     purpose: "Executar verificações de qualidade, testes e critérios técnicos.",
-    whenUsed: "Será usado antes de auditoria, release ou deploy.",
-    example: "sdd master quality",
-    security: ["Deve falhar se encontrar exposição de segredos."]
+    whenUsed: "Use antes da futura implementação para registrar qualidade de fase, documento, requisito ou tarefa.",
+    example: "sdd master quality --yes --phase=\"PHASE-01\" --target=\"tasks\" --title=\"Revisão de qualidade\"",
+    creates: [".sdd-master/quality/quality-index.md", ".sdd-master/quality/QUALITY-001.md"],
+    details: [
+      "Flags: --help, --json, --yes, -y, --title, --phase, --target, --status, --reason.",
+      "Status failed cria blocker e bloqueia readiness.",
+      "Status warning aparece em status/doctor."
+    ],
+    security: ["Não executa implementação.", "Não cria .env real.", "Não expõe segredos em achados."]
   },
   audit: {
     command: "audit",
-    status: "Planejado.",
+    status: "Disponível no BLOCO 19.",
     purpose: "Auditar rastreabilidade, conformidade e riscos do projeto.",
-    whenUsed: "Será usado ao fechar fases ou investigar divergências.",
-    example: "sdd master audit",
-    security: ["Não deve publicar evidências sensíveis."]
+    whenUsed: "Use para registrar auditoria formal e achados por severidade.",
+    example: "sdd master audit --yes --phase=\"PHASE-01\" --type=\"self-audit\" --title=\"Auditoria da fase\"",
+    creates: [".sdd-master/audits/audit-index.md", ".sdd-master/audits/AUDIT-001.md"],
+    details: [
+      "Severidades: INFO, LOW, MEDIUM, HIGH, CRITICAL, BLOCKER.",
+      "Severidade BLOCKER cria blocker ativo.",
+      "HIGH e CRITICAL aparecem em status/doctor e afetam readiness."
+    ],
+    security: ["Evidências devem ser descritas sem expor segredos.", "Não publica release ou pacote."]
   },
   docs: {
     command: "docs",
-    status: "Planejado.",
+    status: "Disponível no BLOCO 19.",
     purpose: "Validar e manter documentação obrigatória do SDD Master.",
-    whenUsed: "Será usado quando requisitos, arquitetura ou código mudarem.",
-    example: "sdd master docs",
+    whenUsed: "Use para registrar atualização ou pendência documental.",
+    example: "sdd master docs --yes --phase=\"PHASE-01\" --target=\"workflow\" --title=\"Validação documental\"",
+    creates: [".sdd-master/docs/docs-index.md", ".sdd-master/docs/DOCS-001.md"],
+    details: [
+      "Detecta os três eixos públicos de docs.",
+      "Status missing ou outdated bloqueia readiness.",
+      "Registro documental não autoriza implementação."
+    ],
     security: ["Deve evitar registrar tokens, senhas ou chaves em documentação."]
+  },
+  blocker: {
+    command: "blocker",
+    status: "Disponível no BLOCO 19.",
+    purpose: "Criar, listar, resolver e consultar blockers formais.",
+    whenUsed: "Use quando houver impedimento formal para avanço.",
+    example: "sdd master blocker --yes --title=\"Bloqueio formal\" --phase=\"PHASE-01\" --severity=\"BLOCKER\"",
+    creates: [".sdd-master/blockers/blockers-index.md", ".sdd-master/blockers/BLOCKER-001.md"],
+    details: [
+      "Use --json para listar blockers.",
+      "Use --id e --status=resolved para resolver.",
+      "Blocker aberto impede futura implementação."
+    ],
+    security: ["Aceite formal ainda depende de aprovação humana.", "Não executa implementação."]
   },
   git: {
     command: "git",
@@ -313,13 +345,14 @@ Comandos disponíveis:
   sdd master approve    Registra aprovações humanas formais
   sdd master scope      Controla escopo e mudanças
   sdd master backlog    Registra itens futuros fora do escopo atual
+  sdd master quality    Registra revisão de qualidade
+  sdd master audit      Registra auditoria formal
+  sdd master docs       Registra estado documental
+  sdd master blocker    Gerencia blockers formais
 
 Comandos planejados:
   sdd master update
   sdd master implement
-  sdd master quality
-  sdd master audit
-  sdd master docs
   sdd master release
   sdd master deploy
   sdd master agents

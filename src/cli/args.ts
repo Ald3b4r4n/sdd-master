@@ -10,6 +10,7 @@ export type ParsedCommand =
   | { kind: "master-git"; args: string[] }
   | { kind: "master-workflow"; command: "discovery" | "requirements" | "spec" | "plan" | "tasks"; args: string[] }
   | { kind: "master-governance"; command: "clarify" | "approve" | "scope" | "backlog"; args: string[] }
+  | { kind: "master-gate"; command: "quality" | "audit" | "docs" | "blocker"; args: string[] }
   | { kind: "planned-command"; command: "update" }
   | { kind: "unknown"; command: string; scope: "root" | "master" };
 
@@ -18,6 +19,7 @@ const versionFlags = new Set(["--version", "-v"]);
 const plannedCommands = new Set(["update"]);
 const workflowCommands = new Set(["discovery", "requirements", "spec", "plan", "tasks"]);
 const governanceCommands = new Set(["clarify", "approve", "scope", "backlog"]);
+const gateCommands = new Set(["quality", "audit", "docs", "blocker"]);
 
 export function parseArgs(args: string[]): ParsedCommand {
   const [first, second, third] = args;
@@ -78,6 +80,14 @@ export function parseArgs(args: string[]): ParsedCommand {
     return {
       kind: "master-governance",
       command: second as "clarify" | "approve" | "scope" | "backlog",
+      args: args.slice(2)
+    };
+  }
+
+  if (gateCommands.has(second)) {
+    return {
+      kind: "master-gate",
+      command: second as "quality" | "audit" | "docs" | "blocker",
       args: args.slice(2)
     };
   }

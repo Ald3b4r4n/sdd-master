@@ -82,6 +82,24 @@ Comandos:
 
 Todos exigem projeto inicializado. Clarificações abertas, mudanças de escopo abertas, rejeições e aprovações pendentes aparecem em `status` e `doctor`.
 
+## Quality, audit, docs e blockers
+
+```bash
+sdd master quality --yes --phase="PHASE-01" --target="tasks" --title="Revisão de qualidade"
+sdd master audit --yes --phase="PHASE-01" --type="self-audit" --title="Auditoria da fase"
+sdd master docs --yes --phase="PHASE-01" --target="workflow" --title="Validação documental"
+sdd master blocker --yes --title="Bloqueio formal" --phase="PHASE-01" --severity="BLOCKER"
+```
+
+Comandos:
+
+1. `quality` registra revisão de qualidade.
+2. `audit` registra auditoria e severidade.
+3. `docs` registra estado documental.
+4. `blocker` cria, lista ou resolve bloqueios formais.
+
+`failed`, `BLOCKER`, `HIGH`, `CRITICAL`, `missing` e `outdated` alimentam `status`, `doctor` e readiness de implementação.
+
 ## Update
 
 ```bash

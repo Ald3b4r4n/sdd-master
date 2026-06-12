@@ -1063,6 +1063,7 @@ describe("SDD Master package foundation", () => {
       "docs/03-codigo/desenvolvimento-local.md",
       "docs/03-codigo/governanca-sdd.md",
       "docs/03-codigo/publicacao-npm.md",
+      "docs/03-codigo/quality-audit-blockers.md",
       "docs/03-codigo/release-local.md",
       "docs/03-codigo/workflow-sdd.md"
     ];
@@ -1439,6 +1440,192 @@ describe("SDD Master package foundation", () => {
     assert.equal(existsSync(join(rootDir, "SDD Master Roadmap.pdf")), true);
     assert.equal(existsSync(join(rootDir, "SDD Master — Checklist de Implementação v0.1.pdf")), true);
     assert.equal(existsSync(join(rootDir, "SDD Master — Documento Mestre v0.1.pdf")), true);
+  });
+
+  it("implements quality audit docs and blocker gates safely", () => {
+    for (const command of ["quality", "audit", "docs", "blocker"]) {
+      withTempProject((projectDir) => {
+        const result = runCli(["master", command, "--yes"], projectDir);
+
+        assert.notEqual(result.status, 0);
+        assert.match(result.stderr, /SDD Master não inicializado neste diretório/);
+        assert.match(result.stderr, /sdd master init/);
+      });
+    }
+
+    withTempProject((projectDir) => {
+      initTempProject(projectDir);
+
+      const quality = runCli(
+        ["master", "quality", "--yes", "--phase=PHASE-01", "--target=tasks", "--title=Revisão de qualidade"],
+        projectDir
+      );
+      assert.equal(quality.status, 0);
+      assert.equal(existsSync(join(projectDir, ".sdd-master", "quality", "QUALITY-001.md")), true);
+
+      const qualityJson = JSON.parse(
+        runCli(
+          [
+            "master",
+            "quality",
+            "--json",
+            "--yes",
+            "--phase=PHASE-01",
+            "--target=spec",
+            "--status=failed",
+            "--reason=Critérios de aceite incompletos."
+          ],
+          projectDir
+        ).stdout
+      );
+      assert.equal(qualityJson.command, "quality");
+      assert.equal(qualityJson.status, "created");
+      assert.equal(qualityJson.implementReady, false);
+      assert.equal(existsSync(join(projectDir, ".sdd-master", "quality", "QUALITY-002.md")), true);
+      assert.equal(existsSync(join(projectDir, ".sdd-master", "blockers", "BLOCKER-001.md")), true);
+
+      const audit = runCli(
+        ["master", "audit", "--yes", "--phase=PHASE-01", "--type=self-audit", "--title=Auditoria da fase"],
+        projectDir
+      );
+      assert.equal(audit.status, 0);
+      assert.equal(existsSync(join(projectDir, ".sdd-master", "audits", "AUDIT-001.md")), true);
+
+      const auditBlocker = runCli(
+        [
+          "master",
+          "audit",
+          "--yes",
+          "--phase=PHASE-01",
+          "--severity=BLOCKER",
+          "--category=constitution",
+          "--title=Tentativa de avançar sem aprovação",
+          "--reason=Tasks ainda pendentes de aprovação humana."
+        ],
+        projectDir
+      );
+      assert.equal(auditBlocker.status, 0);
+      assert.equal(existsSync(join(projectDir, ".sdd-master", "audits", "AUDIT-002.md")), true);
+      assert.equal(existsSync(join(projectDir, ".sdd-master", "blockers", "BLOCKER-002.md")), true);
+
+      const auditHigh = runCli(
+        [
+          "master",
+          "audit",
+          "--yes",
+          "--phase=PHASE-01",
+          "--severity=HIGH",
+          "--category=workflow",
+          "--title=Achado alto",
+          "--reason=Risco alto registrado."
+        ],
+        projectDir
+      );
+      assert.equal(auditHigh.status, 0);
+
+      const docs = runCli(
+        ["master", "docs", "--yes", "--phase=PHASE-01", "--target=workflow", "--title=Validação documental"],
+        projectDir
+      );
+      assert.equal(docs.status, 0);
+      assert.equal(existsSync(join(projectDir, ".sdd-master", "docs", "DOCS-001.md")), true);
+
+      const outdatedDocs = runCli(
+        [
+          "master",
+          "docs",
+          "--yes",
+          "--phase=PHASE-01",
+          "--target=docs/03-codigo/workflow-sdd.md",
+          "--status=outdated",
+          "--reason=Novo comando ainda não documentado."
+        ],
+        projectDir
+      );
+      assert.equal(outdatedDocs.status, 0);
+      assert.equal(existsSync(join(projectDir, ".sdd-master", "docs", "DOCS-002.md")), true);
+
+      const manualBlocker = runCli(
+        [
+          "master",
+          "blocker",
+          "--yes",
+          "--title=Tasks sem aprovação humana",
+          "--phase=PHASE-01",
+          "--severity=BLOCKER",
+          "--reason=Implementação não pode começar."
+        ],
+        projectDir
+      );
+      assert.equal(manualBlocker.status, 0);
+      assert.equal(existsSync(join(projectDir, ".sdd-master", "blockers", "BLOCKER-003.md")), true);
+
+      const blockerJson = JSON.parse(runCli(["master", "blocker", "--json"], projectDir).stdout);
+      assert.equal(blockerJson.command, "blocker");
+      assert.equal(blockerJson.status, "listed");
+      assert.equal(blockerJson.records.includes("BLOCKER-001"), true);
+
+      const resolved = runCli(
+        ["master", "blocker", "--yes", "--id=BLOCKER-003", "--status=resolved", "--reason=Aprovação registrada."],
+        projectDir
+      );
+      assert.equal(resolved.status, 0);
+      assert.match(
+        readFileSync(join(projectDir, ".sdd-master", "blockers", "BLOCKER-003.md"), "utf8"),
+        /## Status\s+Resolvido/
+      );
+
+      const status = runCli(["master", "status"], projectDir);
+      assert.equal(status.status, 0);
+      assert.match(status.stdout, /Quality:/);
+      assert.match(status.stdout, /Falhas abertas: 1/);
+      assert.match(status.stdout, /Audit:/);
+      assert.match(status.stdout, /BLOCKER abertos: 1/);
+      assert.match(status.stdout, /HIGH\/CRITICAL abertos: 1/);
+      assert.match(status.stdout, /Docs:/);
+      assert.match(status.stdout, /Pendências documentais: 1/);
+      assert.match(status.stdout, /Blockers:/);
+      assert.match(status.stdout, /Abertos: 2/);
+      assert.match(status.stdout, /Pronta: Não/);
+
+      const doctorJson = JSON.parse(runCli(["master", "doctor", "--json"], projectDir).stdout);
+      assert.equal(typeof doctorJson.gates, "object");
+      assert.equal(doctorJson.gates.quality.failedOpen, 1);
+      assert.equal(doctorJson.gates.audit.blockerOpen, 1);
+      assert.equal(doctorJson.gates.audit.highCriticalOpen, 1);
+      assert.equal(doctorJson.gates.docs.pending, 1);
+      assert.equal(doctorJson.gates.blockers.open, 2);
+      assert.equal(doctorJson.implementReadiness.ready, false);
+      assert.equal(doctorJson.status, "broken");
+
+      for (const command of ["quality", "audit", "docs", "blocker"]) {
+        const contextual = runCli(["master", "help", command]);
+        const direct = runCli(["master", command, "--help"]);
+
+        assert.equal(contextual.status, 0);
+        assert.equal(direct.status, 0);
+        assert.match(contextual.stdout, new RegExp(`sdd master ${command}`));
+        assert.match(direct.stdout, /readiness|implementação|Bloqueios/i);
+      }
+
+      assert.equal(existsSync(join(projectDir, ".env")), false);
+      const gateContent = [
+        readFileSync(join(projectDir, ".sdd-master", "quality", "QUALITY-001.md"), "utf8"),
+        readFileSync(join(projectDir, ".sdd-master", "audits", "AUDIT-002.md"), "utf8"),
+        readFileSync(join(projectDir, ".sdd-master", "docs", "DOCS-002.md"), "utf8"),
+        readFileSync(join(projectDir, ".sdd-master", "blockers", "BLOCKER-001.md"), "utf8")
+      ].join("\n");
+      assert.doesNotMatch(gateContent, /sk-[A-Za-z0-9_-]{20,}|BEGIN (RSA |EC |OPENSSH |)PRIVATE KEY/);
+    });
+
+    assert.equal(existsSync(join(rootDir, ".sdd-master")), false);
+    assert.equal(existsSync(join(rootDir, "SDD Master Roadmap.pdf")), true);
+    assert.equal(existsSync(join(rootDir, "SDD Master — Checklist de Implementação v0.1.pdf")), true);
+    assert.equal(existsSync(join(rootDir, "SDD Master — Documento Mestre v0.1.pdf")), true);
+
+    const prePush = runCli(["master", "git", "--pre-push"], rootDir);
+    assert.notEqual(prePush.stdout, "");
+    assert.doesNotMatch(prePush.stdout, /Status geral:\s+blocked/);
   });
 
   it("includes local prototype release checks and documentation", () => {

@@ -2,12 +2,14 @@ import { execFileSync } from "node:child_process";
 import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
 import { getRecognizedAgentFiles } from "../agents/agent-writer.js";
+import { getGateStatus } from "../gates/gate-state.js";
 import { getImplementReadiness } from "../governance/blockers.js";
 import { getGovernanceStatus } from "../governance/governance-state.js";
 import { officialTemplates } from "../templates/official-templates.js";
 import type {
   DoctorAgentInfo,
   DoctorCheck,
+  DoctorGateInfo,
   DoctorGitInfo,
   DoctorGovernanceInfo,
   DoctorImplementReadinessInfo,
@@ -308,6 +310,36 @@ export function checkImplementReadiness(cwd: string): {
       details: readiness.blockers
     },
     info: readiness
+  };
+}
+
+export function checkGates(cwd: string): {
+  check: DoctorCheck;
+  info: DoctorGateInfo;
+} {
+  const gates = getGateStatus(cwd);
+  const details = [
+    gates.quality.total === 0 ? "Quality não iniciada." : "",
+    gates.audit.total === 0 ? "Audit não iniciada." : "",
+    gates.docs.total === 0 ? "Docs gate não iniciado." : "",
+    gates.blockers.total === 0 ? "Blockers não iniciados." : "",
+    gates.quality.failedOpen > 0 ? "Quality failed aberta." : "",
+    gates.audit.blockerOpen > 0 ? "Auditoria BLOCKER aberta." : "",
+    gates.audit.highCriticalOpen > 0 ? "Auditoria HIGH/CRITICAL aberta." : "",
+    gates.docs.pending > 0 ? "Pendência documental aberta." : "",
+    gates.blockers.open > 0 ? "Blocker aberto." : ""
+  ].filter(Boolean);
+
+  const hasCriticalBlock = gates.blockers.open > 0 || gates.audit.blockerOpen > 0;
+
+  return {
+    check: {
+      id: "gates",
+      label: "Quality/Audit/Docs/Blockers",
+      status: hasCriticalBlock ? "fail" : details.length === 0 ? "pass" : "warn",
+      details
+    },
+    info: gates
   };
 }
 

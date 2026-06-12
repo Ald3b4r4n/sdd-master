@@ -257,6 +257,21 @@ sdd master scope --yes --type="change" --title="Nova solicitação" --phase="PHA
 sdd master backlog --yes --type="improvement" --title="Melhoria futura" --priority="COULD"
 ```
 
+## Quality, audit, docs e blockers
+
+Antes de implementar, o SDD Master exige portões formais de qualidade, auditoria e documentação.
+
+Comandos:
+
+```bash
+sdd master quality --yes --phase="PHASE-01" --target="tasks" --title="Revisão de qualidade"
+sdd master audit --yes --phase="PHASE-01" --type="self-audit" --title="Auditoria da fase"
+sdd master docs --yes --phase="PHASE-01" --target="workflow" --title="Validação documental"
+sdd master blocker --yes --title="Bloqueio formal" --phase="PHASE-01" --severity="BLOCKER"
+```
+
+Blockers abertos impedem a futura implementação.
+
 ## Qualidade e validação local
 
 Antes de qualquer release ou publicação, execute:

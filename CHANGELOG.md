@@ -20,6 +20,13 @@
   - `sdd master backlog`
 - Bloqueios formais antes da futura implementação.
 - Cálculo inicial de prontidão para implementação.
+- Comandos de quality/audit/docs/blockers:
+  - `sdd master quality`
+  - `sdd master audit`
+  - `sdd master docs`
+  - `sdd master blocker`
+- Integração desses portões com `status`, `doctor` e readiness de implementação.
+- Bloqueios formais para achados BLOCKER, auditorias críticas, documentação pendente e qualidade reprovada.
 
 ## [0.1.0-prototype.1] - 2026-06-11
 

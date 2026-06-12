@@ -1,5 +1,6 @@
 import {
   checkAgents,
+  checkGates,
   checkGitignore,
   checkGovernance,
   checkImplementReadiness,
@@ -22,6 +23,7 @@ export function runDoctor(cwd: string): DoctorReport {
   const gitignore = checkGitignore(cwd);
   const workflow = checkWorkflow(cwd);
   const governance = checkGovernance(cwd);
+  const gates = checkGates(cwd);
   const implementReadiness = checkImplementReadiness(cwd);
   const security = checkSensitiveFiles(cwd);
   const git = getGitInfo(cwd);
@@ -46,6 +48,7 @@ export function runDoctor(cwd: string): DoctorReport {
     templates.check,
     workflow.check,
     governance.check,
+    gates.check,
     implementReadiness.check,
     gitignore,
     security.check,
@@ -66,6 +69,7 @@ export function runDoctor(cwd: string): DoctorReport {
     agents: agents.info,
     workflow: workflow.info,
     governance: governance.info,
+    gates: gates.info,
     implementReadiness: implementReadiness.info,
     gitSecurity: {
       status: gitSecurity.status,

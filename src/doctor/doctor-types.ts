@@ -76,6 +76,29 @@ export type DoctorImplementReadinessInfo = {
   blockers: string[];
 };
 
+export type DoctorGateInfo = {
+  quality: {
+    total: number;
+    failedOpen: number;
+    warnings: number;
+  };
+  audit: {
+    total: number;
+    blockerOpen: number;
+    highCriticalOpen: number;
+  };
+  docs: {
+    total: number;
+    pending: number;
+    publicAxesPresent: boolean;
+  };
+  blockers: {
+    total: number;
+    open: number;
+    resolved: number;
+  };
+};
+
 export type DoctorReport = {
   status: DoctorStatus;
   checks: DoctorCheck[];
@@ -86,6 +109,7 @@ export type DoctorReport = {
   agents: DoctorAgentInfo;
   workflow: DoctorWorkflowInfo;
   governance: DoctorGovernanceInfo;
+  gates: DoctorGateInfo;
   implementReadiness: DoctorImplementReadinessInfo;
   gitSecurity: {
     status: "clean" | "warning" | "blocked";

@@ -9,6 +9,7 @@ import { getPlannedCommandOutput } from "./commands/planned-command.js";
 import { getRootHelp } from "./commands/root-help.js";
 import { getStatusOutput } from "./commands/master-status.js";
 import { getVersionOutput } from "./commands/master-version.js";
+import { runGateCommand } from "../gates/gate-runner.js";
 import { runGovernanceCommand } from "../governance/governance-runner.js";
 import { runWorkflowCommand } from "../workflow/workflow-runner.js";
 
@@ -47,6 +48,8 @@ export async function runCommand(
       return runWorkflowCommand(command.command, command.args, output, runtime);
     case "master-governance":
       return runGovernanceCommand(command.command, command.args, output, runtime);
+    case "master-gate":
+      return runGateCommand(command.command, command.args, output, runtime);
     case "planned-command":
       output.stdout(getPlannedCommandOutput(command.command));
       return 0;

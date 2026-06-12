@@ -66,6 +66,23 @@ Governança:
   Mudanças de escopo abertas: ${report.governance.scope.openChanges}
   Backlog registrado: ${report.governance.backlog.total}
 
+Quality:
+  Revisões registradas: ${report.gates.quality.total}
+  Falhas abertas: ${report.gates.quality.failedOpen}
+
+Audit:
+  Auditorias registradas: ${report.gates.audit.total}
+  BLOCKER abertos: ${report.gates.audit.blockerOpen}
+  HIGH/CRITICAL abertos: ${report.gates.audit.highCriticalOpen}
+
+Docs:
+  Checks registrados: ${report.gates.docs.total}
+  Pendências documentais: ${report.gates.docs.pending}
+
+Blockers:
+  Abertos: ${report.gates.blockers.open}
+  Resolvidos: ${report.gates.blockers.resolved}
+
 Implementação:
   Pronta: ${report.implementReadiness.ready ? "Sim" : "Não"}
   Bloqueios:

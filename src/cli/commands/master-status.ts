@@ -1,6 +1,7 @@
 import { existsSync } from "node:fs";
 import { join } from "node:path";
 import { getRecognizedAgentFiles } from "../../agents/agent-writer.js";
+import { getGateStatus } from "../../gates/gate-state.js";
 import { runGitSecurityCheck } from "../../git/git-checks.js";
 import { getImplementReadiness } from "../../governance/blockers.js";
 import { getGovernanceStatus } from "../../governance/governance-state.js";
@@ -34,6 +35,7 @@ function getInstalledStatus(cwd: string): string {
   const gitSecurity = runGitSecurityCheck(cwd, "default");
   const workflow = getWorkflowStatus(cwd);
   const governance = getGovernanceStatus(cwd);
+  const gates = getGateStatus(cwd);
   const implementReadiness = getImplementReadiness(cwd);
 
   return `SDD Master — Status
@@ -74,6 +76,23 @@ Governança:
   Aprovações registradas: ${governance.approvals.total}
   Mudanças de escopo abertas: ${governance.scope.openChanges}
   Backlog registrado: ${governance.backlog.total}
+
+Quality:
+  Revisões registradas: ${gates.quality.total}
+  Falhas abertas: ${gates.quality.failedOpen}
+
+Audit:
+  Auditorias registradas: ${gates.audit.total}
+  BLOCKER abertos: ${gates.audit.blockerOpen}
+  HIGH/CRITICAL abertos: ${gates.audit.highCriticalOpen}
+
+Docs:
+  Checks registrados: ${gates.docs.total}
+  Pendências documentais: ${gates.docs.pending}
+
+Blockers:
+  Abertos: ${gates.blockers.open}
+  Resolvidos: ${gates.blockers.resolved}
 
 Implementação:
   Pronta: ${implementReadiness.ready ? "Sim" : "Não"}
