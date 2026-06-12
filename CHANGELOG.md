@@ -18,6 +18,7 @@
 - Nenhum segredo, `.env` real, credencial ou dado sensível foi incluído.
 - npm publish real foi executado com a dist-tag `prototype`.
 - A dist-tag `latest` também aponta para `0.1.0-prototype.1` por comportamento automático da primeira publicação npm.
+- Registrado que o npm bloqueou a remoção de `latest` enquanto `0.1.0-prototype.1` é a única versão publicada; a mitigação é instalar com `sdd-master@prototype`.
 
 ## [0.1.0-prototype] - 2026-06-11
 

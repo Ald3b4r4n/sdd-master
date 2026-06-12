@@ -26,7 +26,15 @@ Dist-tag:
 prototype
 ```
 
-Observação: por ser a primeira versão publicada, o npm também manteve `latest` apontando para `0.1.0-prototype.1`. A instalação recomendada neste estágio permanece `sdd-master@prototype`.
+Observação: por ser a primeira versão publicada, o npm também manteve `latest` apontando para `0.1.0-prototype.1`. O registry bloqueou a remoção de `latest` enquanto essa é a única versão publicada. A instalação recomendada neste estágio permanece `sdd-master@prototype`.
+
+Evite usar:
+
+```bash
+npm install -g sdd-master
+```
+
+até existir uma release estável.
 
 ## Antes de publicar
 
@@ -37,7 +45,8 @@ Observação: por ser a primeira versão publicada, o npm também manteve `lates
 - [ ] Confirmar GitHub Release draft.
 - [ ] Executar `npm run check`.
 - [ ] Executar `npm publish --dry-run --access public --tag prototype`.
-- [ ] Confirmar no output do dry-run que a tag npm é `prototype`, não `latest`.
+- [ ] Confirmar no output do dry-run que a tag npm planejada é `prototype`.
+- [ ] Se `latest` apontar para prototype por ser a única versão publicada, registrar o risco e a mitigação.
 - [ ] Executar `sdd master git --pre-push`.
 - [ ] Confirmar ausência de `.env`.
 - [ ] Confirmar ausência de segredos.

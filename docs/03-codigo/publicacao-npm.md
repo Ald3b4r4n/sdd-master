@@ -22,7 +22,15 @@ Dist-tag:
 prototype
 ```
 
-Como esta é a primeira versão publicada do pacote, o npm também mantém `latest` apontando para `0.1.0-prototype.1`. A instalação recomendada neste estágio continua sendo `sdd-master@prototype`, porque a versão ainda é prototype e não é release estável.
+Como esta é a primeira versão publicada do pacote, o npm também mantém `latest` apontando para `0.1.0-prototype.1`. O registry bloqueou a remoção de `latest` enquanto essa é a única versão publicada. A instalação recomendada neste estágio continua sendo `sdd-master@prototype`, porque a versão ainda é prototype e não é release estável.
+
+Evite usar:
+
+```bash
+npm install -g sdd-master
+```
+
+até existir uma release estável.
 
 ## Validação pré-publicação usada
 
@@ -71,7 +79,8 @@ Antes de uma publicação real:
 - Confirmar autenticação npm.
 - Confirmar acesso ao pacote ou escopo npm.
 - Confirmar que `npm publish --dry-run --access public --tag prototype` passou.
-- Confirmar que o output do dry-run não aponta para `latest`.
+- Confirmar que o output do dry-run aponta para a dist-tag planejada.
+- Se `latest` apontar para uma versão prototype por ser a única versão publicada, registrar o risco e orientar instalação por `sdd-master@prototype`.
 - Confirmar aprovação humana explícita.
 
 ## Publicação real

@@ -1152,6 +1152,8 @@ describe("SDD Master package foundation", () => {
     assert.match(releaseDocCurrent, /npm install -g sdd-master@prototype/);
     assert.match(releaseDocCurrent, /npm publish: realizado/);
     assert.match(releaseDocCurrent, /latest.*0\.1\.0-prototype\.1/);
+    assert.match(releaseDocCurrent, /bloqueou a remoção de `latest`/);
+    assert.match(releaseDocCurrent, /npm install -g sdd-master/);
     assert.match(githubReleaseDocCurrent, /v0\.1\.0-prototype\.1/);
     assert.match(githubReleaseDocCurrent, /v0\.1\.0-prototype/);
     assert.match(githubReleaseDocCurrent, /Real npm publication/);
@@ -1171,6 +1173,8 @@ describe("SDD Master package foundation", () => {
     assert.match(npmPublishChecklist, /0\.1\.0-prototype\.1/);
     assert.match(npmPublishChecklist, /npm install -g sdd-master@prototype/);
     assert.match(npmPublishChecklist, /latest.*0\.1\.0-prototype\.1/);
+    assert.match(npmPublishChecklist, /bloqueou a remoção de `latest`/);
+    assert.match(npmPublishChecklist, /Evite usar/);
     assert.match(releaseAudit, /v0\.1\.0-prototype/);
     assert.match(releaseAudit, /npm publish dry-run/);
     assert.match(releaseAudit, /npm publish real: não executado/);
@@ -1186,6 +1190,8 @@ describe("SDD Master package foundation", () => {
     assert.match(npmPublish, /--tag prototype/);
     assert.match(npmPublish, /npm install -g sdd-master@prototype/);
     assert.match(npmPublish, /latest.*0\.1\.0-prototype\.1/);
+    assert.match(npmPublish, /bloqueou a remoção de `latest`/);
+    assert.match(npmPublish, /Evite usar/);
     assert.match(npmPublish, /aprovação humana/i);
     assert.match(readme, /0\.1\.0-prototype\.1/);
     assert.match(readme, /histórico Git/);
@@ -1196,12 +1202,15 @@ describe("SDD Master package foundation", () => {
     assert.match(readme, /npm publish real executado/);
     assert.match(readme, /publicação npm prototype/);
     assert.match(readme, /latest.*0\.1\.0-prototype\.1/);
+    assert.match(readme, /bloqueou a remoção de `latest`/);
+    assert.match(readme, /Evite usar/);
     assert.match(readme, /--tag prototype/);
     assert.match(readme, /GitHub Release draft/);
     assert.match(readme, /aprovação humana explícita/);
     assert.match(changelog, /### Release local/);
     assert.match(changelog, /0\.1\.0-prototype\.1/);
     assert.match(changelog, /Mantida a tag `v0\.1\.0-prototype` sem reescrita/);
+    assert.match(changelog, /bloqueou a remoção de `latest`/);
     assert.match(changelog, /Release notes públicas/);
     assert.match(changelog, /Auditoria da release draft/);
 

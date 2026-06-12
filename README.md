@@ -59,7 +59,15 @@ O pacote está publicado como prototype e ainda não representa uma release est�
 sdd-master@0.1.0-prototype.1
 ```
 
-Como esta é a primeira versão publicada no npm, o registry também mantém `latest` apontando para `0.1.0-prototype.1`. A instalação recomendada para este estágio continua sendo `sdd-master@prototype`.
+Como esta é a primeira versão publicada no npm, o registry mantém `latest` apontando para `0.1.0-prototype.1` e não permitiu remover essa dist-tag enquanto não há outra versão publicada. A instalação recomendada para este estágio continua sendo `sdd-master@prototype`.
+
+Evite usar:
+
+```bash
+npm install -g sdd-master
+```
+
+até existir uma release estável.
 
 ## Uso local durante desenvolvimento
 
@@ -275,6 +283,7 @@ Status:
 - GitHub Release final ainda não publicada.
 - npm publish real executado para `sdd-master@0.1.0-prototype.1` com dist-tag `prototype`.
 - npm `latest` também aponta para `0.1.0-prototype.1` por comportamento automático da primeira publicação.
+- npm bloqueou a remoção de `latest` enquanto `0.1.0-prototype.1` é a única versão publicada.
 
 A release atual é um prototype e não representa versão final estável.
 
