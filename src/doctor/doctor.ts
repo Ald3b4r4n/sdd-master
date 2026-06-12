@@ -5,6 +5,7 @@ import {
   checkPublicDocs,
   checkSensitiveFiles,
   checkTemplates,
+  checkWorkflow,
   getGitInfo,
   readProjectState
 } from "./doctor-checks.js";
@@ -17,6 +18,7 @@ export function runDoctor(cwd: string): DoctorReport {
   const agents = checkAgents(cwd);
   const templates = checkTemplates(cwd);
   const gitignore = checkGitignore(cwd);
+  const workflow = checkWorkflow(cwd);
   const security = checkSensitiveFiles(cwd);
   const git = getGitInfo(cwd);
   const gitSecurity = runGitSecurityCheck(cwd, "default");
@@ -38,6 +40,7 @@ export function runDoctor(cwd: string): DoctorReport {
     publicDocs,
     agents.check,
     templates.check,
+    workflow.check,
     gitignore,
     security.check,
     git.check,
@@ -55,6 +58,7 @@ export function runDoctor(cwd: string): DoctorReport {
     security: security.info,
     templates: templates.info,
     agents: agents.info,
+    workflow: workflow.info,
     gitSecurity: {
       status: gitSecurity.status,
       forbiddenFiles: gitSecurity.security.forbiddenFiles,

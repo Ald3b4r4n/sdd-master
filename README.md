@@ -86,6 +86,11 @@ node dist/cli/main.js master help
 | `sdd master doctor` | Disponível | Diagnostica instalação |
 | `sdd master agents` | Disponível | Gera instruções multi-IA |
 | `sdd master git` | Disponível | Valida Git e segurança |
+| `sdd master discovery` | Disponível | Cria discovery inicial |
+| `sdd master requirements` | Disponível | Cria requisitos iniciais |
+| `sdd master spec` | Disponível | Cria especificação inicial |
+| `sdd master plan` | Disponível | Cria plano técnico inicial |
+| `sdd master tasks` | Disponível | Cria tarefas iniciais |
 | `sdd master update` | Planejado | Atualizará templates/estrutura |
 
 ## Fluxo visual
@@ -219,6 +224,20 @@ O SDD Master instala templates locais em `.sdd-master/templates/` para requisito
 
 Templates são pontos de partida. Documentos reais devem ser criados a partir deles, revisados e aprovados pelo fluxo SDD Master.
 
+## Workflow SDD inicial
+
+Comandos iniciais:
+
+```bash
+sdd master discovery --yes --title="Meu Projeto" --project-type="web" --profiles="WEB" --maturity="M0"
+sdd master requirements --yes --title="Requisitos iniciais"
+sdd master spec --yes --phase="PHASE-01" --title="Especificação inicial"
+sdd master plan --yes --phase="PHASE-01" --title="Plano técnico inicial"
+sdd master tasks --yes --phase="PHASE-01" --title="Tarefas iniciais"
+```
+
+Esses comandos criam documentos locais em `.sdd-master/` e documentação pública em `docs/`. Cada etapa registra `Aprovação humana: Pendente` e preserva arquivos existentes por padrão.
+
 ## Qualidade e validação local
 
 Antes de qualquer release ou publicação, execute:
@@ -311,6 +330,7 @@ Nunca publique `.env`, tokens, credenciais, chaves privadas, certificados, dados
 - [Segurança e governança](docs/02-tecnica-arquitetura/seguranca-e-governanca.md)
 - [Comandos CLI](docs/03-codigo/comandos-cli.md)
 - [Desenvolvimento local](docs/03-codigo/desenvolvimento-local.md)
+- [Workflow SDD](docs/03-codigo/workflow-sdd.md)
 
 ## Roadmap
 

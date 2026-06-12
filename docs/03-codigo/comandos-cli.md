@@ -44,6 +44,26 @@ sdd master git --json
 
 Valida Git local, `.gitignore`, arquivos sensíveis e possíveis segredos. Não executa commit nem push.
 
+## Workflow SDD inicial
+
+```bash
+sdd master discovery --yes --title="Meu Projeto" --project-type="web" --profiles="WEB" --maturity="M0"
+sdd master requirements --yes --title="Requisitos iniciais"
+sdd master spec --yes --phase="PHASE-01" --title="Especificação inicial"
+sdd master plan --yes --phase="PHASE-01" --title="Plano técnico inicial"
+sdd master tasks --yes --phase="PHASE-01" --title="Tarefas iniciais"
+```
+
+Ordem mínima:
+
+1. `discovery`
+2. `requirements`
+3. `spec`
+4. `plan`
+5. `tasks`
+
+Todos exigem projeto inicializado com `sdd master init`, preservam arquivos existentes por padrão e registram aprovação humana pendente.
+
 ## Update
 
 ```bash

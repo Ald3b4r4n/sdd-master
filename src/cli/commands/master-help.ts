@@ -62,19 +62,42 @@ const commandHelps: Record<string, CommandHelp> = {
   },
   discovery: {
     command: "discovery",
-    status: "Planejado.",
+    status: "Disponível no BLOCO 17.",
     purpose: "Guiar descoberta inicial do produto, negócio e contexto de uso.",
-    whenUsed: "Será usado antes de requisitos detalhados e planejamento técnico.",
-    example: "sdd master discovery",
-    security: ["Não deve registrar dados sensíveis sem consentimento explícito."]
+    whenUsed: "Use após sdd master init e antes de requirements.",
+    example: "sdd master discovery --yes --title=\"Meu Projeto\" --project-type=\"web\" --profiles=\"WEB\" --maturity=\"M0\"",
+    creates: [
+      ".sdd-master/discovery/initial-discovery.md",
+      ".sdd-master/discovery/project-profiles.md",
+      ".sdd-master/discovery/initial-risks.md",
+      ".sdd-master/discovery/constraints.md",
+      "docs/01-negocio-requisitos/visao-do-produto.md"
+    ],
+    details: [
+      "Flags: --help, --json, --yes, -y, --title, --phase, --project-type, --profiles, --maturity.",
+      "Próximo comando: /sdd-master-requirements.",
+      "Aprovação humana pendente antes de avançar."
+    ],
+    security: ["Exige projeto inicializado.", "Não cria .env real.", "Preserva arquivos existentes."]
   },
   requirements: {
     command: "requirements",
-    status: "Planejado.",
+    status: "Disponível no BLOCO 17.",
     purpose: "Organizar requisitos funcionais, não funcionais e critérios de aceite.",
-    whenUsed: "Será usado após discovery e antes de especificação técnica.",
-    example: "sdd master requirements",
-    security: ["Deve separar requisitos públicos de informações sensíveis."]
+    whenUsed: "Use após discovery e antes de spec.",
+    example: "sdd master requirements --yes --title=\"Requisitos iniciais\"",
+    creates: [
+      ".sdd-master/requirements/requirements-index.md",
+      ".sdd-master/requirements/rf/RF-001.md",
+      ".sdd-master/requirements/rnf/RNF-001.md",
+      ".sdd-master/requirements/business-rules/BR-001.md"
+    ],
+    details: [
+      "Pré-condição: .sdd-master/discovery/initial-discovery.md.",
+      "Próximo comando: /sdd-master-spec.",
+      "Aprovação humana pendente antes de avançar."
+    ],
+    security: ["Exige projeto inicializado.", "Não cria .env real.", "Preserva arquivos existentes."]
   },
   clarify: {
     command: "clarify",
@@ -86,27 +109,45 @@ const commandHelps: Record<string, CommandHelp> = {
   },
   spec: {
     command: "spec",
-    status: "Planejado.",
+    status: "Disponível no BLOCO 17.",
     purpose: "Criar ou validar especificações de funcionalidades.",
-    whenUsed: "Será usado para transformar requisitos em escopo implementável.",
-    example: "sdd master spec",
-    security: ["Deve documentar limites de dados sensíveis."]
+    whenUsed: "Use após requirements e antes de plan.",
+    example: "sdd master spec --yes --phase=\"PHASE-01\" --title=\"Especificação inicial\"",
+    creates: [".sdd-master/specs/phase-01-spec.md"],
+    details: [
+      "Pré-condição: .sdd-master/requirements/requirements-index.md.",
+      "Próximo comando: /sdd-master-plan.",
+      "Aprovação humana pendente antes de avançar."
+    ],
+    security: ["Exige projeto inicializado.", "Não cria .env real.", "Preserva arquivos existentes."]
   },
   plan: {
     command: "plan",
-    status: "Planejado.",
+    status: "Disponível no BLOCO 17.",
     purpose: "Planejar arquitetura, etapas técnicas e impactos antes do código.",
-    whenUsed: "Será usado depois da especificação aprovada.",
-    example: "sdd master plan",
-    security: ["Deve registrar riscos de segurança no plano técnico."]
+    whenUsed: "Use após spec e antes de tasks.",
+    example: "sdd master plan --yes --phase=\"PHASE-01\" --title=\"Plano técnico inicial\"",
+    creates: [".sdd-master/plans/phase-01-plan.md", "docs/02-tecnica-arquitetura/plano-tecnico-inicial.md"],
+    details: [
+      "Pré-condição: .sdd-master/specs/phase-01-spec.md.",
+      "Próximo comando: /sdd-master-tasks.",
+      "Aprovação humana pendente antes de avançar."
+    ],
+    security: ["Exige projeto inicializado.", "Não cria .env real.", "Preserva arquivos existentes."]
   },
   tasks: {
     command: "tasks",
-    status: "Planejado.",
+    status: "Disponível no BLOCO 17.",
     purpose: "Quebrar o plano aprovado em tarefas rastreáveis.",
-    whenUsed: "Será usado antes da implementação orientada por TDD.",
-    example: "sdd master tasks",
-    security: ["Deve incluir tarefas de validação de segurança quando aplicável."]
+    whenUsed: "Use após plan e antes de implement.",
+    example: "sdd master tasks --yes --phase=\"PHASE-01\" --title=\"Tarefas iniciais\"",
+    creates: [".sdd-master/tasks/phase-01-tasks.md", ".sdd-master/tasks/TASK-001.md"],
+    details: [
+      "Pré-condição: .sdd-master/plans/phase-01-plan.md.",
+      "Próximo comando lógico: /sdd-master-implement, ainda não implementado.",
+      "Aprovação humana pendente antes de avançar."
+    ],
+    security: ["Exige projeto inicializado.", "Não cria .env real.", "Preserva arquivos existentes."]
   },
   implement: {
     command: "implement",
@@ -210,15 +251,15 @@ Comandos disponíveis:
   sdd master doctor     Diagnostica a instalação SDD Master
   sdd master agents     Gera arquivos de instrução para IAs/agentes
   sdd master git        Diagnostica Git e segurança local
+  sdd master discovery  Cria discovery inicial
+  sdd master requirements Cria requisitos iniciais
+  sdd master spec       Cria especificação inicial
+  sdd master plan       Cria plano técnico inicial
+  sdd master tasks      Cria tarefas iniciais
 
 Comandos planejados:
   sdd master update
-  sdd master discovery
-  sdd master requirements
   sdd master clarify
-  sdd master spec
-  sdd master plan
-  sdd master tasks
   sdd master implement
   sdd master quality
   sdd master audit

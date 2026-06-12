@@ -1,5 +1,19 @@
 # Changelog
 
+## [Unreleased]
+
+### Adicionado
+
+- Comandos iniciais de workflow SDD:
+  - `sdd master discovery`
+  - `sdd master requirements`
+  - `sdd master spec`
+  - `sdd master plan`
+  - `sdd master tasks`
+- Geração inicial de documentos em `.sdd-master/`.
+- Atualização de documentação pública em `docs/`.
+- Guardas simples de ordem do fluxo SDD.
+
 ## [0.1.0-prototype.1] - 2026-06-11
 
 ### Alterado

@@ -40,6 +40,15 @@ export type DoctorAgentInfo = {
   hasProjectStateBlock: boolean;
 };
 
+export type DoctorWorkflowInfo = {
+  discovery: boolean;
+  requirements: boolean;
+  spec: boolean;
+  plan: boolean;
+  tasks: boolean;
+  nextCommand: string;
+};
+
 export type DoctorReport = {
   status: DoctorStatus;
   checks: DoctorCheck[];
@@ -48,6 +57,7 @@ export type DoctorReport = {
   security: DoctorSecurityInfo;
   templates: DoctorTemplateInfo;
   agents: DoctorAgentInfo;
+  workflow: DoctorWorkflowInfo;
   gitSecurity: {
     status: "clean" | "warning" | "blocked";
     forbiddenFiles: string[];

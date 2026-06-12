@@ -1062,7 +1062,8 @@ describe("SDD Master package foundation", () => {
       "docs/03-codigo/comandos-cli.md",
       "docs/03-codigo/desenvolvimento-local.md",
       "docs/03-codigo/publicacao-npm.md",
-      "docs/03-codigo/release-local.md"
+      "docs/03-codigo/release-local.md",
+      "docs/03-codigo/workflow-sdd.md"
     ];
 
     for (const doc of docs) {
@@ -1078,6 +1079,173 @@ describe("SDD Master package foundation", () => {
     assert.match(localDevelopment, /npm run smoke/);
     assert.match(localDevelopment, /npm run package:check/);
     assert.match(localDevelopment, /npm run pack:dry-run/);
+  });
+
+  it("implements the initial SDD workflow commands safely", () => {
+    for (const command of ["discovery", "requirements", "spec", "plan", "tasks"]) {
+      withTempProject((projectDir) => {
+        const result = runCli(["master", command, "--yes"], projectDir);
+
+        assert.notEqual(result.status, 0);
+        assert.match(result.stderr, /SDD Master não inicializado neste diretório/);
+        assert.match(result.stderr, /sdd master init/);
+      });
+    }
+
+    withTempProject((projectDir) => {
+      initTempProject(projectDir);
+
+      const prematureRequirements = runCli(["master", "requirements", "--yes"], projectDir);
+      const prematureSpec = runCli(["master", "spec", "--yes"], projectDir);
+      const prematurePlan = runCli(["master", "plan", "--yes"], projectDir);
+      const prematureTasks = runCli(["master", "tasks", "--yes"], projectDir);
+
+      assert.notEqual(prematureRequirements.status, 0);
+      assert.notEqual(prematureSpec.status, 0);
+      assert.notEqual(prematurePlan.status, 0);
+      assert.notEqual(prematureTasks.status, 0);
+      assert.match(prematureRequirements.stderr, /Pré-condição ausente/);
+      assert.match(prematureSpec.stderr, /requirements-index\.md/);
+      assert.match(prematurePlan.stderr, /phase-01-spec\.md/);
+      assert.match(prematureTasks.stderr, /phase-01-plan\.md/);
+
+      const discovery = runCli(
+        [
+          "master",
+          "discovery",
+          "--yes",
+          "--title=Minha Loja",
+          "--project-type=web",
+          "--profiles=WEB,E-COMMERCE",
+          "--maturity=M0"
+        ],
+        projectDir
+      );
+
+      assert.equal(discovery.status, 0);
+      assert.match(discovery.stdout, /SDD Master — Discovery/);
+      assert.match(discovery.stdout, /\/sdd-master-requirements/);
+      assert.equal(existsSync(join(projectDir, ".sdd-master", "discovery", "initial-discovery.md")), true);
+      assert.equal(existsSync(join(projectDir, ".sdd-master", "discovery", "project-profiles.md")), true);
+      assert.equal(existsSync(join(projectDir, ".sdd-master", "discovery", "initial-risks.md")), true);
+      assert.equal(existsSync(join(projectDir, ".sdd-master", "discovery", "constraints.md")), true);
+      assert.equal(existsSync(join(projectDir, "docs", "01-negocio-requisitos", "publico-alvo.md")), true);
+
+      const stateAfterDiscovery = readFileSync(join(projectDir, ".sdd-master", "project-state.md"), "utf8");
+      assert.match(stateAfterDiscovery, /Fase atual: PHASE-01 — Discovery/);
+      assert.match(stateAfterDiscovery, /Próximo comando permitido: \/sdd-master-requirements/);
+      assert.match(stateAfterDiscovery, /Maturidade atual: M0 — Ideia/);
+
+      const discoveryJson = JSON.parse(
+        runCli(["master", "discovery", "--json", "--yes", "--title=Minha Loja"], projectDir).stdout
+      );
+      assert.equal(discoveryJson.status, "created");
+      assert.equal(discoveryJson.command, "discovery");
+      assert.equal(discoveryJson.nextCommand, "/sdd-master-requirements");
+      assert.equal(discoveryJson.approval, "pending");
+      assert.equal(discoveryJson.preservedFiles.includes(".sdd-master/discovery/initial-discovery.md"), true);
+
+      const requirements = runCli(["master", "requirements", "--yes", "--title=Requisitos iniciais"], projectDir);
+      assert.equal(requirements.status, 0);
+      assert.equal(existsSync(join(projectDir, ".sdd-master", "requirements", "requirements-index.md")), true);
+      assert.equal(existsSync(join(projectDir, ".sdd-master", "requirements", "rf", "RF-001.md")), true);
+      assert.equal(existsSync(join(projectDir, ".sdd-master", "requirements", "rnf", "RNF-001.md")), true);
+      assert.equal(
+        existsSync(join(projectDir, ".sdd-master", "requirements", "business-rules", "BR-001.md")),
+        true
+      );
+
+      const spec = runCli(
+        ["master", "spec", "--yes", "--phase=PHASE-01", "--title=Especificação inicial"],
+        projectDir
+      );
+      assert.equal(spec.status, 0);
+      assert.equal(existsSync(join(projectDir, ".sdd-master", "specs", "phase-01-spec.md")), true);
+
+      const plan = runCli(
+        ["master", "plan", "--yes", "--phase=PHASE-01", "--title=Plano técnico inicial"],
+        projectDir
+      );
+      assert.equal(plan.status, 0);
+      assert.equal(existsSync(join(projectDir, ".sdd-master", "plans", "phase-01-plan.md")), true);
+      assert.equal(
+        existsSync(join(projectDir, "docs", "02-tecnica-arquitetura", "plano-tecnico-inicial.md")),
+        true
+      );
+
+      const tasks = runCli(
+        ["master", "tasks", "--yes", "--phase=PHASE-01", "--title=Tarefas iniciais"],
+        projectDir
+      );
+      assert.equal(tasks.status, 0);
+      assert.match(tasks.stdout, /ainda não está implementado/);
+      assert.equal(existsSync(join(projectDir, ".sdd-master", "tasks", "phase-01-tasks.md")), true);
+      assert.equal(existsSync(join(projectDir, ".sdd-master", "tasks", "TASK-001.md")), true);
+      assert.equal(existsSync(join(projectDir, "docs", "03-codigo", "tarefas-iniciais.md")), true);
+
+      const stateAfterTasks = readFileSync(join(projectDir, ".sdd-master", "project-state.md"), "utf8");
+      assert.match(stateAfterTasks, /Fase atual: PHASE-05 — Tasks/);
+      assert.match(stateAfterTasks, /Próximo comando permitido: \/sdd-master-implement/);
+
+      const generatedFiles = [
+        ".sdd-master/discovery/initial-discovery.md",
+        ".sdd-master/requirements/rf/RF-001.md",
+        ".sdd-master/specs/phase-01-spec.md",
+        ".sdd-master/plans/phase-01-plan.md",
+        ".sdd-master/tasks/TASK-001.md"
+      ];
+
+      for (const file of generatedFiles) {
+        const content = readFileSync(join(projectDir, file), "utf8");
+        assert.match(content, /Aprovação humana: Pendente|## Aprovação humana\s+Pendente/);
+      }
+
+      assert.match(
+        readFileSync(join(projectDir, ".sdd-master", "discovery", "initial-discovery.md"), "utf8"),
+        /\/sdd-master-requirements/
+      );
+      assert.match(
+        readFileSync(join(projectDir, ".sdd-master", "specs", "phase-01-spec.md"), "utf8"),
+        /\/sdd-master-plan/
+      );
+      assert.match(
+        readFileSync(join(projectDir, ".sdd-master", "plans", "phase-01-plan.md"), "utf8"),
+        /\/sdd-master-tasks/
+      );
+
+      const status = runCli(["master", "status"], projectDir);
+      assert.equal(status.status, 0);
+      assert.match(status.stdout, /Workflow inicial:/);
+      assert.match(status.stdout, /Discovery: OK/);
+      assert.match(status.stdout, /Tasks: OK/);
+      assert.match(status.stdout, /\/sdd-master-implement/);
+
+      const doctorJson = JSON.parse(runCli(["master", "doctor", "--json"], projectDir).stdout);
+      assert.equal(typeof doctorJson.workflow, "object");
+      assert.equal(doctorJson.workflow.discovery, true);
+      assert.equal(doctorJson.workflow.tasks, true);
+
+      for (const command of ["discovery", "requirements", "spec", "plan", "tasks"]) {
+        const contextual = runCli(["master", "help", command]);
+        const direct = runCli(["master", command, "--help"]);
+
+        assert.equal(contextual.status, 0);
+        assert.equal(direct.status, 0);
+        assert.match(contextual.stdout, new RegExp(`sdd master ${command}`));
+        assert.match(direct.stdout, /Aprovação humana/);
+      }
+
+      assert.equal(existsSync(join(projectDir, ".env")), false);
+      assert.doesNotMatch(
+        generatedFiles.map((file) => readFileSync(join(projectDir, file), "utf8")).join("\n"),
+        /sk-[A-Za-z0-9_-]{20,}|BEGIN (RSA |EC |OPENSSH |)PRIVATE KEY/
+      );
+    });
+
+    assert.equal(existsSync(join(rootDir, ".sdd-master")), false);
+    assert.equal(existsSync(join(rootDir, "SDD Master Roadmap.pdf")), true);
+    assert.equal(existsSync(join(rootDir, "SDD Master — Checklist de Implementação v0.1.pdf")), true);
+    assert.equal(existsSync(join(rootDir, "SDD Master — Documento Mestre v0.1.pdf")), true);
   });
 
   it("includes local prototype release checks and documentation", () => {

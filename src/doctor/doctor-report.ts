@@ -53,6 +53,13 @@ Git:
   Branch atual: ${report.git.branch ?? "não detectado"}
   Remoto configurado: ${report.git.hasRemote ? "Sim" : "Não"}
 
+Workflow inicial:
+  Discovery: ${report.workflow.discovery ? "OK" : "Não iniciado"}
+  Requirements: ${report.workflow.requirements ? "OK" : "Não iniciado"}
+  Spec: ${report.workflow.spec ? "OK" : "Não iniciado"}
+  Plan: ${report.workflow.plan ? "OK" : "Não iniciado"}
+  Tasks: ${report.workflow.tasks ? "OK" : "Não iniciado"}
+
 Estado do projeto:
   Fase atual: ${report.projectState.currentPhase ?? "não detectado"}
   Próximo comando permitido: ${report.projectState.nextCommand ?? "não detectado"}

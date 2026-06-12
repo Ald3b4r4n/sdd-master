@@ -2,6 +2,7 @@ import { existsSync } from "node:fs";
 import { join } from "node:path";
 import { getRecognizedAgentFiles } from "../../agents/agent-writer.js";
 import { runGitSecurityCheck } from "../../git/git-checks.js";
+import { getWorkflowStatus } from "../../workflow/workflow-runner.js";
 
 export function getStatusOutput(cwd: string): string {
   const hasSddMaster = existsSync(join(cwd, ".sdd-master"));
@@ -29,6 +30,7 @@ Observação:
 function getInstalledStatus(cwd: string): string {
   const agentFiles = getRecognizedAgentFiles(cwd);
   const gitSecurity = runGitSecurityCheck(cwd, "default");
+  const workflow = getWorkflowStatus(cwd);
 
   return `SDD Master — Status
 
@@ -56,8 +58,15 @@ Git/Security:
   Segredos suspeitos: ${gitSecurity.security.suspectedSecrets.length > 0 ? "Sim" : "Não"}
   .gitignore: ${gitSecurity.security.gitignore.missingEntries.length === 0 ? "OK" : "Atenção"}
 
+Workflow inicial:
+  Discovery: ${formatStatus(workflow.discovery)}
+  Requirements: ${formatStatus(workflow.requirements)}
+  Spec: ${formatStatus(workflow.spec)}
+  Plan: ${formatStatus(workflow.plan)}
+  Tasks: ${formatStatus(workflow.tasks)}
+
 Próximo comando recomendado:
-  /sdd-master-discovery
+  ${workflow.nextCommand}
 `;
 }
 

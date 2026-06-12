@@ -11,6 +11,7 @@ import type {
   DoctorSecurityInfo,
   DoctorTemplateInfo
 } from "./doctor-types.js";
+import { getWorkflowStatus } from "../workflow/workflow-runner.js";
 
 const internalPaths = [
   ".sdd-master",
@@ -238,6 +239,30 @@ export function readProjectState(cwd: string): DoctorProjectState {
 
 export function getOfficialTemplateCount(): number {
   return officialTemplates.length;
+}
+
+export function checkWorkflow(cwd: string): {
+  check: DoctorCheck;
+  info: ReturnType<typeof getWorkflowStatus>;
+} {
+  const workflow = getWorkflowStatus(cwd);
+  const details = [
+    workflow.discovery ? "" : "Discovery não iniciado.",
+    workflow.requirements ? "" : "Requirements não iniciado.",
+    workflow.spec ? "" : "Spec não iniciada.",
+    workflow.plan ? "" : "Plan não iniciado.",
+    workflow.tasks ? "" : "Tasks não iniciadas."
+  ].filter(Boolean);
+
+  return {
+    check: {
+      id: "workflow-initial",
+      label: "Workflow inicial",
+      status: details.length === 0 ? "pass" : "warn",
+      details
+    },
+    info: workflow
+  };
 }
 
 function hasAgentsProjectStateBlock(cwd: string): boolean {
