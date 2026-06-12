@@ -2,6 +2,8 @@ import { existsSync } from "node:fs";
 import { join } from "node:path";
 import { getRecognizedAgentFiles } from "../../agents/agent-writer.js";
 import { runGitSecurityCheck } from "../../git/git-checks.js";
+import { getImplementReadiness } from "../../governance/blockers.js";
+import { getGovernanceStatus } from "../../governance/governance-state.js";
 import { getWorkflowStatus } from "../../workflow/workflow-runner.js";
 
 export function getStatusOutput(cwd: string): string {
@@ -31,6 +33,8 @@ function getInstalledStatus(cwd: string): string {
   const agentFiles = getRecognizedAgentFiles(cwd);
   const gitSecurity = runGitSecurityCheck(cwd, "default");
   const workflow = getWorkflowStatus(cwd);
+  const governance = getGovernanceStatus(cwd);
+  const implementReadiness = getImplementReadiness(cwd);
 
   return `SDD Master — Status
 
@@ -65,6 +69,17 @@ Workflow inicial:
   Plan: ${formatStatus(workflow.plan)}
   Tasks: ${formatStatus(workflow.tasks)}
 
+Governança:
+  Clarificações abertas: ${governance.clarifications.open}
+  Aprovações registradas: ${governance.approvals.total}
+  Mudanças de escopo abertas: ${governance.scope.openChanges}
+  Backlog registrado: ${governance.backlog.total}
+
+Implementação:
+  Pronta: ${implementReadiness.ready ? "Sim" : "Não"}
+  Bloqueios:
+${formatBlockers(implementReadiness.blockers)}
+
 Próximo comando recomendado:
   ${workflow.nextCommand}
 `;
@@ -80,4 +95,8 @@ function formatAgentFiles(files: string[]): string {
   }
 
   return `${files.map((file) => `  ${file}: OK`).join("\n")}\n`;
+}
+
+function formatBlockers(blockers: string[]): string {
+  return blockers.length > 0 ? blockers.map((blocker) => `    - ${blocker}`).join("\n") : "    - Nenhum";
 }

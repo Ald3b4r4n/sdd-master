@@ -49,6 +49,33 @@ export type DoctorWorkflowInfo = {
   nextCommand: string;
 };
 
+export type DoctorGovernanceInfo = {
+  clarifications: {
+    total: number;
+    open: number;
+    resolved: number;
+  };
+  approvals: {
+    total: number;
+    approvedTargets: string[];
+    rejectedTargets: string[];
+    pendingTargets: string[];
+  };
+  scope: {
+    approvedItems: number;
+    outOfScopeItems: number;
+    openChanges: number;
+  };
+  backlog: {
+    total: number;
+  };
+};
+
+export type DoctorImplementReadinessInfo = {
+  ready: boolean;
+  blockers: string[];
+};
+
 export type DoctorReport = {
   status: DoctorStatus;
   checks: DoctorCheck[];
@@ -58,6 +85,8 @@ export type DoctorReport = {
   templates: DoctorTemplateInfo;
   agents: DoctorAgentInfo;
   workflow: DoctorWorkflowInfo;
+  governance: DoctorGovernanceInfo;
+  implementReadiness: DoctorImplementReadinessInfo;
   gitSecurity: {
     status: "clean" | "warning" | "blocked";
     forbiddenFiles: string[];

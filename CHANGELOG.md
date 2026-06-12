@@ -13,6 +13,13 @@
 - Geração inicial de documentos em `.sdd-master/`.
 - Atualização de documentação pública em `docs/`.
 - Guardas simples de ordem do fluxo SDD.
+- Comandos de governança:
+  - `sdd master clarify`
+  - `sdd master approve`
+  - `sdd master scope`
+  - `sdd master backlog`
+- Bloqueios formais antes da futura implementação.
+- Cálculo inicial de prontidão para implementação.
 
 ## [0.1.0-prototype.1] - 2026-06-11
 

@@ -1061,6 +1061,7 @@ describe("SDD Master package foundation", () => {
       "docs/03-codigo/checklist-publicacao-npm.md",
       "docs/03-codigo/comandos-cli.md",
       "docs/03-codigo/desenvolvimento-local.md",
+      "docs/03-codigo/governanca-sdd.md",
       "docs/03-codigo/publicacao-npm.md",
       "docs/03-codigo/release-local.md",
       "docs/03-codigo/workflow-sdd.md"
@@ -1240,6 +1241,198 @@ describe("SDD Master package foundation", () => {
         generatedFiles.map((file) => readFileSync(join(projectDir, file), "utf8")).join("\n"),
         /sk-[A-Za-z0-9_-]{20,}|BEGIN (RSA |EC |OPENSSH |)PRIVATE KEY/
       );
+    });
+
+    assert.equal(existsSync(join(rootDir, ".sdd-master")), false);
+    assert.equal(existsSync(join(rootDir, "SDD Master Roadmap.pdf")), true);
+    assert.equal(existsSync(join(rootDir, "SDD Master — Checklist de Implementação v0.1.pdf")), true);
+    assert.equal(existsSync(join(rootDir, "SDD Master — Documento Mestre v0.1.pdf")), true);
+  });
+
+  it("implements governance commands and formal implement gates safely", () => {
+    for (const command of ["clarify", "approve", "scope", "backlog"]) {
+      withTempProject((projectDir) => {
+        const result = runCli(["master", command, "--yes"], projectDir);
+
+        assert.notEqual(result.status, 0);
+        assert.match(result.stderr, /SDD Master não inicializado neste diretório/);
+        assert.match(result.stderr, /sdd master init/);
+      });
+    }
+
+    withTempProject((projectDir) => {
+      initTempProject(projectDir);
+
+      const clarify = runCli(
+        [
+          "master",
+          "clarify",
+          "--yes",
+          "--title=Definir público-alvo principal",
+          "--phase=PHASE-01",
+          "--type=question"
+        ],
+        projectDir
+      );
+      assert.equal(clarify.status, 0);
+      assert.equal(existsSync(join(projectDir, ".sdd-master", "clarifications", "CLARIFY-001.md")), true);
+      assert.match(
+        readFileSync(join(projectDir, ".sdd-master", "clarifications", "CLARIFY-001.md"), "utf8"),
+        /## Status\s+Aberta/
+      );
+
+      const clarifyJson = JSON.parse(
+        runCli(
+          [
+            "master",
+            "clarify",
+            "--json",
+            "--yes",
+            "--id=CLARIFY-001",
+            "--status=resolved",
+            "--reason=Público-alvo definido pelo humano."
+          ],
+          projectDir
+        ).stdout
+      );
+      assert.equal(clarifyJson.command, "clarify");
+      assert.equal(clarifyJson.id, "CLARIFY-001");
+      assert.equal(clarifyJson.status, "updated");
+      assert.equal(Array.isArray(clarifyJson.blockers), true);
+      assert.match(
+        readFileSync(join(projectDir, ".sdd-master", "clarifications", "CLARIFY-001.md"), "utf8"),
+        /## Status\s+Resolvida/
+      );
+
+      const approveMissingDecision = runCli(
+        ["master", "approve", "--yes", "--target=discovery", "--phase=PHASE-01"],
+        projectDir
+      );
+      assert.notEqual(approveMissingDecision.status, 0);
+      assert.match(approveMissingDecision.stderr, /approve exige --decision/);
+
+      const approval = runCli(
+        [
+          "master",
+          "approve",
+          "--yes",
+          "--target=discovery",
+          "--phase=PHASE-01",
+          "--decision=approved",
+          "--reason=Discovery revisado e aprovado pelo humano."
+        ],
+        projectDir
+      );
+      assert.equal(approval.status, 0);
+      assert.equal(existsSync(join(projectDir, ".sdd-master", "approvals", "APPROVAL-001.md")), true);
+      assert.match(
+        readFileSync(join(projectDir, ".sdd-master", "approvals", "APPROVAL-001.md"), "utf8"),
+        /## Aprovador\s+Humano/
+      );
+
+      const approvedScope = runCli(
+        ["master", "scope", "--yes", "--type=approved", "--title=MVP inicial", "--phase=PHASE-01"],
+        projectDir
+      );
+      assert.equal(approvedScope.status, 0);
+      assert.match(
+        readFileSync(join(projectDir, ".sdd-master", "scope", "approved-scope.md"), "utf8"),
+        /MVP inicial/
+      );
+
+      const outOfScope = runCli(
+        [
+          "master",
+          "scope",
+          "--yes",
+          "--type=out-of-scope",
+          "--title=Deploy em produção",
+          "--phase=PHASE-01",
+          "--reason=Fora do MVP inicial."
+        ],
+        projectDir
+      );
+      assert.equal(outOfScope.status, 0);
+      assert.match(
+        readFileSync(join(projectDir, ".sdd-master", "scope", "out-of-scope.md"), "utf8"),
+        /Deploy em produção/
+      );
+
+      const change = runCli(
+        [
+          "master",
+          "scope",
+          "--yes",
+          "--type=change",
+          "--title=Adicionar suporte mobile",
+          "--phase=PHASE-01",
+          "--reason=Nova necessidade identificada."
+        ],
+        projectDir
+      );
+      assert.equal(change.status, 0);
+      assert.equal(existsSync(join(projectDir, ".sdd-master", "scope", "changes", "CHANGE-001.md")), true);
+      assert.match(change.stdout, /Mudanças de escopo abertas/);
+
+      const backlog = runCli(
+        [
+          "master",
+          "backlog",
+          "--yes",
+          "--type=future-requirement",
+          "--title=Integração com GitHub Projects",
+          "--priority=COULD"
+        ],
+        projectDir
+      );
+      assert.equal(backlog.status, 0);
+      assert.equal(existsSync(join(projectDir, ".sdd-master", "backlog", "BACKLOG-001.md")), true);
+      assert.match(backlog.stdout, /Backlog não autoriza implementação/);
+
+      const status = runCli(["master", "status"], projectDir);
+      assert.equal(status.status, 0);
+      assert.match(status.stdout, /Governança:/);
+      assert.match(status.stdout, /Clarificações abertas: 0/);
+      assert.match(status.stdout, /Aprovações registradas: 1/);
+      assert.match(status.stdout, /Mudanças de escopo abertas: 1/);
+      assert.match(status.stdout, /Backlog registrado: 1/);
+      assert.match(status.stdout, /Implementação:/);
+      assert.match(status.stdout, /Pronta: Não/);
+
+      const doctorJson = JSON.parse(runCli(["master", "doctor", "--json"], projectDir).stdout);
+      assert.equal(typeof doctorJson.governance, "object");
+      assert.equal(doctorJson.governance.backlog.total, 1);
+      assert.equal(doctorJson.governance.scope.openChanges, 1);
+      assert.equal(typeof doctorJson.implementReadiness, "object");
+      assert.equal(doctorJson.implementReadiness.ready, false);
+      assert.equal(doctorJson.implementReadiness.blockers.includes("Mudanças de escopo abertas"), true);
+
+      for (const command of ["clarify", "approve", "scope", "backlog"]) {
+        const contextual = runCli(["master", "help", command]);
+        const direct = runCli(["master", command, "--help"]);
+
+        assert.equal(contextual.status, 0);
+        assert.equal(direct.status, 0);
+        assert.match(contextual.stdout, new RegExp(`sdd master ${command}`));
+        assert.match(direct.stdout, /Aprovação humana|Backlog não autoriza implementação/);
+      }
+
+      const secondBacklog = runCli(
+        ["master", "backlog", "--yes", "--type=idea", "--title=Ideia futura", "--priority=COULD"],
+        projectDir
+      );
+      assert.equal(secondBacklog.status, 0);
+      assert.equal(existsSync(join(projectDir, ".sdd-master", "backlog", "BACKLOG-001.md")), true);
+      assert.equal(existsSync(join(projectDir, ".sdd-master", "backlog", "BACKLOG-002.md")), true);
+
+      assert.equal(existsSync(join(projectDir, ".env")), false);
+      const governanceContent = [
+        readFileSync(join(projectDir, ".sdd-master", "clarifications", "CLARIFY-001.md"), "utf8"),
+        readFileSync(join(projectDir, ".sdd-master", "approvals", "APPROVAL-001.md"), "utf8"),
+        readFileSync(join(projectDir, ".sdd-master", "scope", "changes", "CHANGE-001.md"), "utf8"),
+        readFileSync(join(projectDir, ".sdd-master", "backlog", "BACKLOG-001.md"), "utf8")
+      ].join("\n");
+      assert.doesNotMatch(governanceContent, /sk-[A-Za-z0-9_-]{20,}|BEGIN (RSA |EC |OPENSSH |)PRIVATE KEY/);
     });
 
     assert.equal(existsSync(join(rootDir, ".sdd-master")), false);

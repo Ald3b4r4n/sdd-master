@@ -60,6 +60,17 @@ Workflow inicial:
   Plan: ${report.workflow.plan ? "OK" : "Não iniciado"}
   Tasks: ${report.workflow.tasks ? "OK" : "Não iniciado"}
 
+Governança:
+  Clarificações abertas: ${report.governance.clarifications.open}
+  Aprovações registradas: ${report.governance.approvals.total}
+  Mudanças de escopo abertas: ${report.governance.scope.openChanges}
+  Backlog registrado: ${report.governance.backlog.total}
+
+Implementação:
+  Pronta: ${report.implementReadiness.ready ? "Sim" : "Não"}
+  Bloqueios:
+${formatBlockers(report.implementReadiness.blockers)}
+
 Estado do projeto:
   Fase atual: ${report.projectState.currentPhase ?? "não detectado"}
   Próximo comando permitido: ${report.projectState.nextCommand ?? "não detectado"}
@@ -100,4 +111,8 @@ function formatPathStatus(report: DoctorReport, path: string): string {
 
 function getCheckStatus(report: DoctorReport, id: string): string {
   return report.checks.find((check) => check.id === id)?.status ?? "fail";
+}
+
+function formatBlockers(blockers: string[]): string {
+  return blockers.length > 0 ? blockers.map((blocker) => `    - ${blocker}`).join("\n") : "    - Nenhum";
 }

@@ -101,11 +101,64 @@ const commandHelps: Record<string, CommandHelp> = {
   },
   clarify: {
     command: "clarify",
-    status: "Planejado.",
+    status: "Disponível no BLOCO 18.",
     purpose: "Registrar perguntas, ambiguidades e decisões antes da implementação.",
-    whenUsed: "Será usado quando uma especificação ainda tiver lacunas.",
-    example: "sdd master clarify",
-    security: ["Não deve inferir segredos nem solicitar credenciais reais."]
+    whenUsed: "Use quando uma especificação ainda tiver lacunas ou depender de resposta humana.",
+    example: "sdd master clarify --yes --title=\"Dúvida sobre escopo\" --phase=\"PHASE-01\"",
+    creates: [".sdd-master/clarifications/clarifications-index.md", ".sdd-master/clarifications/CLARIFY-001.md"],
+    details: [
+      "Flags: --help, --json, --yes, -y, --title, --id, --type, --status, --reason, --phase.",
+      "Clarificações abertas bloqueiam a futura implementação.",
+      "Resolução exige registro humano explícito."
+    ],
+    security: ["Não deve inferir segredos nem solicitar credenciais reais.", "Não cria .env real."]
+  },
+  approve: {
+    command: "approve",
+    status: "Disponível no BLOCO 18.",
+    purpose: "Registrar aprovação humana formal de documentos, fases ou transições.",
+    whenUsed: "Use antes de liberar etapas do fluxo SDD para implementação futura.",
+    example:
+      "sdd master approve --yes --target=\"tasks\" --phase=\"PHASE-01\" --decision=\"approved\" --reason=\"Tarefas aprovadas.\"",
+    creates: [".sdd-master/approvals/approvals-index.md", ".sdd-master/approvals/APPROVAL-001.md"],
+    details: [
+      "Flags: --help, --json, --yes, -y, --target, --phase, --decision, --reason.",
+      "Aprovação nunca é presumida.",
+      "Rejeições bloqueiam o próximo passo relacionado."
+    ],
+    security: ["Registra Aprovador: Humano.", "Não cria .env real."]
+  },
+  scope: {
+    command: "scope",
+    status: "Disponível no BLOCO 18.",
+    purpose: "Controlar escopo aprovado, fora de escopo e mudanças de escopo.",
+    whenUsed: "Use quando o escopo precisar ser registrado ou quando houver solicitação de mudança.",
+    example: "sdd master scope --yes --type=\"change\" --title=\"Nova solicitação\" --phase=\"PHASE-01\"",
+    creates: [
+      ".sdd-master/scope/approved-scope.md",
+      ".sdd-master/scope/out-of-scope.md",
+      ".sdd-master/scope/changes/CHANGE-001.md"
+    ],
+    details: [
+      "Flags: --help, --json, --yes, -y, --title, --type, --reason, --phase.",
+      "Mudança de escopo aberta bloqueia a futura implementação.",
+      "Escopo aprovado deve ser rastreável."
+    ],
+    security: ["Não autoriza implementação automaticamente.", "Não cria .env real."]
+  },
+  backlog: {
+    command: "backlog",
+    status: "Disponível no BLOCO 18.",
+    purpose: "Registrar itens futuros, melhorias, dívida técnica, riscos futuros e ideias fora do escopo atual.",
+    whenUsed: "Use para separar ideias futuras do escopo aprovado.",
+    example: "sdd master backlog --yes --type=\"improvement\" --title=\"Melhoria futura\" --priority=\"COULD\"",
+    creates: [".sdd-master/backlog/backlog-index.md", ".sdd-master/backlog/BACKLOG-001.md"],
+    details: [
+      "Flags: --help, --json, --yes, -y, --title, --type, --reason, --phase, --priority.",
+      "Backlog não autoriza implementação.",
+      "Promoção de backlog exigirá fluxo formal futuro."
+    ],
+    security: ["Não implementa itens registrados.", "Não cria .env real."]
   },
   spec: {
     command: "spec",
@@ -256,10 +309,13 @@ Comandos disponíveis:
   sdd master spec       Cria especificação inicial
   sdd master plan       Cria plano técnico inicial
   sdd master tasks      Cria tarefas iniciais
+  sdd master clarify    Registra dúvidas e respostas humanas
+  sdd master approve    Registra aprovações humanas formais
+  sdd master scope      Controla escopo e mudanças
+  sdd master backlog    Registra itens futuros fora do escopo atual
 
 Comandos planejados:
   sdd master update
-  sdd master clarify
   sdd master implement
   sdd master quality
   sdd master audit

@@ -64,6 +64,24 @@ Ordem mínima:
 
 Todos exigem projeto inicializado com `sdd master init`, preservam arquivos existentes por padrão e registram aprovação humana pendente.
 
+## Governança SDD
+
+```bash
+sdd master clarify --yes --title="Dúvida sobre escopo" --phase="PHASE-01"
+sdd master approve --yes --target="tasks" --phase="PHASE-01" --decision="approved" --reason="Tarefas aprovadas."
+sdd master scope --yes --type="change" --title="Nova solicitação" --phase="PHASE-01"
+sdd master backlog --yes --type="improvement" --title="Melhoria futura" --priority="COULD"
+```
+
+Comandos:
+
+1. `clarify` registra dúvidas e respostas humanas.
+2. `approve` registra aprovação ou rejeição humana formal.
+3. `scope` registra escopo aprovado, fora de escopo e mudanças.
+4. `backlog` registra itens futuros sem liberar implementação.
+
+Todos exigem projeto inicializado. Clarificações abertas, mudanças de escopo abertas, rejeições e aprovações pendentes aparecem em `status` e `doctor`.
+
 ## Update
 
 ```bash

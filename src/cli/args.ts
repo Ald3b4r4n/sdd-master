@@ -9,6 +9,7 @@ export type ParsedCommand =
   | { kind: "master-doctor"; args: string[] }
   | { kind: "master-git"; args: string[] }
   | { kind: "master-workflow"; command: "discovery" | "requirements" | "spec" | "plan" | "tasks"; args: string[] }
+  | { kind: "master-governance"; command: "clarify" | "approve" | "scope" | "backlog"; args: string[] }
   | { kind: "planned-command"; command: "update" }
   | { kind: "unknown"; command: string; scope: "root" | "master" };
 
@@ -16,6 +17,7 @@ const rootHelpFlags = new Set(["--help", "-h"]);
 const versionFlags = new Set(["--version", "-v"]);
 const plannedCommands = new Set(["update"]);
 const workflowCommands = new Set(["discovery", "requirements", "spec", "plan", "tasks"]);
+const governanceCommands = new Set(["clarify", "approve", "scope", "backlog"]);
 
 export function parseArgs(args: string[]): ParsedCommand {
   const [first, second, third] = args;
@@ -68,6 +70,14 @@ export function parseArgs(args: string[]): ParsedCommand {
     return {
       kind: "master-workflow",
       command: second as "discovery" | "requirements" | "spec" | "plan" | "tasks",
+      args: args.slice(2)
+    };
+  }
+
+  if (governanceCommands.has(second)) {
+    return {
+      kind: "master-governance",
+      command: second as "clarify" | "approve" | "scope" | "backlog",
       args: args.slice(2)
     };
   }

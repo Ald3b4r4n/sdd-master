@@ -2,11 +2,15 @@ import { execFileSync } from "node:child_process";
 import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
 import { getRecognizedAgentFiles } from "../agents/agent-writer.js";
+import { getImplementReadiness } from "../governance/blockers.js";
+import { getGovernanceStatus } from "../governance/governance-state.js";
 import { officialTemplates } from "../templates/official-templates.js";
 import type {
   DoctorAgentInfo,
   DoctorCheck,
   DoctorGitInfo,
+  DoctorGovernanceInfo,
+  DoctorImplementReadinessInfo,
   DoctorProjectState,
   DoctorSecurityInfo,
   DoctorTemplateInfo
@@ -262,6 +266,48 @@ export function checkWorkflow(cwd: string): {
       details
     },
     info: workflow
+  };
+}
+
+export function checkGovernance(cwd: string): {
+  check: DoctorCheck;
+  info: DoctorGovernanceInfo;
+} {
+  const governance = getGovernanceStatus(cwd);
+  const details = [
+    governance.clarifications.total === 0 ? "Clarifications não iniciadas." : "",
+    governance.approvals.total === 0 ? "Approvals não iniciadas." : "",
+    governance.scope.approvedItems === 0 && governance.scope.outOfScopeItems === 0 && governance.scope.openChanges === 0
+      ? "Scope não iniciado."
+      : "",
+    governance.backlog.total === 0 ? "Backlog não iniciado." : ""
+  ].filter(Boolean);
+
+  return {
+    check: {
+      id: "governance",
+      label: "Governança SDD",
+      status: details.length === 0 ? "pass" : "warn",
+      details
+    },
+    info: governance
+  };
+}
+
+export function checkImplementReadiness(cwd: string): {
+  check: DoctorCheck;
+  info: DoctorImplementReadinessInfo;
+} {
+  const readiness = getImplementReadiness(cwd);
+
+  return {
+    check: {
+      id: "implement-readiness",
+      label: "Prontidão para implementação",
+      status: readiness.ready ? "pass" : "warn",
+      details: readiness.blockers
+    },
+    info: readiness
   };
 }
 

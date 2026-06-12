@@ -238,6 +238,25 @@ sdd master tasks --yes --phase="PHASE-01" --title="Tarefas iniciais"
 
 Esses comandos criam documentos locais em `.sdd-master/` e documentação pública em `docs/`. Cada etapa registra `Aprovação humana: Pendente` e preserva arquivos existentes por padrão.
 
+## Governança antes da implementação
+
+Antes de implementar, o SDD Master exige:
+
+- dúvidas resolvidas;
+- escopo controlado;
+- backlog separado do escopo atual;
+- aprovações humanas registradas;
+- bloqueios formais verificados.
+
+Comandos:
+
+```bash
+sdd master clarify --yes --title="Dúvida sobre escopo" --phase="PHASE-01"
+sdd master approve --yes --target="tasks" --phase="PHASE-01" --decision="approved" --reason="Tarefas aprovadas."
+sdd master scope --yes --type="change" --title="Nova solicitação" --phase="PHASE-01"
+sdd master backlog --yes --type="improvement" --title="Melhoria futura" --priority="COULD"
+```
+
 ## Qualidade e validação local
 
 Antes de qualquer release ou publicação, execute:
