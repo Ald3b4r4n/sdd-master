@@ -1062,6 +1062,7 @@ describe("SDD Master package foundation", () => {
       "docs/03-codigo/comandos-cli.md",
       "docs/03-codigo/desenvolvimento-local.md",
       "docs/03-codigo/governanca-sdd.md",
+      "docs/03-codigo/implement-guard.md",
       "docs/03-codigo/publicacao-npm.md",
       "docs/03-codigo/quality-audit-blockers.md",
       "docs/03-codigo/release-local.md",
@@ -1616,6 +1617,219 @@ describe("SDD Master package foundation", () => {
         readFileSync(join(projectDir, ".sdd-master", "blockers", "BLOCKER-001.md"), "utf8")
       ].join("\n");
       assert.doesNotMatch(gateContent, /sk-[A-Za-z0-9_-]{20,}|BEGIN (RSA |EC |OPENSSH |)PRIVATE KEY/);
+    });
+
+    assert.equal(existsSync(join(rootDir, ".sdd-master")), false);
+    assert.equal(existsSync(join(rootDir, "SDD Master Roadmap.pdf")), true);
+    assert.equal(existsSync(join(rootDir, "SDD Master — Checklist de Implementação v0.1.pdf")), true);
+    assert.equal(existsSync(join(rootDir, "SDD Master — Documento Mestre v0.1.pdf")), true);
+
+    const prePush = runCli(["master", "git", "--pre-push"], rootDir);
+    assert.notEqual(prePush.stdout, "");
+    assert.doesNotMatch(prePush.stdout, /Status geral:\s+blocked/);
+  });
+
+  it("implements the implement guard without changing consumer code", () => {
+    withTempProject((projectDir) => {
+      const result = runCli(["master", "implement", "--yes"], projectDir);
+
+      assert.notEqual(result.status, 0);
+      assert.match(result.stderr, /SDD Master não inicializado neste diretório/);
+      assert.match(result.stderr, /sdd master init/);
+    });
+
+    const contextual = runCli(["master", "help", "implement"]);
+    const direct = runCli(["master", "implement", "--help"]);
+    assert.equal(contextual.status, 0);
+    assert.equal(direct.status, 0);
+    assert.match(contextual.stdout, /guard\/dry-run/);
+    assert.match(direct.stdout, /não altera código/);
+
+    withTempProject((projectDir) => {
+      initTempProject(projectDir);
+      const consumerCode = join(projectDir, "app.js");
+      writeFileSync(consumerCode, "console.log('consumer code');\n", "utf8");
+
+      const blocked = runCli(["master", "implement", "--yes", "--phase=PHASE-01", "--task=TASK-001"], projectDir);
+      assert.notEqual(blocked.status, 0);
+      assert.match(blocked.stdout, /SDD Master — Implement Guard/);
+      assert.match(blocked.stdout, /Status:\s+Bloqueado/);
+      assert.match(blocked.stdout, /Discovery não criado/);
+      assert.equal(readFileSync(consumerCode, "utf8"), "console.log('consumer code');\n");
+      assert.equal(existsSync(join(projectDir, ".sdd-master", "implementation", "IMPLEMENT-001.md")), true);
+
+      const json = JSON.parse(
+        runCli(["master", "implement", "--json", "--yes", "--phase=PHASE-01", "--target=TASK-001"], projectDir).stdout
+      );
+      assert.equal(json.status, "blocked");
+      assert.equal(json.mode, "guard");
+      assert.equal(json.phase, "PHASE-01");
+      assert.equal(json.task, "TASK-001");
+      assert.equal(json.ready, false);
+      assert.equal(json.codeChanged, false);
+      assert.equal(Array.isArray(json.gates), true);
+      assert.equal(Array.isArray(json.nextActions), true);
+
+      const discoveryOnly = runCli(["master", "discovery", "--yes", "--title=Projeto"], projectDir);
+      assert.equal(discoveryOnly.status, 0);
+      const missingRequirements = JSON.parse(
+        runCli(["master", "implement", "--json", "--yes", "--phase=PHASE-01", "--task=TASK-001"], projectDir).stdout
+      );
+      assert.equal(missingRequirements.blockers.includes("Requirements não criados"), true);
+
+      assert.equal(runCli(["master", "requirements", "--yes", "--title=Requisitos"], projectDir).status, 0);
+      const missingSpec = JSON.parse(
+        runCli(["master", "implement", "--json", "--yes", "--phase=PHASE-01", "--task=TASK-001"], projectDir).stdout
+      );
+      assert.equal(missingSpec.blockers.includes("Spec não criada"), true);
+
+      assert.equal(runCli(["master", "spec", "--yes", "--phase=PHASE-01", "--title=Spec"], projectDir).status, 0);
+      const missingPlan = JSON.parse(
+        runCli(["master", "implement", "--json", "--yes", "--phase=PHASE-01", "--task=TASK-001"], projectDir).stdout
+      );
+      assert.equal(missingPlan.blockers.includes("Plan não criado"), true);
+
+      assert.equal(runCli(["master", "plan", "--yes", "--phase=PHASE-01", "--title=Plan"], projectDir).status, 0);
+      const missingTasks = JSON.parse(
+        runCli(["master", "implement", "--json", "--yes", "--phase=PHASE-01", "--task=TASK-001"], projectDir).stdout
+      );
+      assert.equal(missingTasks.blockers.includes("Tasks não criadas"), true);
+
+      assert.equal(runCli(["master", "tasks", "--yes", "--phase=PHASE-01", "--title=Tasks"], projectDir).status, 0);
+      const missingApprovalsAndTests = JSON.parse(
+        runCli(["master", "implement", "--json", "--yes", "--phase=PHASE-01", "--task=TASK-001"], projectDir).stdout
+      );
+      assert.equal(missingApprovalsAndTests.blockers.includes("Aprovação de tasks pendente"), true);
+      assert.equal(
+        missingApprovalsAndTests.blockers.includes("Testes obrigatórios antes da implementação não definidos"),
+        true
+      );
+
+      const taskPath = join(projectDir, ".sdd-master", "tasks", "TASK-001.md");
+      const taskContent = readFileSync(taskPath, "utf8").replace(
+        "## Testes obrigatórios antes da implementação\n-",
+        "## Testes obrigatórios antes da implementação\n- npm test"
+      );
+      writeFileSync(taskPath, taskContent, "utf8");
+
+      const testsOk = JSON.parse(
+        runCli(["master", "implement", "--json", "--yes", "--phase=PHASE-01", "--task=TASK-001"], projectDir).stdout
+      );
+      assert.equal(testsOk.gates.find((gate) => gate.gate === "Test gates")?.status, "OK");
+      assert.equal(testsOk.blockers.includes("Testes obrigatórios antes da implementação não definidos"), false);
+
+      for (const target of ["discovery", "requirements", "spec", "plan", "tasks"]) {
+        assert.equal(
+          runCli(
+            [
+              "master",
+              "approve",
+              "--yes",
+              `--target=${target}`,
+              "--phase=PHASE-01",
+              "--decision=approved",
+              `--reason=${target} aprovado.`
+            ],
+            projectDir
+          ).status,
+          0
+        );
+      }
+
+      assert.equal(
+        runCli(["master", "clarify", "--yes", "--title=Dúvida aberta", "--phase=PHASE-01"], projectDir).status,
+        0
+      );
+      const withClarification = JSON.parse(
+        runCli(["master", "implement", "--json", "--yes", "--phase=PHASE-01", "--task=TASK-001"], projectDir).stdout
+      );
+      assert.equal(withClarification.blockers.includes("Clarificações abertas"), true);
+      assert.equal(
+        runCli(
+          [
+            "master",
+            "clarify",
+            "--yes",
+            "--id=CLARIFY-001",
+            "--status=resolved",
+            "--reason=Resolvida."
+          ],
+          projectDir
+        ).status,
+        0
+      );
+
+      assert.equal(
+        runCli(["master", "scope", "--yes", "--type=change", "--title=Mudança aberta", "--phase=PHASE-01"], projectDir)
+          .status,
+        0
+      );
+      const withScopeChange = JSON.parse(
+        runCli(["master", "implement", "--json", "--yes", "--phase=PHASE-01", "--task=TASK-001"], projectDir).stdout
+      );
+      assert.equal(withScopeChange.blockers.includes("Mudanças de escopo abertas"), true);
+
+      assert.equal(
+        runCli(["master", "blocker", "--yes", "--title=Bloqueio", "--phase=PHASE-01"], projectDir).status,
+        0
+      );
+      const withBlocker = JSON.parse(
+        runCli(["master", "implement", "--json", "--yes", "--phase=PHASE-01", "--task=TASK-001"], projectDir).stdout
+      );
+      assert.equal(withBlocker.blockers.includes("Blockers ativos"), true);
+
+      assert.equal(
+        runCli(["master", "audit", "--yes", "--severity=BLOCKER", "--title=Audit blocker", "--phase=PHASE-01"], projectDir)
+          .status,
+        0
+      );
+      const withAudit = JSON.parse(
+        runCli(["master", "implement", "--json", "--yes", "--phase=PHASE-01", "--task=TASK-001"], projectDir).stdout
+      );
+      assert.equal(withAudit.blockers.includes("Auditoria BLOCKER aberta"), true);
+
+      assert.equal(
+        runCli(["master", "quality", "--yes", "--status=failed", "--title=Quality failed", "--phase=PHASE-01"], projectDir)
+          .status,
+        0
+      );
+      const withQuality = JSON.parse(
+        runCli(["master", "implement", "--json", "--yes", "--phase=PHASE-01", "--task=TASK-001"], projectDir).stdout
+      );
+      assert.equal(withQuality.blockers.includes("Quality review failed aberta"), true);
+
+      assert.equal(
+        runCli(["master", "docs", "--yes", "--status=outdated", "--title=Docs outdated", "--phase=PHASE-01"], projectDir)
+          .status,
+        0
+      );
+      const withDocs = JSON.parse(
+        runCli(["master", "implement", "--json", "--yes", "--phase=PHASE-01", "--task=TASK-001"], projectDir).stdout
+      );
+      assert.equal(withDocs.blockers.includes("Documentação desatualizada"), true);
+
+      const implementFile = readFileSync(join(projectDir, ".sdd-master", "implementation", "IMPLEMENT-001.md"), "utf8");
+      assert.match(implementFile, /## Gates verificados/);
+      assert.match(implementFile, /\| Test gates \|/);
+      assert.match(implementFile, /Este registro não executa implementação/);
+      assert.equal(readFileSync(consumerCode, "utf8"), "console.log('consumer code');\n");
+
+      const status = runCli(["master", "status"], projectDir);
+      assert.equal(status.status, 0);
+      assert.match(status.stdout, /Implement Guard:/);
+      assert.match(status.stdout, /Código alterado pelo implement: Não/);
+
+      const doctorJson = JSON.parse(runCli(["master", "doctor", "--json"], projectDir).stdout);
+      assert.equal(typeof doctorJson.implementGuard, "object");
+      assert.equal(doctorJson.implementGuard.codeChanged, false);
+      assert.equal(doctorJson.implementGuard.hasRecords, true);
+
+      assert.equal(existsSync(join(projectDir, ".env")), false);
+      const implementationContent = readFileSync(
+        join(projectDir, ".sdd-master", "implementation", "IMPLEMENT-001.md"),
+        "utf8"
+      );
+      assert.doesNotMatch(implementationContent, /sk-[A-Za-z0-9_-]{20,}|BEGIN (RSA |EC |OPENSSH |)PRIVATE KEY/);
     });
 
     assert.equal(existsSync(join(rootDir, ".sdd-master")), false);

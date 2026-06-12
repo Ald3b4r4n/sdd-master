@@ -27,6 +27,10 @@
   - `sdd master blocker`
 - Integração desses portões com `status`, `doctor` e readiness de implementação.
 - Bloqueios formais para achados BLOCKER, auditorias críticas, documentação pendente e qualidade reprovada.
+- Comando `sdd master implement` em modo guard/dry-run.
+- Test gates para validar testes obrigatórios antes da implementação.
+- Registro `.sdd-master/implementation/`.
+- Bloqueio explícito contra implementação sem gates mínimos aprovados.
 
 ## [0.1.0-prototype.1] - 2026-06-11
 

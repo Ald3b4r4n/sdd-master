@@ -5,6 +5,7 @@ import { getGateStatus } from "../../gates/gate-state.js";
 import { runGitSecurityCheck } from "../../git/git-checks.js";
 import { getImplementReadiness } from "../../governance/blockers.js";
 import { getGovernanceStatus } from "../../governance/governance-state.js";
+import { getImplementGuardStatus } from "../../implementation/implement-readiness.js";
 import { getWorkflowStatus } from "../../workflow/workflow-runner.js";
 
 export function getStatusOutput(cwd: string): string {
@@ -37,6 +38,7 @@ function getInstalledStatus(cwd: string): string {
   const governance = getGovernanceStatus(cwd);
   const gates = getGateStatus(cwd);
   const implementReadiness = getImplementReadiness(cwd);
+  const implementGuard = getImplementGuardStatus(cwd);
 
   return `SDD Master — Status
 
@@ -99,6 +101,12 @@ Implementação:
   Bloqueios:
 ${formatBlockers(implementReadiness.blockers)}
 
+Implement Guard:
+  Status: ${formatImplementGuardStatus(implementGuard.latestStatus)}
+  Test gates: ${implementGuard.testGates}
+  Código alterado pelo implement: ${implementGuard.codeChanged ? "Sim" : "Não"}
+  Próxima ação: ${implementGuard.nextAction}
+
 Próximo comando recomendado:
   ${workflow.nextCommand}
 `;
@@ -118,4 +126,10 @@ function formatAgentFiles(files: string[]): string {
 
 function formatBlockers(blockers: string[]): string {
   return blockers.length > 0 ? blockers.map((blocker) => `    - ${blocker}`).join("\n") : "    - Nenhum";
+}
+
+function formatImplementGuardStatus(status: string): string {
+  if (status === "not-started") return "Não iniciado";
+  if (status === "ready") return "Pronto para autorização";
+  return "Bloqueado";
 }

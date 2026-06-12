@@ -23,6 +23,7 @@ const requiredFiles = [
   "docs/03-codigo/comandos-cli.md",
   "docs/03-codigo/desenvolvimento-local.md",
   "docs/03-codigo/governanca-sdd.md",
+  "docs/03-codigo/implement-guard.md",
   "docs/03-codigo/publicacao-npm.md",
   "docs/03-codigo/quality-audit-blockers.md",
   "docs/03-codigo/release-local.md",

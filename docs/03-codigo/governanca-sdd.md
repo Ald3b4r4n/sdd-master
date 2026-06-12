@@ -48,6 +48,8 @@ Para a futura implementação ser considerada pronta, o projeto deve ter:
 8. aprovação humana para discovery, requirements, spec, plan e tasks;
 9. nenhum blocker ativo;
 10. nenhum risco obrigatório sem aceite.
+11. test gates obrigatórios definidos na tarefa alvo.
+12. Implement Guard sem bloqueios.
 
 Enquanto esses critérios não forem atendidos, o status deve indicar:
 
@@ -65,3 +67,4 @@ Sem aprovação humana, sem implementação.
 Sem dúvidas resolvidas, sem implementação.
 Sem escopo aprovado, sem implementação.
 Sem tarefas aprovadas, sem implementação.
+Sem test gates definidos, sem implementação.

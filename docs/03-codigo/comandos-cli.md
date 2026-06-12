@@ -100,6 +100,15 @@ Comandos:
 
 `failed`, `BLOCKER`, `HIGH`, `CRITICAL`, `missing` e `outdated` alimentam `status`, `doctor` e readiness de implementação.
 
+## Implement Guard
+
+```bash
+sdd master implement --yes --phase="PHASE-01" --task="TASK-001" --dry-run
+sdd master implement --json --yes --phase="PHASE-01" --target="TASK-001"
+```
+
+`implement` não altera código nesta versão prototype. Ele cria apenas registros internos em `.sdd-master/implementation/`, verifica readiness, valida test gates e informa bloqueios antes de qualquer implementação real futura.
+
 ## Update
 
 ```bash

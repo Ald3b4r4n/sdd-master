@@ -88,6 +88,12 @@ Implementação:
   Bloqueios:
 ${formatBlockers(report.implementReadiness.blockers)}
 
+Implement Guard:
+  Status: ${formatImplementGuardStatus(report.implementGuard.latestStatus)}
+  Test gates: ${report.implementGuard.testGates}
+  Código alterado pelo implement: ${report.implementGuard.codeChanged ? "Sim" : "Não"}
+  Próxima ação: ${report.implementGuard.nextAction}
+
 Estado do projeto:
   Fase atual: ${report.projectState.currentPhase ?? "não detectado"}
   Próximo comando permitido: ${report.projectState.nextCommand ?? "não detectado"}
@@ -132,4 +138,10 @@ function getCheckStatus(report: DoctorReport, id: string): string {
 
 function formatBlockers(blockers: string[]): string {
   return blockers.length > 0 ? blockers.map((blocker) => `    - ${blocker}`).join("\n") : "    - Nenhum";
+}
+
+function formatImplementGuardStatus(status: string): string {
+  if (status === "not-started") return "Não iniciado";
+  if (status === "ready") return "Pronto para autorização";
+  return "Bloqueado";
 }

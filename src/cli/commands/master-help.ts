@@ -204,11 +204,17 @@ const commandHelps: Record<string, CommandHelp> = {
   },
   implement: {
     command: "implement",
-    status: "Planejado.",
-    purpose: "Conduzir implementação baseada em tarefas aprovadas.",
-    whenUsed: "Será usado quando especificação, plano e tarefas estiverem prontos.",
-    example: "sdd master implement",
-    security: ["Não deve implementar fora do escopo aprovado."]
+    status: "Disponível no BLOCO 20 em modo guard/dry-run.",
+    purpose: "Verificar readiness completo e preparar manifesto de implementação autorizável.",
+    whenUsed: "Use após workflow, governança, gates e test gates para validar se a implementação futura pode ser autorizada.",
+    example: "sdd master implement --yes --phase=\"PHASE-01\" --task=\"TASK-001\" --dry-run",
+    creates: [".sdd-master/implementation/implementation-index.md", ".sdd-master/implementation/IMPLEMENT-001.md"],
+    details: [
+      "Nesta versão prototype, não altera código do projeto consumidor.",
+      "Dry-run é o comportamento padrão.",
+      "Verifica discovery, requirements, spec, plan, tasks, approvals, clarifications, scope, quality, audit, docs, blockers, test gates e security/git."
+    ],
+    security: ["Não executa comandos arbitrários.", "Não roda scripts fornecidos pelo usuário.", "codeChanged sempre é false neste bloco."]
   },
   quality: {
     command: "quality",
@@ -349,10 +355,10 @@ Comandos disponíveis:
   sdd master audit      Registra auditoria formal
   sdd master docs       Registra estado documental
   sdd master blocker    Gerencia blockers formais
+  sdd master implement  Verifica readiness em modo guard/dry-run
 
 Comandos planejados:
   sdd master update
-  sdd master implement
   sdd master release
   sdd master deploy
   sdd master agents

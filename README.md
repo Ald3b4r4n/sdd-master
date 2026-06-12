@@ -272,6 +272,34 @@ sdd master blocker --yes --title="Bloqueio formal" --phase="PHASE-01" --severity
 
 Blockers abertos impedem a futura implementação.
 
+## Implement Guard
+
+O comando `sdd master implement` existe como guardião de implementação.
+
+Nesta versão prototype, ele não altera código do projeto consumidor.
+
+Ele verifica:
+
+- requisitos;
+- especificação;
+- plano;
+- tarefas;
+- aprovações humanas;
+- dúvidas abertas;
+- escopo;
+- qualidade;
+- auditoria;
+- documentação;
+- blockers;
+- testes obrigatórios antes da implementação;
+- segurança/Git.
+
+Exemplo:
+
+```bash
+sdd master implement --yes --phase="PHASE-01" --task="TASK-001" --dry-run
+```
+
 ## Qualidade e validação local
 
 Antes de qualquer release ou publicação, execute:

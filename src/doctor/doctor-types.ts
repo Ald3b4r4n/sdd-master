@@ -99,6 +99,14 @@ export type DoctorGateInfo = {
   };
 };
 
+export type DoctorImplementGuardInfo = {
+  hasRecords: boolean;
+  latestStatus: "not-started" | "blocked" | "ready";
+  testGates: "not-started" | "OK" | "Pendente";
+  codeChanged: false;
+  nextAction: string;
+};
+
 export type DoctorReport = {
   status: DoctorStatus;
   checks: DoctorCheck[];
@@ -111,6 +119,7 @@ export type DoctorReport = {
   governance: DoctorGovernanceInfo;
   gates: DoctorGateInfo;
   implementReadiness: DoctorImplementReadinessInfo;
+  implementGuard: DoctorImplementGuardInfo;
   gitSecurity: {
     status: "clean" | "warning" | "blocked";
     forbiddenFiles: string[];

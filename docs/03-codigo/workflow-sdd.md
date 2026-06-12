@@ -53,10 +53,17 @@ Essa aprovação ainda não é aplicada como comando formal neste prototype, mas
 
 O SDD Master separa intenção, requisitos, especificação, plano e tarefas para evitar implementação sem escopo aprovado. A implementação deve vir depois de tarefas rastreáveis e testes obrigatórios definidos.
 
+## Implement Guard
+
+Depois de `tasks`, o próximo comando é:
+
+```bash
+sdd master implement --yes --phase="PHASE-01" --task="TASK-001" --dry-run
+```
+
+Neste prototype, `implement` não altera código. Ele valida readiness, test gates e segurança antes de uma futura implementação real.
+
 ## Comandos ainda pendentes
 
-- `sdd master implement`
-- `sdd master quality`
-- `sdd master audit`
 - `sdd master release`
 - `sdd master deploy`

@@ -11,6 +11,7 @@ export type ParsedCommand =
   | { kind: "master-workflow"; command: "discovery" | "requirements" | "spec" | "plan" | "tasks"; args: string[] }
   | { kind: "master-governance"; command: "clarify" | "approve" | "scope" | "backlog"; args: string[] }
   | { kind: "master-gate"; command: "quality" | "audit" | "docs" | "blocker"; args: string[] }
+  | { kind: "master-implement"; args: string[] }
   | { kind: "planned-command"; command: "update" }
   | { kind: "unknown"; command: string; scope: "root" | "master" };
 
@@ -66,6 +67,10 @@ export function parseArgs(args: string[]): ParsedCommand {
 
   if (second === "git") {
     return { kind: "master-git", args: args.slice(2) };
+  }
+
+  if (second === "implement") {
+    return { kind: "master-implement", args: args.slice(2) };
   }
 
   if (workflowCommands.has(second)) {

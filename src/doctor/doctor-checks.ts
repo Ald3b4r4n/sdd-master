@@ -5,6 +5,7 @@ import { getRecognizedAgentFiles } from "../agents/agent-writer.js";
 import { getGateStatus } from "../gates/gate-state.js";
 import { getImplementReadiness } from "../governance/blockers.js";
 import { getGovernanceStatus } from "../governance/governance-state.js";
+import { getImplementGuardStatus } from "../implementation/implement-readiness.js";
 import { officialTemplates } from "../templates/official-templates.js";
 import type {
   DoctorAgentInfo,
@@ -12,6 +13,7 @@ import type {
   DoctorGateInfo,
   DoctorGitInfo,
   DoctorGovernanceInfo,
+  DoctorImplementGuardInfo,
   DoctorImplementReadinessInfo,
   DoctorProjectState,
   DoctorSecurityInfo,
@@ -340,6 +342,28 @@ export function checkGates(cwd: string): {
       details
     },
     info: gates
+  };
+}
+
+export function checkImplementGuard(cwd: string): {
+  check: DoctorCheck;
+  info: DoctorImplementGuardInfo;
+} {
+  const guard = getImplementGuardStatus(cwd);
+  const details = [
+    guard.hasRecords ? "" : "Implement guard não iniciado.",
+    guard.testGates === "Pendente" ? "Test gates pendentes." : "",
+    guard.codeChanged ? "Código alterado pelo implement." : ""
+  ].filter(Boolean);
+
+  return {
+    check: {
+      id: "implement-guard",
+      label: "Implement Guard",
+      status: guard.codeChanged ? "fail" : details.length === 0 ? "pass" : "warn",
+      details
+    },
+    info: guard
   };
 }
 

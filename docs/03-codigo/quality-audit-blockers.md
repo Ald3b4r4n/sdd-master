@@ -60,3 +60,7 @@ A futura implementação continuará exigindo:
 - auditorias sem achados graves abertos;
 - documentação sem pendências bloqueantes;
 - nenhum blocker ativo.
+
+## Relação com Implement Guard
+
+`sdd master implement` consome esses portões em modo dry-run. Se houver quality `failed`, auditoria `BLOCKER`, `HIGH` ou `CRITICAL`, documentação `missing` ou `outdated`, ou blocker aberto, o guard registra `IMPLEMENT-XXX.md` como bloqueado e não altera código.
