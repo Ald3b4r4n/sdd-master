@@ -2,18 +2,15 @@
 
 ## Status
 
-Release draft criada.
-Release final ainda não publicada.
+Prerelease `v0.2.0-prototype` preparada.
 
-A tag inicial `v0.1.0-prototype` foi preservada sem reescrita. A versão corrente para alinhamento antes da publicação npm futura é `v0.1.0-prototype.1`.
+A tag inicial `v0.1.0-prototype` e a tag `v0.1.0-prototype.1` devem ser preservadas sem reescrita. A versão corrente é `v0.2.0-prototype`.
 
 ## Antes de publicar a release final
 
-- [ ] Confirmar tag remota `v0.1.0-prototype.1`.
+- [ ] Confirmar tag remota `v0.2.0-prototype`.
 - [ ] Confirmar que `v0.1.0-prototype` não foi movida ou reescrita.
-- [ ] Confirmar release draft vinculada à tag correta.
-- [ ] Confirmar `isDraft: true` antes da publicação.
-- [ ] Confirmar `publishedAt` vazio antes da publicação.
+- [ ] Confirmar que a release será criada como prerelease.
 - [ ] Confirmar release notes seguras.
 - [ ] Confirmar que não há `.env`.
 - [ ] Confirmar que não há segredos.
@@ -22,16 +19,14 @@ A tag inicial `v0.1.0-prototype` foi preservada sem reescrita. A versão corrent
 - [ ] Executar `sdd master git --pre-push`.
 - [ ] Obter aprovação humana explícita.
 
-## Comando para publicar draft futuramente
+## Comando para criar prerelease
 
-A publicação final deve ser feita apenas com aprovação humana explícita.
-
-Exemplo futuro:
+A prerelease deve ser criada apenas com aprovação humana explícita.
 
 ```bash
-gh release edit v0.1.0-prototype.1 --draft=false
+gh release create v0.2.0-prototype --prerelease --title "v0.2.0-prototype" --notes-file releases/github-v0.2.0-prototype-notes.md
 ```
 
 ## Regra
 
-Não publicar release final sem autorização humana explícita.
+Não publicar release estável sem autorização humana explícita.

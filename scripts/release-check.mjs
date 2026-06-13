@@ -3,7 +3,7 @@ import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
 
 const rootDir = process.cwd();
-const expectedVersion = "0.1.0-prototype.1";
+const expectedVersion = "0.2.0-prototype";
 const forbiddenPackPatterns = [
   /\.env$/,
   /\.env\.(local|production|development|staging|test|backup|old)$/,
@@ -37,6 +37,9 @@ const requiredFiles = [
   "docs/03-codigo/release-local.md",
   "docs/03-codigo/publicacao-npm.md",
   "docs/03-codigo/workflow-sdd.md",
+  "releases/github-v0.2.0-prototype.md",
+  "releases/github-v0.2.0-prototype-notes.md",
+  "releases/v0.2.0-prototype.md",
   "releases/github-v0.1.0-prototype.md",
   "releases/github-v0.1.0-prototype-notes.md",
   "releases/github-v0.1.0-prototype.1.md",

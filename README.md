@@ -8,7 +8,7 @@
   <strong>Framework rígido para desenvolvimento de software com especificação, TDD, documentação, auditoria, rastreabilidade, segurança e agentes de IA.</strong>
 </p>
 
-![Version](https://img.shields.io/badge/version-0.1.0--prototype.1-blue)
+![Version](https://img.shields.io/badge/version-0.2.0--prototype-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
 ![Node.js](https://img.shields.io/badge/Node.js-20%2B-43853d)
 ![TypeScript](https://img.shields.io/badge/TypeScript-ready-blue)
@@ -56,7 +56,7 @@ sdd master help
 O pacote está publicado como prototype e ainda não representa uma release estável. Use a dist-tag `prototype` para instalar esta versão.
 
 ```text
-sdd-master@0.1.0-prototype.1
+sdd-master@0.2.0-prototype
 ```
 
 Como esta é a primeira versão publicada no npm, o registry mantém `latest` apontando para `0.1.0-prototype.1` e não permitiu remover essa dist-tag enquanto não há outra versão publicada. A instalação recomendada para este estágio continua sendo `sdd-master@prototype`.
@@ -68,6 +68,21 @@ npm install -g sdd-master
 ```
 
 até existir uma release estável.
+
+## O que mudou em 0.2.0-prototype
+
+Esta versão adiciona o primeiro fluxo SDD funcional:
+
+- discovery;
+- requirements;
+- spec;
+- plan;
+- tasks;
+- governance;
+- quality/audit/docs/blockers;
+- implement guard;
+- skills/UIUX;
+- update seguro.
 
 ## Uso local durante desenvolvimento
 
@@ -378,10 +393,10 @@ Esses scripts verificam se o pacote contém os arquivos necessários para uso vi
 A versão atual é:
 
 ```text
-0.1.0-prototype.1
+0.2.0-prototype
 ```
 
-Esta versão consolida ajustes finais após a tag inicial `v0.1.0-prototype`, sem reescrever o histórico Git nem mover a tag já publicada.
+Esta versão consolida os blocos 17 a 22, sem reescrever histórico Git nem mover tags já publicadas.
 
 Antes de qualquer publicação:
 
@@ -397,20 +412,19 @@ A publicação real no npm e o push para GitHub exigem aprovação humana explí
 
 ## GitHub Release
 
-A primeira versão pública preparada é:
+A prerelease pública preparada é:
 
 ```text
-v0.1.0-prototype.1
+v0.2.0-prototype
 ```
 
 Status:
 
 - Tag inicial `v0.1.0-prototype` preservada sem reescrita.
-- Nova tag `v0.1.0-prototype.1` preparada para alinhar versão, documentação e release draft futura.
-- GitHub Release final ainda não publicada.
-- npm publish real executado para `sdd-master@0.1.0-prototype.1` com dist-tag `prototype`.
-- npm `latest` também aponta para `0.1.0-prototype.1` por comportamento automático da primeira publicação.
-- npm bloqueou a remoção de `latest` enquanto `0.1.0-prototype.1` é a única versão publicada.
+- Tag `v0.1.0-prototype.1` preservada sem reescrita.
+- GitHub prerelease `v0.2.0-prototype` pendente de autorização humana explícita.
+- npm publish real de `0.2.0-prototype` pendente de autorização humana explícita.
+- npm publish deve usar `npm publish --access public --tag prototype`.
 
 A release atual é um prototype e não representa versão final estável.
 

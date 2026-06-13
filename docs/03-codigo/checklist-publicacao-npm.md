@@ -2,9 +2,9 @@
 
 ## Status
 
-Publicação real executada para `sdd-master@0.1.0-prototype.1`.
+Preparação de publicação real para `sdd-master@0.2.0-prototype`.
 
-Versão prerelease atual: `0.1.0-prototype.1`.
+Versão prerelease atual: `0.2.0-prototype`.
 
 ## npm
 
@@ -17,7 +17,7 @@ npm install -g sdd-master@prototype
 Versão publicada:
 
 ```text
-sdd-master@0.1.0-prototype.1
+sdd-master@0.2.0-prototype
 ```
 
 Dist-tag:
@@ -26,7 +26,7 @@ Dist-tag:
 prototype
 ```
 
-Observação: por ser a primeira versão publicada, o npm também manteve `latest` apontando para `0.1.0-prototype.1`. O registry bloqueou a remoção de `latest` enquanto essa é a única versão publicada. A instalação recomendada neste estágio permanece `sdd-master@prototype`.
+Observação: a publicação deve usar `npm publish --access public --tag prototype`. A instalação recomendada neste estágio permanece `sdd-master@prototype`.
 
 Evite usar:
 
@@ -41,7 +41,7 @@ até existir uma release estável.
 - [ ] Confirmar nome do pacote no npm.
 - [ ] Confirmar login npm.
 - [ ] Confirmar versão em `package.json`.
-- [ ] Confirmar tag Git correspondente `v0.1.0-prototype.1`.
+- [ ] Confirmar tag Git correspondente `v0.2.0-prototype`.
 - [ ] Confirmar GitHub Release draft.
 - [ ] Executar `npm run check`.
 - [ ] Executar `npm publish --dry-run --access public --tag prototype`.

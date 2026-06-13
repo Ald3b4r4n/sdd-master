@@ -1,6 +1,6 @@
 # Publicação npm
 
-A publicação npm do SDD Master foi executada para a versão prototype `0.1.0-prototype.1`.
+A próxima publicação npm controlada do SDD Master é a versão prototype `0.2.0-prototype`.
 
 ## npm
 
@@ -13,7 +13,7 @@ npm install -g sdd-master@prototype
 Versão publicada:
 
 ```text
-sdd-master@0.1.0-prototype.1
+sdd-master@0.2.0-prototype
 ```
 
 Dist-tag:
@@ -22,7 +22,7 @@ Dist-tag:
 prototype
 ```
 
-Como esta é a primeira versão publicada do pacote, o npm também mantém `latest` apontando para `0.1.0-prototype.1`. O registry bloqueou a remoção de `latest` enquanto essa é a única versão publicada. A instalação recomendada neste estágio continua sendo `sdd-master@prototype`, porque a versão ainda é prototype e não é release estável.
+`0.2.0-prototype` deve ser publicado com `npm publish --access public --tag prototype`. A instalação recomendada neste estágio continua sendo `sdd-master@prototype`, porque a versão ainda é prototype e não é release estável.
 
 Evite usar:
 
@@ -44,7 +44,7 @@ npm publish --dry-run --access public --tag prototype
 
 O dry-run ajuda a confirmar quais arquivos entrariam no pacote e se a configuração npm está coerente, sem publicar a versão real.
 
-Como `0.1.0-prototype.1` é uma versão prerelease, a configuração do pacote usa a tag npm `prototype` para evitar publicação acidental como `latest`. O comando deve informar `--tag prototype` explicitamente.
+Como `0.2.0-prototype` é uma versão prerelease, a configuração do pacote usa a tag npm `prototype` para evitar publicação acidental como `latest`. O comando deve informar `--tag prototype` explicitamente.
 
 ## Antes de novas publicações npm
 

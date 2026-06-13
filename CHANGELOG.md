@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [0.2.0-prototype] - 2026-06-13
+
 ### Adicionado
 
 - Comandos iniciais de workflow SDD:
@@ -42,6 +44,20 @@
 - Versionamento inicial de templates oficiais.
 - Relatórios de update em `.sdd-master/reports/`.
 - Detecção de conflitos e preservação de arquivos locais.
+
+### Segurança
+
+- `implement` não altera código do consumidor nesta versão.
+- `skills` não instala globalmente.
+- `skills` não executa código remoto.
+- `update` não apaga histórico.
+- `update` não sobrescreve decisões humanas.
+- `.env`, segredos e `.sdd-master/` na raiz continuam bloqueados.
+
+### Observação
+
+- Esta versão continua sendo prototype.
+- A instalação recomendada é `npm install -g sdd-master@prototype`.
 
 ## [0.1.0-prototype.1] - 2026-06-11
 
