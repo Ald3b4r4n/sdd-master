@@ -2,6 +2,14 @@
 
 ## [Unreleased]
 
+### Adicionado
+
+- Auditoria final da fase `0.2.0-prototype`.
+- Inventário dos comandos implementados.
+- Matriz de maturidade do SDD Master.
+- Roadmap para `0.3.0-alpha`.
+- Auditoria de segurança da fase publicada.
+
 ## [0.2.0-prototype] - 2026-06-13
 
 ### Adicionado

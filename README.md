@@ -69,6 +69,27 @@ npm install -g sdd-master
 
 até existir uma release estável.
 
+## Estado atual
+
+A versão pública atual recomendada é:
+
+```bash
+npm install -g sdd-master@prototype
+```
+
+Versão:
+
+```text
+0.2.0-prototype
+```
+
+Status:
+
+- npm publicado;
+- GitHub prerelease publicada;
+- prototype, não estável;
+- próximo alvo: `0.3.0-alpha`.
+
 ## O que mudou em 0.2.0-prototype
 
 Esta versão adiciona o primeiro fluxo SDD funcional:
