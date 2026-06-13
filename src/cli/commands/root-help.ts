@@ -1,23 +1,40 @@
 export function getRootHelp(): string {
   return `SDD Master
 
-Framework rígido para desenvolvimento de software orientado por especificação, documentação, TDD, auditoria, rastreabilidade, segurança e agentes de IA.
-
 Uso:
+  sdd master <comando> [opções]
   sdd master <command>
 
-Comandos principais:
-  sdd master help       Mostra ajuda do SDD Master
-  sdd master version    Mostra a versão instalada
-  sdd master status     Mostra status básico do projeto
-  sdd master init       Inicializa o SDD Master no projeto
-  sdd master doctor     Diagnostica a instalação
-  sdd master agents     Gera instruções para IAs/agentes
-  sdd master git        Diagnostica Git e segurança local
-  sdd master security   Executa segurança builtin e scanners externos opt-in
-  sdd master update     Planejado: atualiza templates e estrutura
+Primeiros passos:
+  sdd master init
+  sdd master onboard
+  sdd master doctor
+  sdd master discovery
+  sdd master requirements
+  sdd master plan
+  sdd master tasks
 
-Use:
-  sdd master help <command>
+Comandos principais:
+  init          Inicializa o SDD Master em um projeto
+  onboard       Guia os primeiros passos do projeto
+  doctor        Diagnostica estrutura, segurança e readiness
+  status        Mostra estado atual do projeto
+  discovery     Registra descoberta do produto
+  requirements  Registra requisitos
+  spec          Cria especificação de fase
+  plan          Cria plano
+  tasks         Cria tarefas
+  implement     Prepara implementação assistida
+  quality       Executa gate de qualidade
+  audit         Executa auditoria
+  release       Prepara release como guard
+  deploy        Prepara deploy como guard
+  security      Executa segurança builtin/opt-in
+  plugins       Gerencia extensões seguras
+  update        Atualiza estrutura SDD com segurança
+
+Dica:
+  Rode \`sdd master init\` dentro do projeto consumidor.
+  Use \`sdd master help\` para ver todos os comandos.
 `;
 }

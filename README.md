@@ -153,12 +153,25 @@ npm run build
 node dist/cli/main.js master help
 ```
 
+## Onboarding guiado
+
+O SDD Master pode guiar os primeiros passos de um projeto.
+
+```bash
+sdd master init
+sdd master onboard --profile="web" --ai="codex"
+sdd master doctor
+```
+
+O onboarding gera uma lista de próximos passos dentro de `.sdd-master/onboarding/` sem alterar código do projeto consumidor.
+
 ## Comandos atuais
 
 | Comando | Status | O que faz |
 |---|---|---|
 | `sdd master help` | Disponível | Mostra ajuda |
 | `sdd master init` | Disponível | Inicializa estrutura SDD Master |
+| `sdd master onboard` | Disponível | Guia os primeiros passos do projeto |
 | `sdd master doctor` | Disponível | Diagnostica instalação |
 | `sdd master agents` | Disponível | Gera instruções multi-IA |
 | `sdd master git` | Disponível | Valida Git e segurança |
@@ -569,6 +582,8 @@ Nunca publique `.env`, tokens, credenciais, chaves privadas, certificados, dados
 - [Segurança e governança](docs/02-tecnica-arquitetura/seguranca-e-governanca.md)
 - [Path safety multiplataforma](docs/02-tecnica-arquitetura/path-safety-multiplataforma.md)
 - [Comandos CLI](docs/03-codigo/comandos-cli.md)
+- [Onboarding guiado](docs/03-codigo/onboarding-guiado.md)
+- [Exemplos práticos](docs/03-codigo/exemplos-praticos.md)
 - [Desenvolvimento local](docs/03-codigo/desenvolvimento-local.md)
 - [Workflow SDD](docs/03-codigo/workflow-sdd.md)
 - [Skills locais e UI/UX](docs/03-codigo/skills-uiux.md)

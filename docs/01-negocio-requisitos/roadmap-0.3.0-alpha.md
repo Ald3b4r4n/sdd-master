@@ -44,9 +44,9 @@ Transformar o SDD Master de prototype publicado em alpha operacional validado em
 
 ### 6. Experiencia de uso
 
-- Melhorar mensagens.
-- Melhorar help.
-- Reduzir atrito de setup.
+- Validar as mensagens centralizadas do BLOCO 30.
+- Validar o help guiado e o comando `onboard` em projetos reais.
+- Medir redução de atrito no setup.
 - Validar em Windows, Linux e macOS.
 
 ## Fora de escopo para 0.3.0-alpha
@@ -60,4 +60,5 @@ Transformar o SDD Master de prototype publicado em alpha operacional validado em
 
 O BLOCO 27A completa o registry seguro de extensões antes do avanço para segurança avançada opcional.
 O BLOCO 28 adiciona segurança avançada opt-in com redaction e gates integrados.
-O próximo bloco recomendado é o BLOCO 29, com hardening multiambiente Windows/Linux/macOS e path safety.
+O BLOCO 29 adicionou hardening multiambiente e path safety.
+O BLOCO 30 adiciona onboarding guiado, help e próximos passos centralizados.

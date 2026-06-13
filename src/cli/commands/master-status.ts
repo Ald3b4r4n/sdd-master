@@ -15,12 +15,27 @@ import { getUiuxStatus } from "../../uiux/uiux-gates.js";
 import { getUpdateStatus } from "../../update/update-state.js";
 import { getWorkflowStatus } from "../../workflow/workflow-runner.js";
 import { getPathSafetyState } from "../../filesystem/path-safety-state.js";
+import { getOnboardingState } from "../../ux/onboarding.js";
+import { getNextActions } from "../../ux/next-actions.js";
 
-export function getStatusOutput(cwd: string): string {
+export function getStatusOutput(cwd: string, json = false): string {
   const hasSddMaster = existsSync(join(cwd, ".sdd-master"));
 
   if (hasSddMaster) {
-    return getInstalledStatus(cwd);
+    return getInstalledStatus(cwd, json);
+  }
+
+  if (json) {
+    return `${JSON.stringify({
+      command: "status",
+      status: "not-started",
+      summary: ["SDD Master não inicializado."],
+      files: [],
+      blockers: ["Estrutura .sdd-master ausente."],
+      warnings: [],
+      nextActions: getNextActions("status", { initialized: false }),
+      onboarding: getOnboardingState(cwd)
+    }, null, 2)}\n`;
   }
 
   return `SDD Master — Status
@@ -39,7 +54,7 @@ Observação:
 `;
 }
 
-function getInstalledStatus(cwd: string): string {
+function getInstalledStatus(cwd: string, json: boolean): string {
   const agentFiles = getRecognizedAgentFiles(cwd);
   const gitSecurity = runGitSecurityCheck(cwd, "default");
   const workflow = getWorkflowStatus(cwd);
@@ -56,6 +71,37 @@ function getInstalledStatus(cwd: string): string {
   const delivery = getDeliveryStatus(cwd);
   const advancedSecurity = getAdvancedSecurityState(cwd);
   const pathSafety = getPathSafetyState(cwd);
+  const onboarding = getOnboardingState(cwd);
+  const nextActions = onboarding.status === "not-started"
+    ? [onboarding.nextStep, workflow.nextCommand.replace("/sdd-master-", "sdd master ")]
+    : [workflow.nextCommand.replace("/sdd-master-", "sdd master ")];
+
+  if (json) {
+    return `${JSON.stringify({
+      command: "status",
+      status: implementReadiness.ready ? "ok" : "warning",
+      summary: [
+        `Workflow: ${workflow.nextCommand}`,
+        `Implementação pronta: ${implementReadiness.ready ? "Sim" : "Não"}`
+      ],
+      files: [],
+      blockers: implementReadiness.blockers,
+      warnings: [],
+      nextActions,
+      onboarding,
+      workflow,
+      readiness: {
+        discovery: !workflow.discovery,
+        requirements: workflow.discovery && !workflow.requirements,
+        tasks: workflow.plan && !workflow.tasks,
+        implement: implementReadiness.ready,
+        release: delivery.release.status === "ready"
+      },
+      pathSafety,
+      gitSecurity,
+      delivery
+    }, null, 2)}\n`;
+  }
 
   return `SDD Master — Status
 
@@ -97,6 +143,13 @@ Path Safety:
   Caminhos inseguros: ${pathSafety.unsafePaths}
   Symlinks perigosos: ${pathSafety.dangerousSymlinks}
   Status: ${pathSafety.status}
+
+Onboarding:
+  Status: ${onboarding.status}
+  Perfil: ${onboarding.profile}
+  IA principal: ${onboarding.ai}
+  Idioma: ${onboarding.language}
+  Próximo passo: ${onboarding.nextStep}
 
 Workflow inicial:
   Discovery: ${formatStatus(workflow.discovery)}
@@ -196,6 +249,9 @@ Implement Assistido:
 
 Próximo comando recomendado:
   ${workflow.nextCommand}
+
+Próximos passos:
+${nextActions.map((action, index) => `  ${index + 1}. ${action}`).join("\n")}
 `;
 }
 

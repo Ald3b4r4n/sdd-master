@@ -1,12 +1,9 @@
 import { existsSync } from "node:fs";
 import { join } from "node:path";
+import { notInitializedMessage } from "../ux/messages.js";
 
 export function getNotInitializedMessage(): string {
-  return `SDD Master não inicializado neste diretório.
-
-Execute primeiro:
-  sdd master init
-`;
+  return notInitializedMessage();
 }
 
 export function isWorkflowInitialized(cwd: string): boolean {

@@ -67,6 +67,7 @@ npm run check
 
 ```bash
 node dist/cli/main.js master help
+node dist/cli/main.js master onboard --help
 ```
 
 ## Testar update seguro
@@ -91,3 +92,5 @@ O update deve criar backup apenas dos arquivos alterados, registrar relatório e
 7. Rodar `npm run pack:dry-run`.
 8. Rodar `npm run check`.
 9. Criar commit local apenas depois dos checks.
+
+Use diretórios temporários nos testes de onboarding. Nunca execute `init` ou `onboard` na raiz do pacote.

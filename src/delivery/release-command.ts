@@ -268,5 +268,10 @@ Segurança avançada:
 
 Risco:
   Release real exige autorização humana explícita fora deste comando.
+
+Próximos passos:
+  1. Resolver bloqueios.
+  2. Rodar sdd master release novamente.
+  3. Solicitar aprovação humana antes de publicar ou criar tag.
 `;
 }

@@ -668,5 +668,10 @@ Próximo passo futuro:
     sdd master docs
     sdd master release
     sdd master deploy
+
+Próximos passos:
+  1. Revisar manifesto.
+  2. Aprovar contrato de testes.
+  3. Entregar handoff ao agente escolhido.
 `;
 }

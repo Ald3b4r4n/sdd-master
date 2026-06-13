@@ -1,4 +1,5 @@
 import type { PathSafetyState } from "../filesystem/path-safety-state.js";
+import type { OnboardingState } from "../ux/onboarding.js";
 
 export type DoctorStatus = "healthy" | "warning" | "broken";
 export type DoctorCheckStatus = "pass" | "warn" | "fail";
@@ -195,7 +196,12 @@ export type DoctorDeliveryInfo = {
 };
 
 export type DoctorReport = {
+  command: "doctor";
   status: DoctorStatus;
+  summary: string[];
+  files: string[];
+  blockers: string[];
+  warnings: string[];
   checks: DoctorCheck[];
   projectState: DoctorProjectState;
   git: DoctorGitInfo;
@@ -215,6 +221,8 @@ export type DoctorReport = {
   assistedImplement: DoctorAssistedImplementInfo;
   delivery: DoctorDeliveryInfo;
   pathSafety: PathSafetyState;
+  onboarding: OnboardingState;
+  nextActions: string[];
   gitSecurity: {
     status: "clean" | "warning" | "blocked";
     forbiddenFiles: string[];

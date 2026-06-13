@@ -28,10 +28,15 @@ Próximo passo recomendado:
 Status geral:
   ${report.status}
 
-Instalação:
+Estrutura / Instalação:
   .sdd-master/: ${formatPathStatus(report, ".sdd-master")}
   constitution.md: ${formatPathStatus(report, ".sdd-master/constitution.md")}
   project-state.md: ${formatPathStatus(report, ".sdd-master/project-state.md")}
+
+Onboarding:
+  Status: ${report.onboarding.status}
+  Perfil: ${report.onboarding.profile}
+  Próximo passo: ${report.onboarding.nextStep}
 
 Documentação pública:
   docs/01-negocio-requisitos/: ${formatPathStatus(report, "docs/01-negocio-requisitos")}
@@ -175,6 +180,9 @@ Estado do projeto:
 
 Próximo passo recomendado:
   ${report.recommendation}
+
+Próximos passos:
+${report.nextActions.map((action, index) => `  ${index + 1}. ${action}`).join("\n")}
 `;
 }
 

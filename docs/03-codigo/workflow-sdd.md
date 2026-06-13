@@ -18,7 +18,10 @@ Todos os comandos exigem projeto inicializado:
 
 ```bash
 sdd master init
+sdd master onboard --profile="web" --ai="codex"
 ```
+
+O onboarding é recomendado antes do discovery, mas não substitui os gates do workflow.
 
 O fluxo tem guarda simples de ordem:
 

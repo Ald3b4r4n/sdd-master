@@ -11,6 +11,7 @@ import type { CliOutput, CliRuntime } from "../output.js";
 import { ensureExtensionInfrastructure, writeExtensionRegistry } from "../../extensions/extension-registry.js";
 import { formatUnsafePathError, resolveInsideProject, UnsafePathError } from "../../filesystem/path-safety.js";
 import { safeMkdir, safeWriteFile } from "../../filesystem/safe-write.js";
+import { formatNextActions, getNextActions } from "../../ux/next-actions.js";
 
 type Language = AgentLanguage;
 type Agent = SupportedAgent | "other";
@@ -20,6 +21,7 @@ type InitOptions = {
   language?: Language;
   agent?: Agent;
   projectName?: string;
+  projectType?: string;
 };
 
 const initAgents = new Set<Agent>([
@@ -185,6 +187,17 @@ function parseInitArgs(args: string[]):
     if (arg === "--project-name") {
       index += 1;
       options.projectName = args[index];
+      continue;
+    }
+
+    if (arg === "--project-type") {
+      index += 1;
+      options.projectType = args[index];
+      continue;
+    }
+
+    if (arg.startsWith("--project-type=")) {
+      options.projectType = arg.slice("--project-type=".length);
       continue;
     }
 
@@ -354,6 +367,9 @@ Agentes / IAs:
 
 Próximo comando recomendado:
   /sdd-master-discovery
+
+Próximos passos:
+${formatNextActions(getNextActions("init"))}
 `;
 }
 

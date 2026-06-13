@@ -1522,7 +1522,7 @@ describe("SDD Master package foundation", () => {
     const result = runCli(["master", "banana"]);
 
     assert.notEqual(result.status, 0);
-    assert.match(result.stderr, /Comando desconhecido: banana/);
+    assert.match(result.stderr, /Comando não reconhecido: banana/);
     assert.match(result.stderr, /sdd master help/);
   });
 
@@ -3108,5 +3108,120 @@ describe("cross-platform path safety", () => {
         rmSync(external, { recursive: true, force: true });
       }
     });
+  });
+});
+
+describe("guided onboarding and command experience", () => {
+  it("shows onboarding help from command and contextual help", () => {
+    const direct = runCli(["master", "onboard", "--help"]);
+    const contextual = runCli(["master", "help", "onboard"]);
+
+    assert.equal(direct.status, 0);
+    assert.equal(contextual.status, 0);
+    assert.match(direct.stdout, /sdd master onboard/);
+    assert.match(direct.stdout, /Próximos passos/);
+    assert.match(contextual.stdout, /ONBOARDING-001/);
+  });
+
+  it("guides users to init when onboarding is not initialized", () => {
+    withTempProject((projectDir) => {
+      const result = runCli(["master", "onboard", "--yes"], projectDir);
+
+      assert.notEqual(result.status, 0);
+      assert.match(result.stderr, /SDD Master não inicializado neste diretório/);
+      assert.match(result.stderr, /sdd master init/);
+      assert.match(result.stderr, /sdd master doctor/);
+    });
+  });
+
+  it("creates onboarding records with selected profile, AI and language without changing consumer code", () => {
+    withTempProject((projectDir) => {
+      assert.equal(initTempProject(projectDir).status, 0);
+      mkdirSync(join(projectDir, "src"), { recursive: true });
+      const marker = join(projectDir, "src", "consumer-code.ts");
+      writeFileSync(marker, "export const untouched = true;\n", "utf8");
+
+      const result = runCli(
+        ["master", "onboard", "--yes", "--profile=web", "--ai=codex", "--language=pt-BR"],
+        projectDir
+      );
+      const record = join(projectDir, ".sdd-master", "onboarding", "ONBOARDING-001.md");
+      const nextSteps = join(projectDir, ".sdd-master", "onboarding", "next-steps.md");
+
+      assert.equal(result.status, 0);
+      assert.equal(existsSync(record), true);
+      assert.equal(existsSync(nextSteps), true);
+      assert.match(readFileSync(record, "utf8"), /## Perfil do projeto\nweb/);
+      assert.match(readFileSync(record, "utf8"), /## IA principal\ncodex/);
+      assert.match(readFileSync(record, "utf8"), /## Idioma\npt-BR/);
+      assert.equal(readFileSync(marker, "utf8"), "export const untouched = true;\n");
+    });
+  });
+
+  it("returns valid onboarding JSON and keeps dry-run free of writes", () => {
+    withTempProject((projectDir) => {
+      assert.equal(initTempProject(projectDir).status, 0);
+      const result = runCli(
+        ["master", "onboard", "--json", "--dry-run", "--profile=api", "--ai=claude", "--language=en"],
+        projectDir
+      );
+      const json = JSON.parse(result.stdout);
+
+      assert.equal(result.status, 0);
+      assert.equal(json.command, "onboard");
+      assert.equal(json.status, "dry-run");
+      assert.equal(json.profile, "api");
+      assert.equal(json.ai, "claude");
+      assert.equal(json.language, "en");
+      assert.equal(json.codeChanged, false);
+      assert.deepEqual(json.files, []);
+      assert.equal(existsSync(join(projectDir, ".sdd-master", "onboarding")), false);
+    });
+  });
+
+  it("improves global help and suggests similar commands", () => {
+    const help = runCli(["master", "help"]);
+    const unknown = runCli(["master", "doctr"]);
+
+    assert.match(help.stdout, /Primeiros passos:/);
+    assert.match(help.stdout, /onboard/);
+    assert.match(help.stdout, /Comandos principais:/);
+    assert.notEqual(unknown.status, 0);
+    assert.match(unknown.stderr, /Comando não reconhecido: doctr/);
+    assert.match(unknown.stderr, /sdd master doctor/);
+  });
+
+  it("adds onboarding and next actions to status and doctor", () => {
+    withTempProject((projectDir) => {
+      assert.equal(initTempProject(projectDir).status, 0);
+      assert.equal(runCli(["master", "onboard", "--yes", "--profile=cli", "--ai=codex"], projectDir).status, 0);
+      const statusJson = JSON.parse(runCli(["master", "status", "--json"], projectDir).stdout);
+      const statusText = runCli(["master", "status"], projectDir).stdout;
+      const doctorJson = JSON.parse(runCli(["master", "doctor", "--json"], projectDir).stdout);
+      const doctorText = runCli(["master", "doctor"], projectDir).stdout;
+
+      assert.equal(statusJson.onboarding.status, "completed");
+      assert.equal(statusJson.onboarding.profile, "cli");
+      assert.equal(Array.isArray(statusJson.nextActions), true);
+      assert.match(statusText, /Onboarding:/);
+      assert.match(statusText, /Próximos passos:/);
+      assert.equal(Array.isArray(doctorJson.nextActions), true);
+      assert.equal(doctorJson.onboarding.status, "completed");
+      for (const category of ["Onboarding:", "Segurança:", "Path Safety:", "Git:", "Workflow inicial:", "Implementação:", "Release Guard:", "Extensões:"]) {
+        assert.match(doctorText, new RegExp(category));
+      }
+    });
+  });
+
+  it("documents practical examples and guided onboarding without recreating root state", () => {
+    const readme = readFileSync(join(rootDir, "README.md"), "utf8");
+    const changelog = readFileSync(join(rootDir, "CHANGELOG.md"), "utf8");
+
+    assert.equal(existsSync(join(rootDir, "docs", "03-codigo", "exemplos-praticos.md")), true);
+    assert.equal(existsSync(join(rootDir, "docs", "03-codigo", "onboarding-guiado.md")), true);
+    assert.match(readme, /## Onboarding guiado/);
+    assert.match(changelog, /Comando `sdd master onboard`/);
+    assert.equal(existsSync(join(rootDir, ".sdd-master")), false);
+    assertRootPdfsPreserved();
   });
 });

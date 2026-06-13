@@ -2,7 +2,7 @@ import { existsSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import type { CliOutput, CliRuntime } from "../cli/output.js";
 import { safeMkdir, safeWriteFile } from "../filesystem/safe-write.js";
-import { isWorkflowInitialized } from "../workflow/workflow-guards.js";
+import { getNotInitializedMessage, isWorkflowInitialized } from "../workflow/workflow-guards.js";
 import { detectExternalTool, notRequestedTool, runExternalTool } from "./external-tools.js";
 import { runBuiltinSecurity } from "./security-detectors.js";
 import { formatSecurityJson, formatSecurityText } from "./security-report.js";
@@ -28,7 +28,7 @@ export async function runSecurityCommand(args: string[], output: CliOutput, runt
   }
   const needsInit = parsed.options.report || parsed.options.audit;
   if (needsInit && !isWorkflowInitialized(runtime.cwd)) {
-    output.stderr("SDD Master não inicializado. Execute: sdd master init\n");
+    output.stderr(getNotInitializedMessage());
     return 1;
   }
 

@@ -280,5 +280,10 @@ Segurança avançada:
 
 Risco:
   Deploy real exige autorização humana explícita fora deste comando.
+
+Próximos passos:
+  1. Resolver bloqueios.
+  2. Rodar sdd master deploy novamente.
+  3. Solicitar aprovação humana antes do deploy.
 `;
 }

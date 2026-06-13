@@ -3,8 +3,9 @@ export type ParsedCommand =
   | { kind: "version" }
   | { kind: "master-help" }
   | { kind: "master-command-help"; command: string }
-  | { kind: "master-status" }
+  | { kind: "master-status"; args: string[] }
   | { kind: "master-init"; args: string[] }
+  | { kind: "master-onboard"; args: string[] }
   | { kind: "master-agents"; args: string[] }
   | { kind: "master-doctor"; args: string[] }
   | { kind: "master-git"; args: string[] }
@@ -55,11 +56,15 @@ export function parseArgs(args: string[]): ParsedCommand {
   }
 
   if (second === "status") {
-    return { kind: "master-status" };
+    return { kind: "master-status", args: args.slice(2) };
   }
 
   if (second === "init") {
     return { kind: "master-init", args: args.slice(2) };
+  }
+
+  if (second === "onboard") {
+    return { kind: "master-onboard", args: args.slice(2) };
   }
 
   if (second === "doctor") {

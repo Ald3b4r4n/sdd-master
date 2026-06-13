@@ -111,6 +111,9 @@ Caminho solicitado:
 
 Ação:
   Use apenas caminhos relativos dentro do projeto.
+
+Próxima ação:
+  Revise o caminho informado e execute o comando novamente.
 `;
 }
 

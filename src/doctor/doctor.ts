@@ -23,6 +23,8 @@ import {
 import { runGitSecurityCheck } from "../git/git-checks.js";
 import type { DoctorCheck, DoctorReport, DoctorStatus } from "./doctor-types.js";
 import { getPathSafetyState } from "../filesystem/path-safety-state.js";
+import { getOnboardingState } from "../ux/onboarding.js";
+import { getNextActions } from "../ux/next-actions.js";
 
 export function runDoctor(cwd: string): DoctorReport {
   const internal = checkInternalStructure(cwd);
@@ -46,6 +48,7 @@ export function runDoctor(cwd: string): DoctorReport {
   const git = getGitInfo(cwd);
   const gitSecurity = runGitSecurityCheck(cwd, "default");
   const pathSafety = getPathSafetyState(cwd);
+  const onboarding = getOnboardingState(cwd);
   const pathSafetyCheck: DoctorCheck = {
     id: "path-safety",
     label: "Path Safety",
@@ -91,9 +94,19 @@ export function runDoctor(cwd: string): DoctorReport {
   const projectState = readProjectState(cwd);
   const status = getOverallStatus(checks);
   const recommendation = status === "broken" ? "sdd master init" : "/sdd-master-discovery";
+  const nextActions = getNextActions("doctor", { status });
 
   return {
+    command: "doctor",
     status,
+    summary: [
+      `Checks executados: ${checks.length}`,
+      `Status geral: ${status}`,
+      `Onboarding: ${onboarding.status}`
+    ],
+    files: [],
+    blockers: checks.filter((check) => check.status === "fail").flatMap((check) => check.details),
+    warnings: checks.filter((check) => check.status === "warn").flatMap((check) => check.details),
     checks,
     projectState,
     git: git.info,
@@ -113,6 +126,8 @@ export function runDoctor(cwd: string): DoctorReport {
     assistedImplement: assistedImplement.info,
     delivery: delivery.info,
     pathSafety,
+    onboarding,
+    nextActions,
     gitSecurity: {
       status: gitSecurity.status,
       forbiddenFiles: gitSecurity.security.forbiddenFiles,

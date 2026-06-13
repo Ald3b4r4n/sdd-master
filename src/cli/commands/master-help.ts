@@ -9,6 +9,8 @@ type CommandHelp = {
   creates?: string[];
 };
 
+import { getOnboardHelp } from "./master-onboard.js";
+
 const commandHelps: Record<string, CommandHelp> = {
   init: {
     command: "init",
@@ -460,39 +462,58 @@ export function getMasterCommandHelp(command?: string): string {
   if (!command) {
     return `SDD Master — Namespace master
 
-Comandos disponíveis:
-  sdd master help       Mostra esta ajuda
-  sdd master version    Mostra a versão instalada
-  sdd master status     Mostra status básico do projeto
-  sdd master init       Inicializa estrutura SDD Master no projeto
-  sdd master doctor     Diagnostica a instalação SDD Master
-  sdd master agents     Gera arquivos de instrução para IAs/agentes
-  sdd master git        Diagnostica Git e segurança local
-  sdd master security   Executa segurança avançada opcional e redigida
-  sdd master skills     Gerencia skills locais e relatórios de uso
-  sdd master plugins    Gerencia plugins locais e política de supply chain
-  sdd master uiux       Cria gates de design, accessibility, SEO e responsividade
-  sdd master discovery  Cria discovery inicial
-  sdd master requirements Cria requisitos iniciais
-  sdd master spec       Cria especificação inicial
-  sdd master plan       Cria plano técnico inicial
-  sdd master tasks      Cria tarefas iniciais
-  sdd master clarify    Registra dúvidas e respostas humanas
-  sdd master approve    Registra aprovações humanas formais
-  sdd master scope      Controla escopo e mudanças
-  sdd master backlog    Registra itens futuros fora do escopo atual
-  sdd master quality    Registra revisão de qualidade
-  sdd master audit      Registra auditoria formal
-  sdd master docs       Registra estado documental
-  sdd master blocker    Gerencia blockers formais
-  sdd master implement  Verifica readiness em modo guard/dry-run
+Uso:
+  sdd master <comando> [opções]
+
+Primeiros passos:
+  sdd master init
+  sdd master onboard
+  sdd master doctor
+  sdd master discovery
+  sdd master requirements
+  sdd master plan
+  sdd master tasks
+
+Comandos principais:
+  init          Inicializa o SDD Master em um projeto
+  onboard       Guia os primeiros passos do projeto
+  doctor        Diagnostica estrutura, segurança e readiness
+  status        Mostra estado atual do projeto
+  discovery     Registra descoberta do produto
+  requirements  Registra requisitos
+  spec          Cria especificação de fase
+  plan          Cria plano
+  tasks         Cria tarefas
+  implement     Prepara implementação assistida
+  quality       Executa gate de qualidade
+  audit         Executa auditoria
+  release       Prepara release como guard
+  deploy        Prepara deploy como guard
+  security      Executa segurança builtin/opt-in
+  plugins       Gerencia extensões seguras
+  update        Atualiza estrutura SDD com segurança
+
+Comandos adicionais:
+  sdd master help
+  sdd master agents
+  sdd master git
+  sdd master skills
+  sdd master uiux
+  sdd master clarify
+  sdd master approve
+  sdd master scope
+  sdd master backlog
+  sdd master docs
+  sdd master blocker
   sdd master release
   sdd master deploy
 
-Use:
-  sdd master help <command>
+Dica:
+  Rode \`sdd master init\` dentro do projeto consumidor.
 `;
   }
+
+  if (command === "onboard") return getOnboardHelp();
 
   const help = commandHelps[command];
 
@@ -536,10 +557,13 @@ Status:
 Finalidade:
   ${help.purpose}
 
-Quando será usado:
+Quando usar:
   ${help.whenUsed}
 
-Uso futuro:
+Exemplo:
   ${help.example}
-${creates}${details}${security}`;
+${creates}${details}${security}
+Próximos passos:
+  Consulte sdd master status e sdd master doctor após executar o comando.
+`;
 }

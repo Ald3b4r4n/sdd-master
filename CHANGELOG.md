@@ -10,6 +10,11 @@
 
 ### Adicionado
 
+- Comando `sdd master onboard`.
+- Onboarding guiado com próximos passos.
+- Documentação de exemplos práticos.
+- Camada central de mensagens e next actions.
+- Padronização progressiva das saídas de texto e JSON.
 - Camada central de path safety para Windows, Linux e macOS.
 - Escritas confinadas à raiz do projeto consumidor.
 - Diagnóstico `doctor --path-safety` e resumo no `status`.
@@ -45,6 +50,12 @@
 - Ferramentas externas não são instaladas automaticamente.
 - Scanners externos só rodam com opt-in explícito.
 - Valores sensíveis são redigidos em relatórios.
+
+### Melhorado
+
+- Help global e help por comando.
+- Mensagens de erro comuns.
+- `status` e `doctor` com próximos passos.
 
 ## [0.2.0-prototype] - 2026-06-13
 

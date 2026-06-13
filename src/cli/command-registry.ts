@@ -4,6 +4,7 @@ import { runAgentsCommand } from "./commands/master-agents.js";
 import { runDoctorCommand } from "./commands/master-doctor.js";
 import { runMasterGitCommand } from "./commands/master-git.js";
 import { runInitCommand } from "./commands/master-init.js";
+import { runOnboardCommand } from "./commands/master-onboard.js";
 import { getMasterCommandHelp } from "./commands/master-help.js";
 import { getRootHelp } from "./commands/root-help.js";
 import { getStatusOutput } from "./commands/master-status.js";
@@ -19,6 +20,7 @@ import { runSkillsCommand } from "../skills/skill-command.js";
 import { runUiuxCommand } from "../uiux/uiux-command.js";
 import { runUpdateCommand } from "../update/update-command.js";
 import { runWorkflowCommand } from "../workflow/workflow-runner.js";
+import { unknownCommandMessage } from "../ux/error-format.js";
 
 export async function runCommand(
   args: string[],
@@ -41,10 +43,12 @@ export async function runCommand(
       output.stdout(getMasterCommandHelp(command.command));
       return 0;
     case "master-status":
-      output.stdout(getStatusOutput(runtime.cwd));
+      output.stdout(getStatusOutput(runtime.cwd, command.args.includes("--json")));
       return 0;
     case "master-init":
       return runInitCommand(command.args, output, runtime);
+    case "master-onboard":
+      return runOnboardCommand(command.args, output, runtime);
     case "master-doctor":
       return runDoctorCommand(command.args, output, runtime);
     case "master-agents":
@@ -74,23 +78,7 @@ export async function runCommand(
     case "master-implement":
       return runImplementCommand(command.args, output, runtime);
     case "unknown":
-      output.stderr(getUnknownCommandOutput(command.command, command.scope));
+      output.stderr(unknownCommandMessage(command.command, command.scope));
       return 1;
   }
-}
-
-function getUnknownCommandOutput(command: string, scope: "root" | "master"): string {
-  if (scope === "master") {
-    return `Comando desconhecido: ${command}
-
-Use:
-  sdd master help
-`;
-  }
-
-  return `Comando desconhecido: ${command}
-
-Use:
-  sdd --help
-`;
 }

@@ -8,6 +8,15 @@ sdd master help
 
 Mostra comandos disponíveis e planejados.
 
+## Onboarding
+
+```bash
+sdd master onboard --yes --profile="web" --ai="codex" --language="pt-BR"
+sdd master onboard --dry-run --json
+```
+
+Cria checklist e próximos passos apenas em `.sdd-master/onboarding/`.
+
 ## Init
 
 ```bash
@@ -21,9 +30,19 @@ Inicializa `.sdd-master/`, docs, templates oficiais, agentes e `.gitignore` segu
 ```bash
 sdd master doctor
 sdd master doctor --json
+sdd master doctor --path-safety
 ```
 
 Diagnostica a instalação SDD Master, estrutura, templates, agentes, segurança e Git básico.
+
+## Status
+
+```bash
+sdd master status
+sdd master status --json
+```
+
+Mostra onboarding, readiness e próximos passos sem alterar arquivos.
 
 ## Agents
 
