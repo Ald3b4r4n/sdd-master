@@ -1,6 +1,9 @@
-import { existsSync, mkdirSync, readdirSync, writeFileSync } from "node:fs";
-import { dirname, join } from "node:path";
+import { existsSync, readdirSync } from "node:fs";
+import { join } from "node:path";
 import type { CliOutput, CliRuntime } from "../cli/output.js";
+import { normalizeSafePatterns } from "../filesystem/safe-glob.js";
+import { formatUnsafePathError, UnsafePathError } from "../filesystem/path-safety.js";
+import { safeWriteFile } from "../filesystem/safe-write.js";
 import { getNotInitializedMessage, isWorkflowInitialized } from "../workflow/workflow-guards.js";
 import { formatUsedExtensions } from "../extensions/extension-state.js";
 import { getImplementationReadiness } from "./implement-readiness.js";
@@ -18,7 +21,16 @@ export async function runImplementCommand(args: string[], output: CliOutput, run
     return 0;
   }
 
-  const parsed = parseImplementArgs(args);
+  let parsed: ReturnType<typeof parseImplementArgs>;
+  try {
+    parsed = parseImplementArgs(args);
+  } catch (error) {
+    if (error instanceof UnsafePathError) {
+      output.stderr(formatUnsafePathError(error, args.includes("--json") || args.includes("--output=json")));
+      return 1;
+    }
+    throw error;
+  }
   if (!parsed.ok) {
     output.stderr(`${parsed.error}\n`);
     return 1;
@@ -29,7 +41,16 @@ export async function runImplementCommand(args: string[], output: CliOutput, run
     return 1;
   }
 
-  const result = executeImplementGuard(runtime.cwd, parsed.options);
+  let result: ImplementResult;
+  try {
+    result = executeImplementGuard(runtime.cwd, parsed.options);
+  } catch (error) {
+    if (error instanceof UnsafePathError) {
+      output.stderr(formatUnsafePathError(error, parsed.options.json));
+      return 1;
+    }
+    throw error;
+  }
   output.stdout(parsed.options.json ? formatImplementJson(result) : formatImplementText(result));
   return result.ready ? 0 : 1;
 }
@@ -38,10 +59,8 @@ function executeImplementGuard(cwd: string, options: ImplementOptions): Implemen
   const readiness = getImplementationReadiness(cwd, options.task);
   const id = nextImplementId(cwd);
   const path = `.sdd-master/implementation/${id}.md`;
-  const fullPath = join(cwd, path);
-  mkdirSync(dirname(fullPath), { recursive: true });
-  writeFileSync(fullPath, implementationContent(id, options, readiness), "utf8");
-  writeFileSync(join(cwd, ".sdd-master", "implementation", "implementation-index.md"), implementationIndex(cwd, id), "utf8");
+  safeWriteFile(cwd, path, implementationContent(id, options, readiness));
+  safeWriteFile(cwd, ".sdd-master/implementation/implementation-index.md", implementationIndex(cwd, id));
 
   const status = readiness.ready ? "ready" : "blocked";
   const assisted = options.prepare || options.handoff || options.manifest || options.testContract;
@@ -562,17 +581,17 @@ function nextNestedImplementId(cwd: string, directoryName: string, prefix: strin
 
 function writeImplementationFile(cwd: string, relativeImplementationPath: string, content: string): string {
   const relativePath = `.sdd-master/implementation/${relativeImplementationPath}`;
-  const fullPath = join(cwd, relativePath);
-  mkdirSync(dirname(fullPath), { recursive: true });
-  writeFileSync(fullPath, content, "utf8");
+  safeWriteFile(cwd, relativePath, content);
   return relativePath;
 }
 
 function parsePatternList(value: string): string[] {
-  return value
-    .split(",")
-    .map((item) => item.trim())
-    .filter(Boolean);
+  return normalizeSafePatterns(
+    value
+      .split(",")
+      .map((item) => item.trim())
+      .filter(Boolean)
+  );
 }
 
 function normalizeForbidden(patterns: string[]): string[] {

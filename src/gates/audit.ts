@@ -1,5 +1,6 @@
-import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
+import { safeWriteFile } from "../filesystem/safe-write.js";
 import { getImplementReadiness } from "../governance/blockers.js";
 import { ensureBlocker } from "./blockers.js";
 import type { GateOptions, GateResult, GateWrite } from "./gate-types.js";
@@ -45,15 +46,13 @@ export function runAudit(cwd: string, options: GateOptions): GateResult {
 function writeAudit(cwd: string, id: string, options: GateOptions): GateWrite {
   const path = `.sdd-master/audits/${id}.md`;
   const fullPath = join(cwd, path);
-  mkdirSync(dirname(fullPath), { recursive: true });
-  writeFileSync(fullPath, auditContent(id, options), "utf8");
+  safeWriteFile(cwd, path, auditContent(id, options));
   return { path, status: "created" };
 }
 
 function writeAuditIndex(cwd: string): GateWrite {
   const path = ".sdd-master/audits/audit-index.md";
   const fullPath = join(cwd, path);
-  mkdirSync(dirname(fullPath), { recursive: true });
   const existed = existsSync(fullPath);
   const rows = readdirSync(dirname(fullPath))
     .filter((file) => file.startsWith("AUDIT-") && file.endsWith(".md"))
@@ -62,7 +61,7 @@ function writeAuditIndex(cwd: string): GateWrite {
       const severity = content.match(/^## Severidade\n(.+)$/m)?.[1] ?? "INFO";
       return `- ${file.replace(".md", "")}: ${severity}`;
     });
-  writeFileSync(fullPath, `# Índice de auditorias\n\n${rows.join("\n")}\n`, "utf8");
+  safeWriteFile(cwd, path, `# Índice de auditorias\n\n${rows.join("\n")}\n`);
   return { path, status: existed ? "updated" : "created" };
 }
 

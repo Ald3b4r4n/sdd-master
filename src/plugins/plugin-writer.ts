@@ -1,5 +1,5 @@
-import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
-import { dirname, join } from "node:path";
+import { readFileSync } from "node:fs";
+import { safeWriteFile } from "../filesystem/safe-write.js";
 import {
   ensureExtensionInfrastructure,
   writeExtensionApproval,
@@ -153,9 +153,7 @@ Todo uso deve ser registrado.
 }
 
 function write(cwd: string, relativePath: string, content: string): void {
-  const path = join(cwd, relativePath);
-  mkdirSync(dirname(path), { recursive: true });
-  writeFileSync(path, content, "utf8");
+  safeWriteFile(cwd, relativePath, content);
 }
 
 function bullets(items: string[]): string {

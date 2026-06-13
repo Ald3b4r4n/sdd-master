@@ -1,5 +1,6 @@
-import { appendFileSync, existsSync, mkdirSync, writeFileSync } from "node:fs";
-import { dirname, join } from "node:path";
+import { existsSync } from "node:fs";
+import { join } from "node:path";
+import { safeAppendFile, safeWriteFile } from "../filesystem/safe-write.js";
 import { getImplementReadiness } from "./blockers.js";
 import { getGovernanceStatus, nextGovernanceId, updateGovernanceProjectState } from "./governance-state.js";
 import type { GovernanceOptions, GovernanceResult, GovernanceWrite } from "./governance-types.js";
@@ -39,16 +40,14 @@ export function runScope(cwd: string, options: GovernanceOptions): GovernanceRes
 function appendScopeLine(cwd: string, relativePath: string, options: GovernanceOptions): GovernanceWrite {
   const fullPath = join(cwd, relativePath);
   const existed = existsSync(fullPath);
-  mkdirSync(dirname(fullPath), { recursive: true });
-
   if (!existed) {
-    writeFileSync(fullPath, `# ${relativePath.endsWith("approved-scope.md") ? "Escopo aprovado" : "Fora de escopo"}\n\n`, "utf8");
+    safeWriteFile(cwd, relativePath, `# ${relativePath.endsWith("approved-scope.md") ? "Escopo aprovado" : "Fora de escopo"}\n\n`);
   }
 
-  appendFileSync(
-    fullPath,
-    `- ${options.title ?? "Item de escopo"} | Fase: ${options.phase} | Motivo: ${options.reason ?? "Não informado."}\n`,
-    "utf8"
+  safeAppendFile(
+    cwd,
+    relativePath,
+    `- ${options.title ?? "Item de escopo"} | Fase: ${options.phase} | Motivo: ${options.reason ?? "Não informado."}\n`
   );
   return { path: relativePath, status: existed ? "updated" : "created" };
 }
@@ -56,13 +55,11 @@ function appendScopeLine(cwd: string, relativePath: string, options: GovernanceO
 function writeScopeChange(cwd: string, id: string, options: GovernanceOptions): GovernanceWrite {
   const path = `.sdd-master/scope/changes/${id}.md`;
   const fullPath = join(cwd, path);
-  mkdirSync(dirname(fullPath), { recursive: true });
-
   if (existsSync(fullPath)) {
     return { path, status: "preserved" };
   }
 
-  writeFileSync(fullPath, scopeChangeContent(id, options), "utf8");
+  safeWriteFile(cwd, path, scopeChangeContent(id, options));
   return { path, status: "created" };
 }
 

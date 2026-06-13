@@ -1,5 +1,6 @@
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
-import { dirname, join } from "node:path";
+import { existsSync, readFileSync } from "node:fs";
+import { join } from "node:path";
+import { safeWriteFile } from "../filesystem/safe-write.js";
 import type { GovernanceOptions, GovernanceResult, GovernanceWrite } from "./governance-types.js";
 import { getGovernanceStatus, nextGovernanceId, updateGovernanceProjectState } from "./governance-state.js";
 import { getImplementReadiness } from "./blockers.js";
@@ -39,24 +40,21 @@ export function runClarify(cwd: string, options: GovernanceOptions): GovernanceR
 function writeClarification(cwd: string, id: string, options: GovernanceOptions): GovernanceWrite {
   const path = `.sdd-master/clarifications/${id}.md`;
   const fullPath = join(cwd, path);
-  mkdirSync(dirname(fullPath), { recursive: true });
-
   if (existsSync(fullPath)) {
     return { path, status: "preserved" };
   }
 
-  writeFileSync(fullPath, clarificationContent(id, options), "utf8");
+  safeWriteFile(cwd, path, clarificationContent(id, options));
   return { path, status: "created" };
 }
 
 function updateClarification(cwd: string, id: string, reason: string): GovernanceWrite {
   const path = `.sdd-master/clarifications/${id}.md`;
   const fullPath = join(cwd, path);
-  mkdirSync(dirname(fullPath), { recursive: true });
-
   if (!existsSync(fullPath)) {
-    writeFileSync(
-      fullPath,
+    safeWriteFile(
+      cwd,
+      path,
       clarificationContent(id, {
         yes: true,
         json: false,
@@ -65,8 +63,7 @@ function updateClarification(cwd: string, id: string, reason: string): Governanc
         status: "resolved",
         reason,
         phase: "PHASE-01"
-      }),
-      "utf8"
+      })
     );
     return { path, status: "created" };
   }
@@ -74,25 +71,24 @@ function updateClarification(cwd: string, id: string, reason: string): Governanc
   const content = readFileSync(fullPath, "utf8")
     .replace("## Status\nAberta", "## Status\nResolvida")
     .replace("## Resposta humana\nPendente", `## Resposta humana\n${reason}`);
-  writeFileSync(fullPath, appendHistory(content, "Dúvida resolvida"), "utf8");
+  safeWriteFile(cwd, path, appendHistory(content, "Dúvida resolvida"));
   return { path, status: "updated" };
 }
 
 function writeClarificationIndex(cwd: string): GovernanceWrite {
   const path = ".sdd-master/clarifications/clarifications-index.md";
   const fullPath = join(cwd, path);
-  mkdirSync(dirname(fullPath), { recursive: true });
   const existed = existsSync(fullPath);
   const status = getGovernanceStatus(cwd);
-  writeFileSync(
-    fullPath,
+  safeWriteFile(
+    cwd,
+    path,
     `# Índice de clarificações
 
 - Total: ${status.clarifications.total}
 - Abertas: ${status.clarifications.open}
 - Resolvidas: ${status.clarifications.resolved}
-`,
-    "utf8"
+`
   );
   return { path, status: existed ? "updated" : "created" };
 }

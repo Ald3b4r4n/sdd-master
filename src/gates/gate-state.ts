@@ -1,5 +1,6 @@
-import { existsSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
+import { safeWriteFile } from "../filesystem/safe-write.js";
 import type { GateStatus } from "./gate-types.js";
 
 export function getGateStatus(cwd: string): GateStatus {
@@ -71,7 +72,7 @@ export function updateGateProjectState(cwd: string, status: GateStatus): boolean
 - Blockers abertos: ${status.blockers.open}
 `;
   const content = readFileSync(path, "utf8");
-  writeFileSync(path, upsertBlock(content, "## Gates", block), "utf8");
+  safeWriteFile(cwd, ".sdd-master/project-state.md", upsertBlock(content, "## Gates", block));
   return true;
 }
 

@@ -1,5 +1,6 @@
-import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { dirname, join } from "node:path";
+import { safeWriteFile } from "../filesystem/safe-write.js";
 import { getImplementReadiness } from "../governance/blockers.js";
 import type { GateOptions, GateResult, GateWrite } from "./gate-types.js";
 import { getGateStatus, listGateRecords, nextGateId, updateGateProjectState } from "./gate-state.js";
@@ -60,39 +61,34 @@ export function ensureBlocker(cwd: string, options: GateOptions, origin: string)
 function writeBlocker(cwd: string, id: string, options: GateOptions, origin: string): GateWrite {
   const path = `.sdd-master/blockers/${id}.md`;
   const fullPath = join(cwd, path);
-  mkdirSync(dirname(fullPath), { recursive: true });
-
   if (existsSync(fullPath)) {
     return { path, status: "preserved" };
   }
 
-  writeFileSync(fullPath, blockerContent(id, options, origin), "utf8");
+  safeWriteFile(cwd, path, blockerContent(id, options, origin));
   return { path, status: "created" };
 }
 
 function resolveBlocker(cwd: string, id: string, reason: string): GateWrite {
   const path = `.sdd-master/blockers/${id}.md`;
   const fullPath = join(cwd, path);
-  mkdirSync(dirname(fullPath), { recursive: true });
-
   if (!existsSync(fullPath)) {
-    writeFileSync(
-      fullPath,
-      blockerContent(id, { yes: true, json: false, phase: "PHASE-01", title: id, reason, status: "resolved" }, "manual"),
-      "utf8"
+    safeWriteFile(
+      cwd,
+      path,
+      blockerContent(id, { yes: true, json: false, phase: "PHASE-01", title: id, reason, status: "resolved" }, "manual")
     );
     return { path, status: "created" };
   }
 
   const content = readFileSync(fullPath, "utf8").replace("## Status\nAberto", "## Status\nResolvido");
-  writeFileSync(fullPath, `${content.trimEnd()}\n| ${today()} | Blocker resolvido | Humano |\n`, "utf8");
+  safeWriteFile(cwd, path, `${content.trimEnd()}\n| ${today()} | Blocker resolvido | Humano |\n`);
   return { path, status: "updated" };
 }
 
 function writeBlockerIndex(cwd: string): GateWrite {
   const path = ".sdd-master/blockers/blockers-index.md";
   const fullPath = join(cwd, path);
-  mkdirSync(dirname(fullPath), { recursive: true });
   const existed = existsSync(fullPath);
   const rows = existsSync(dirname(fullPath))
     ? readdirSync(dirname(fullPath))
@@ -104,7 +100,7 @@ function writeBlockerIndex(cwd: string): GateWrite {
         })
     : [];
 
-  writeFileSync(fullPath, `# Índice de blockers\n\n${rows.join("\n")}\n`, "utf8");
+  safeWriteFile(cwd, path, `# Índice de blockers\n\n${rows.join("\n")}\n`);
   return { path, status: existed ? "updated" : "created" };
 }
 

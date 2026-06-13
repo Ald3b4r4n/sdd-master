@@ -1,16 +1,16 @@
-import { existsSync, mkdirSync, writeFileSync } from "node:fs";
-import { dirname, join } from "node:path";
+import { existsSync } from "node:fs";
+import { resolveInsideProject } from "../filesystem/path-safety.js";
+import { safeWriteFile } from "../filesystem/safe-write.js";
 import type { WorkflowFileWrite } from "./workflow-types.js";
 
 export function writeWorkflowFile(cwd: string, relativePath: string, content: string): WorkflowFileWrite {
-  const path = join(cwd, relativePath);
-  mkdirSync(dirname(path), { recursive: true });
+  const path = resolveInsideProject(cwd, relativePath);
 
   if (existsSync(path)) {
     return { path: relativePath, status: "preserved" };
   }
 
-  writeFileSync(path, ensureTrailingNewline(content), "utf8");
+  safeWriteFile(cwd, relativePath, ensureTrailingNewline(content));
   return { path: relativePath, status: "created" };
 }
 

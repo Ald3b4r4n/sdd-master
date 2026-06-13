@@ -8,12 +8,22 @@ import {
   readFileSync,
   rmSync,
   statSync,
+  symlinkSync,
   writeFileSync
 } from "node:fs";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { join, resolve } from "node:path";
 import { describe, it } from "node:test";
 import { redactSensitiveText } from "../dist/security/redaction.js";
+import {
+  isPathTraversal,
+  normalizeProjectPath,
+  resolveInsideProject,
+  safeRelative,
+  UnsafePathError
+} from "../dist/filesystem/path-safety.js";
+import { normalizeSafePattern } from "../dist/filesystem/safe-glob.js";
+import { safeMkdir, safeWriteFile } from "../dist/filesystem/safe-write.js";
 
 const rootDir = process.cwd();
 const cliPath = join(rootDir, "dist", "cli", "main.js");
@@ -2978,5 +2988,125 @@ describe("SDD Master package foundation", () => {
 
     assert.doesNotMatch(reviewedFiles, /sk-[A-Za-z0-9_-]{20,}/);
     assert.doesNotMatch(reviewedFiles, /BEGIN (RSA |EC |OPENSSH |)PRIVATE KEY/);
+  });
+});
+
+describe("cross-platform path safety", () => {
+  it("normalizes separators and allows paths that remain inside the project", () => {
+    withTempProject((projectDir) => {
+      assert.equal(normalizeProjectPath("docs\\guia/arquivo.md").includes("\\"), process.platform === "win32");
+      assert.equal(resolveInsideProject(projectDir, "docs/../src/index.ts"), join(projectDir, "src", "index.ts"));
+      assert.equal(safeRelative(projectDir, join(projectDir, "área com espaços", "ação.md")), "área com espaços/ação.md");
+      assert.equal(isPathTraversal("docs/../src"), true);
+      assert.equal(isPathTraversal("docs/./src"), false);
+    });
+  });
+
+  it("blocks traversal, absolute external paths, drive paths and UNC paths", () => {
+    withTempProject((projectDir) => {
+      const outside = resolve(projectDir, "..", "escape.md");
+      const unsafe = ["../escape.md", outside, "Z:\\outside\\escape.md", "\\\\server\\share\\escape.md"];
+
+      for (const candidate of unsafe) {
+        assert.throws(
+          () => resolveInsideProject(projectDir, candidate),
+          (error) => error instanceof UnsafePathError && error.reason === "unsafe-path"
+        );
+      }
+
+      assert.throws(() => normalizeSafePattern("src/../outside/**"), UnsafePathError);
+      assert.throws(() => normalizeSafePattern("/outside/**"), UnsafePathError);
+    });
+  });
+
+  it("confines mkdir and write operations to the consumer project", () => {
+    withTempProject((projectDir) => {
+      const directory = safeMkdir(projectDir, "área com espaços/nível");
+      const file = safeWriteFile(projectDir, "área com espaços/nível/ação.md", "seguro\n");
+
+      assert.equal(directory.startsWith(resolve(projectDir)), true);
+      assert.equal(file.startsWith(resolve(projectDir)), true);
+      assert.equal(readFileSync(file, "utf8"), "seguro\n");
+      assert.throws(() => safeWriteFile(projectDir, "../fora.md", "não"), UnsafePathError);
+      assert.equal(existsSync(resolve(projectDir, "..", "fora.md")), false);
+    });
+  });
+
+  it("returns a redacted structured error for unsafe implement patterns", () => {
+    withTempProject((projectDir) => {
+      assert.equal(initTempProject(projectDir).status, 0);
+      const result = runCli(
+        ["master", "implement", "--yes", "--json", "--allowed-files=src/**,../escape/**"],
+        projectDir
+      );
+
+      assert.notEqual(result.status, 0);
+      const error = JSON.parse(result.stderr);
+      assert.equal(error.status, "blocked");
+      assert.equal(error.reason, "unsafe-path");
+      assert.equal(error.requestedPath, "[REDACTED]");
+      assert.equal(error.projectRoot, "[REDACTED]");
+      assert.equal(existsSync(resolve(projectDir, "..", "escape")), false);
+    });
+  });
+
+  it("reports path safety in doctor and status", () => {
+    withTempProject((projectDir) => {
+      assert.equal(initTempProject(projectDir).status, 0);
+      const doctorResult = runCli(["master", "doctor", "--path-safety", "--json"], projectDir);
+      const doctor = JSON.parse(doctorResult.stdout);
+      const status = runCli(["master", "status"], projectDir);
+
+      assert.equal(doctorResult.status, 0);
+      assert.equal(doctor.pathSafety.projectRoot, "[REDACTED]");
+      assert.equal(doctor.pathSafety.status, "clean");
+      assert.equal(doctor.checks.some((check) => check.id === "path-safety"), true);
+      assert.match(status.stdout, /Path Safety:/);
+      assert.match(status.stdout, /Raiz do projeto: \[REDACTED\]/);
+    });
+  });
+
+  it("blocks pre-push when .sdd-master exists at the SDD Master package root", () => {
+    withTempProject((projectDir) => {
+      writeFileSync(join(projectDir, "package.json"), JSON.stringify({ name: "sdd-master" }), "utf8");
+      mkdirSync(join(projectDir, ".sdd-master"), { recursive: true });
+      const result = runCli(["master", "git", "--pre-push", "--json"], projectDir);
+      const report = JSON.parse(result.stdout);
+
+      assert.equal(result.status, 0);
+      assert.equal(report.status, "blocked");
+      assert.equal(report.blockers.some((item) => /raiz do pacote SDD Master/.test(item)), true);
+    });
+  });
+
+  it("blocks external critical symlinks and accepts internal critical symlinks", (context) => {
+    withTempProject((projectDir) => {
+      assert.equal(initTempProject(projectDir).status, 0);
+      const agentsPath = join(projectDir, ".agents");
+      const external = mkdtempSync(join(tmpdir(), "sdd-master-external-"));
+      const internal = join(projectDir, "internal-agents");
+      mkdirSync(internal, { recursive: true });
+
+      try {
+        rmSync(agentsPath, { recursive: true, force: true });
+        symlinkSync(internal, agentsPath, process.platform === "win32" ? "junction" : "dir");
+        let doctor = JSON.parse(runCli(["master", "doctor", "--json"], projectDir).stdout);
+        assert.equal(doctor.pathSafety.dangerousSymlinks, 0);
+
+        rmSync(agentsPath, { recursive: true, force: true });
+        symlinkSync(external, agentsPath, process.platform === "win32" ? "junction" : "dir");
+        doctor = JSON.parse(runCli(["master", "doctor", "--json"], projectDir).stdout);
+        assert.equal(doctor.pathSafety.status, "blocked");
+        assert.equal(doctor.pathSafety.dangerousSymlinks, 1);
+      } catch (error) {
+        if (error && typeof error === "object" && ["EPERM", "EACCES"].includes(error.code)) {
+          context.skip("Symlinks are not available in this environment.");
+          return;
+        }
+        throw error;
+      } finally {
+        rmSync(external, { recursive: true, force: true });
+      }
+    });
   });
 });

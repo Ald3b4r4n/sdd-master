@@ -1,12 +1,9 @@
-import { mkdirSync, writeFileSync } from "node:fs";
-import { dirname, join } from "node:path";
+import { safeWriteFile } from "../filesystem/safe-write.js";
 import type { UpdateResult } from "./update-types.js";
 
 export function writeUpdateReport(cwd: string, result: UpdateResult, timestampSlug: string): string {
   const path = `.sdd-master/reports/update-${timestampSlug}.md`;
-  const fullPath = join(cwd, path);
-  mkdirSync(dirname(fullPath), { recursive: true });
-  writeFileSync(fullPath, updateReportContent(result), "utf8");
+  safeWriteFile(cwd, path, updateReportContent(result));
   return path;
 }
 

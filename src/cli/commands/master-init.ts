@@ -1,4 +1,4 @@
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { basename, join } from "node:path";
 import { createInterface } from "node:readline/promises";
 import { parseAgent as parseSupportedAgent, parseLanguage as parseSupportedLanguage } from "../../agents/agent-registry.js";
@@ -9,6 +9,8 @@ import { templateVersion } from "../../templates/official-templates.js";
 import { writeOfficialTemplates } from "../../templates/template-writer.js";
 import type { CliOutput, CliRuntime } from "../output.js";
 import { ensureExtensionInfrastructure, writeExtensionRegistry } from "../../extensions/extension-registry.js";
+import { formatUnsafePathError, resolveInsideProject, UnsafePathError } from "../../filesystem/path-safety.js";
+import { safeMkdir, safeWriteFile } from "../../filesystem/safe-write.js";
 
 type Language = AgentLanguage;
 type Agent = SupportedAgent | "other";
@@ -120,9 +122,17 @@ export async function runInitCommand(
     return 1;
   }
 
-  const result = initializeSddMaster(runtime.cwd, options.options);
-  output.stdout(result);
-  return 0;
+  try {
+    const result = initializeSddMaster(runtime.cwd, options.options);
+    output.stdout(result);
+    return 0;
+  } catch (error) {
+    if (error instanceof UnsafePathError) {
+      output.stderr(formatUnsafePathError(error, false));
+      return 1;
+    }
+    throw error;
+  }
 }
 
 function parseInitArgs(args: string[]):
@@ -269,7 +279,7 @@ function initializeSddMaster(
   cwd: string,
   options: Required<Pick<InitOptions, "language" | "agent" | "projectName">>
 ): string {
-  if (existsSync(join(cwd, ".sdd-master"))) {
+  if (existsSync(resolveInsideProject(cwd, ".sdd-master"))) {
     const templates = writeOfficialTemplates(cwd);
 
     return `Projeto já parece inicializado com SDD Master.
@@ -289,14 +299,15 @@ Recomendação:
   }
 
   for (const directory of sddDirectories) {
-    mkdirSync(join(cwd, directory), { recursive: true });
+    safeMkdir(cwd, directory);
   }
   ensureExtensionInfrastructure(cwd);
   writeExtensionRegistry(cwd, []);
 
-  writeFileIfMissing(join(cwd, ".sdd-master", "constitution.md"), getConstitutionContent());
+  writeFileIfMissing(cwd, ".sdd-master/constitution.md", getConstitutionContent());
   writeFileIfMissing(
-    join(cwd, ".sdd-master", "project-state.md"),
+    cwd,
+    ".sdd-master/project-state.md",
     getProjectStateContent(cwd, options)
   );
   const templates = writeOfficialTemplates(cwd);
@@ -347,7 +358,7 @@ Próximo comando recomendado:
 }
 
 function ensureGitignore(cwd: string): void {
-  const path = join(cwd, ".gitignore");
+  const path = resolveInsideProject(cwd, ".gitignore");
   const existing = existsSync(path) ? readFileSync(path, "utf8") : "";
   const existingLines = new Set(existing.split(/\r?\n/));
   const missing = gitignoreEntries.filter((entry) => entry !== "" && !existingLines.has(entry));
@@ -358,18 +369,18 @@ function ensureGitignore(cwd: string): void {
 
   const block = gitignoreEntries.filter((entry) => entry === "" || !existingLines.has(entry)).join("\n");
   const separator = existing && !existing.endsWith("\n") ? "\n" : "";
-  writeFileSync(path, `${existing}${separator}${existing ? "\n" : ""}${block}\n`, "utf8");
+  safeWriteFile(cwd, ".gitignore", `${existing}${separator}${existing ? "\n" : ""}${block}\n`);
 }
 
 function ensureReadme(cwd: string, projectName: string): void {
-  const path = join(cwd, "README.md");
+  const path = resolveInsideProject(cwd, "README.md");
   const governanceSection = `## Governança SDD Master
 
 Este projeto usa SDD Master para desenvolvimento orientado por especificação, documentação, TDD, auditoria e rastreabilidade.
 `;
 
   if (!existsSync(path)) {
-    writeFileSync(path, getInitialReadmeContent(projectName), "utf8");
+    safeWriteFile(cwd, "README.md", getInitialReadmeContent(projectName));
     return;
   }
 
@@ -380,12 +391,13 @@ Este projeto usa SDD Master para desenvolvimento orientado por especificação, 
   }
 
   const separator = existing.endsWith("\n") ? "\n" : "\n\n";
-  writeFileSync(path, `${existing}${separator}${governanceSection}`, "utf8");
+  safeWriteFile(cwd, "README.md", `${existing}${separator}${governanceSection}`);
 }
 
-function writeFileIfMissing(path: string, content: string): void {
-  if (!existsSync(path)) {
-    writeFileSync(path, content, "utf8");
+function writeFileIfMissing(cwd: string, path: string, content: string): void {
+  const fullPath = resolveInsideProject(cwd, path);
+  if (!existsSync(fullPath)) {
+    safeWriteFile(cwd, path, content);
   }
 }
 

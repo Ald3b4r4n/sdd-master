@@ -1,4 +1,5 @@
 import { execFileSync } from "node:child_process";
+import { resolveInsideProject } from "../filesystem/path-safety.js";
 import { redactSensitiveText } from "./redaction.js";
 import type { ExternalToolName, ExternalToolStatus } from "./security-types.js";
 
@@ -26,9 +27,10 @@ export function runExternalTool(name: ExternalToolName, cwd: string): ExternalTo
   if (!detected.available) return detected;
 
   try {
-    const args = getLocalScanArgs(name, cwd);
+    const safeCwd = resolveInsideProject(cwd, ".");
+    const args = getLocalScanArgs(name, safeCwd);
     const output = execFileSync(name, args, {
-      cwd,
+      cwd: safeCwd,
       encoding: "utf8",
       stdio: ["ignore", "pipe", "pipe"]
     });

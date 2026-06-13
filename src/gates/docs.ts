@@ -1,5 +1,6 @@
-import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
+import { safeWriteFile } from "../filesystem/safe-write.js";
 import { getImplementReadiness } from "../governance/blockers.js";
 import type { GateOptions, GateResult, GateWrite } from "./gate-types.js";
 import { getGateStatus, nextGateId, updateGateProjectState } from "./gate-state.js";
@@ -31,15 +32,13 @@ export function runDocs(cwd: string, options: GateOptions): GateResult {
 function writeDocs(cwd: string, id: string, options: GateOptions): GateWrite {
   const path = `.sdd-master/docs/${id}.md`;
   const fullPath = join(cwd, path);
-  mkdirSync(dirname(fullPath), { recursive: true });
-  writeFileSync(fullPath, docsContent(cwd, id, options), "utf8");
+  safeWriteFile(cwd, path, docsContent(cwd, id, options));
   return { path, status: "created" };
 }
 
 function writeDocsIndex(cwd: string): GateWrite {
   const path = ".sdd-master/docs/docs-index.md";
   const fullPath = join(cwd, path);
-  mkdirSync(dirname(fullPath), { recursive: true });
   const existed = existsSync(fullPath);
   const rows = readdirSync(dirname(fullPath))
     .filter((file) => file.startsWith("DOCS-") && file.endsWith(".md"))
@@ -48,7 +47,7 @@ function writeDocsIndex(cwd: string): GateWrite {
       const status = content.match(/^## Status\n(.+)$/m)?.[1] ?? "needs-review";
       return `- ${file.replace(".md", "")}: ${status}`;
     });
-  writeFileSync(fullPath, `# Índice de docs\n\n${rows.join("\n")}\n`, "utf8");
+  safeWriteFile(cwd, path, `# Índice de docs\n\n${rows.join("\n")}\n`);
   return { path, status: existed ? "updated" : "created" };
 }
 

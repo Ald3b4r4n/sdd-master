@@ -1,6 +1,7 @@
-import { mkdirSync, readdirSync, writeFileSync } from "node:fs";
-import { dirname, join } from "node:path";
+import { readdirSync } from "node:fs";
+import { join } from "node:path";
 import type { CliOutput, CliRuntime } from "../cli/output.js";
+import { safeWriteFile } from "../filesystem/safe-write.js";
 import { getNotInitializedMessage, isWorkflowInitialized } from "../workflow/workflow-guards.js";
 import type { DeployEnvironment, DeployOptions, DeployProvider, DeployResult, DeployStrategy } from "./delivery-types.js";
 import { getDeployReadiness } from "./deploy-readiness.js";
@@ -227,9 +228,7 @@ ${readiness.gates.map((gate) => `- [ ] ${gate.gate}: ${gate.status} — ${gate.e
 }
 
 function writeManaged(cwd: string, relativePath: string, content: string): void {
-  const fullPath = join(cwd, relativePath);
-  mkdirSync(dirname(fullPath), { recursive: true });
-  writeFileSync(fullPath, content, "utf8");
+  safeWriteFile(cwd, relativePath, content);
 }
 
 function indexContent(cwd: string, directory: string, prefix: string, heading: string): string {

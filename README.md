@@ -224,6 +224,8 @@ Regras fortes do SDD Master:
 - não expor segredo;
 - não fazer push sem autorização humana;
 - não enviar `.sdd-master/` ao remoto do produto;
+- não ler ou escrever fora da raiz do projeto consumidor;
+- bloquear traversal, caminhos absolutos externos e symlinks perigosos;
 - testar antes de implementar;
 - documentar e auditar antes de avançar.
 
@@ -233,6 +235,7 @@ Use:
 sdd master git
 sdd master git --pre-commit
 sdd master git --pre-push
+sdd master doctor --path-safety
 ```
 
 O comando verifica arquivos sensíveis, possíveis segredos, `.gitignore`, risco de envio de `.sdd-master/` e status básico do Git. O SDD Master nunca executa push automaticamente.
@@ -564,6 +567,7 @@ Nunca publique `.env`, tokens, credenciais, chaves privadas, certificados, dados
 - [Arquitetura do framework](docs/02-tecnica-arquitetura/arquitetura-do-framework.md)
 - [Compatibilidade multi-IA](docs/02-tecnica-arquitetura/compatibilidade-multi-ia.md)
 - [Segurança e governança](docs/02-tecnica-arquitetura/seguranca-e-governanca.md)
+- [Path safety multiplataforma](docs/02-tecnica-arquitetura/path-safety-multiplataforma.md)
 - [Comandos CLI](docs/03-codigo/comandos-cli.md)
 - [Desenvolvimento local](docs/03-codigo/desenvolvimento-local.md)
 - [Workflow SDD](docs/03-codigo/workflow-sdd.md)

@@ -14,6 +14,7 @@ import { getSkillStatus } from "../../skills/skill-registry.js";
 import { getUiuxStatus } from "../../uiux/uiux-gates.js";
 import { getUpdateStatus } from "../../update/update-state.js";
 import { getWorkflowStatus } from "../../workflow/workflow-runner.js";
+import { getPathSafetyState } from "../../filesystem/path-safety-state.js";
 
 export function getStatusOutput(cwd: string): string {
   const hasSddMaster = existsSync(join(cwd, ".sdd-master"));
@@ -54,6 +55,7 @@ function getInstalledStatus(cwd: string): string {
   const update = getUpdateStatus(cwd);
   const delivery = getDeliveryStatus(cwd);
   const advancedSecurity = getAdvancedSecurityState(cwd);
+  const pathSafety = getPathSafetyState(cwd);
 
   return `SDD Master — Status
 
@@ -88,6 +90,13 @@ Segurança:
   Última auditoria: ${advancedSecurity.lastAudit}
   Resultado: ${advancedSecurity.status}
   Redaction: ${advancedSecurity.redaction}
+
+Path Safety:
+  Plataforma: ${pathSafety.platform}
+  Raiz do projeto: ${pathSafety.projectRoot}
+  Caminhos inseguros: ${pathSafety.unsafePaths}
+  Symlinks perigosos: ${pathSafety.dangerousSymlinks}
+  Status: ${pathSafety.status}
 
 Workflow inicial:
   Discovery: ${formatStatus(workflow.discovery)}

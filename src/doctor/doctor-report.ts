@@ -55,6 +55,13 @@ Segurança:
   Redaction: ${report.security.redaction}
   Saída não redigida: ${report.security.unredactedOutput ? "Sim" : "Não"}
 
+Path Safety:
+  Plataforma: ${report.pathSafety.platform}
+  Raiz do projeto: ${report.pathSafety.projectRoot}
+  Caminhos inseguros: ${report.pathSafety.unsafePaths}
+  Symlinks perigosos: ${report.pathSafety.dangerousSymlinks}
+  Status: ${report.pathSafety.status}
+
 Git:
   Repositório Git: ${report.git.isRepository ? "Sim" : "Não"}
   Branch atual: ${report.git.branch ?? "não detectado"}

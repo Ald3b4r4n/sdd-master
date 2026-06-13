@@ -1,5 +1,6 @@
-import { existsSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
+import { safeWriteFile } from "../filesystem/safe-write.js";
 import { version } from "../index.js";
 import { templateVersion } from "../templates/official-templates.js";
 
@@ -40,7 +41,7 @@ export function getProjectStateUpdate(cwd: string, timestamp: string): ProjectSt
 }
 
 export function writeProjectStateUpdate(cwd: string, content: string): void {
-  writeFileSync(join(cwd, ".sdd-master", "project-state.md"), content, "utf8");
+  safeWriteFile(cwd, ".sdd-master/project-state.md", content);
 }
 
 function sddMasterBlock(timestamp: string): string {

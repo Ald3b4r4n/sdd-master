@@ -1,5 +1,7 @@
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
-import { dirname, join } from "node:path";
+import { existsSync, readFileSync } from "node:fs";
+import { join } from "node:path";
+import { safeMkdir, safeWriteFile } from "../filesystem/safe-write.js";
+import { resolveInsideProject } from "../filesystem/path-safety.js";
 import { agentFiles } from "./agent-registry.js";
 import { createAgentInstruction } from "./agent-instructions.js";
 import type { AgentWriteOptions, AgentWriteResult, SupportedAgent } from "./agent-types.js";
@@ -12,21 +14,20 @@ export function writeAgentFiles(cwd: string, options: AgentWriteOptions): AgentW
     files: []
   };
 
-  mkdirSync(join(cwd, ".agents", "skills"), { recursive: true });
+  safeMkdir(cwd, ".agents/skills");
 
   for (const agent of options.agents) {
     const file = agentFiles[agent];
-    const targetPath = join(cwd, file.path);
+    const targetPath = resolveInsideProject(cwd, file.path);
     const alreadyExists = existsSync(targetPath);
     result.files.push(file);
-    mkdirSync(dirname(targetPath), { recursive: true });
 
     if (alreadyExists && !options.force) {
       result.preserved.push(file.path);
       continue;
     }
 
-    writeFileSync(targetPath, createAgentInstruction(agent, options.language), "utf8");
+    safeWriteFile(cwd, file.path, createAgentInstruction(agent, options.language));
 
     if (alreadyExists && options.force) {
       result.overwritten.push(file.path);
@@ -57,7 +58,7 @@ export function updateProjectStateAgentsBlock(
     ? existing.replace(pattern, block.trimEnd())
     : `${existing.trimEnd()}\n\n${block}`;
 
-  writeFileSync(path, `${next.trimEnd()}\n`, "utf8");
+  safeWriteFile(cwd, ".sdd-master/project-state.md", `${next.trimEnd()}\n`);
 }
 
 export function getRecognizedAgentFiles(cwd: string): string[] {

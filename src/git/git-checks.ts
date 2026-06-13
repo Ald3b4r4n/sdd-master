@@ -4,6 +4,7 @@ import { join } from "node:path";
 import { findForbiddenFiles, requiredGitignoreEntries } from "../security/sensitive-files.js";
 import { scanForSecrets } from "../security/secret-scan.js";
 import { getAdvancedSecurityState } from "../security/security-readiness.js";
+import { getPathSafetyState } from "../filesystem/path-safety-state.js";
 import type { EnvExampleInfo, GitInfo, GitMode, GitSecurityReport, GitignoreInfo } from "./git-types.js";
 
 export function runGitSecurityCheck(cwd: string, mode: GitMode): GitSecurityReport {
@@ -13,6 +14,7 @@ export function runGitSecurityCheck(cwd: string, mode: GitMode): GitSecurityRepo
   const gitignore = getGitignoreInfo(cwd);
   const envExample = getEnvExampleInfo(cwd);
   const advancedSecurity = getAdvancedSecurityState(cwd);
+  const pathSafety = getPathSafetyState(cwd);
   const internalFilesStaged = git.stagedFiles.filter((file) => file.startsWith(".sdd-master/"));
   const internalFilesPending = [...git.stagedFiles, ...git.modifiedFiles, ...git.untrackedFiles].filter((file) =>
     file.startsWith(".sdd-master/")
@@ -37,6 +39,13 @@ export function runGitSecurityCheck(cwd: string, mode: GitMode): GitSecurityRepo
   if (mode === "pre-push" && advancedSecurity.status === "blocked") {
     blockers.push(...advancedSecurity.blockers);
   }
+  if (mode === "pre-push" && pathSafety.status === "blocked") {
+    blockers.push("Path safety bloqueou o push.");
+    blockers.push(...pathSafety.details);
+  }
+  if (mode === "pre-push" && isSddMasterPackageRoot(cwd) && existsSync(join(cwd, ".sdd-master"))) {
+    blockers.push(".sdd-master/ não pode existir na raiz do pacote SDD Master.");
+  }
 
   return {
     status: blockers.length > 0 ? "blocked" : warnings.length > 0 ? "warning" : "clean",
@@ -49,6 +58,17 @@ export function runGitSecurityCheck(cwd: string, mode: GitMode): GitSecurityRepo
     recommendation:
       blockers.length > 0 ? "Remove secrets and forbidden files before commit/push." : "No critical blockers found."
   };
+}
+
+function isSddMasterPackageRoot(cwd: string): boolean {
+  const path = join(cwd, "package.json");
+  if (!existsSync(path)) return false;
+  try {
+    const manifest = JSON.parse(readFileSync(path, "utf8")) as { name?: string };
+    return manifest.name === "sdd-master";
+  } catch {
+    return false;
+  }
 }
 
 function getGitInfo(cwd: string): GitInfo {

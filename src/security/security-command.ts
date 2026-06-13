@@ -1,6 +1,7 @@
-import { existsSync, mkdirSync, readdirSync, writeFileSync } from "node:fs";
-import { dirname, join } from "node:path";
+import { existsSync, readdirSync } from "node:fs";
+import { join } from "node:path";
 import type { CliOutput, CliRuntime } from "../cli/output.js";
+import { safeMkdir, safeWriteFile } from "../filesystem/safe-write.js";
 import { isWorkflowInitialized } from "../workflow/workflow-guards.js";
 import { detectExternalTool, notRequestedTool, runExternalTool } from "./external-tools.js";
 import { runBuiltinSecurity } from "./security-detectors.js";
@@ -150,7 +151,7 @@ function parseSecurityArgs(args: string[]): { ok: true; options: SecurityOptions
 
 function ensureSecurityInfrastructure(cwd: string): void {
   for (const path of ["reports", "audits", "external-tools"]) {
-    mkdirSync(join(cwd, ".sdd-master", "security", path), { recursive: true });
+    safeMkdir(cwd, `.sdd-master/security/${path}`);
   }
 }
 
@@ -318,9 +319,7 @@ function nextSecurityId(cwd: string, directoryName: string, prefix: string): str
 }
 
 function write(cwd: string, relativePath: string, content: string): void {
-  const path = join(cwd, relativePath);
-  mkdirSync(dirname(path), { recursive: true });
-  writeFileSync(path, content, "utf8");
+  safeWriteFile(cwd, relativePath, content);
 }
 
 function bullets(items: string[]): string {

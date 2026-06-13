@@ -10,6 +10,11 @@
 
 ### Adicionado
 
+- Camada central de path safety para Windows, Linux e macOS.
+- Escritas confinadas à raiz do projeto consumidor.
+- Diagnóstico `doctor --path-safety` e resumo no `status`.
+- Validação segura de `--allowed-files` e `--forbidden-files`.
+- Bloqueio de caminhos absolutos externos, traversal e symlinks perigosos.
 - Comando `sdd master security`.
 - Segurança avançada opcional com detecção de `gitleaks` e `trufflehog`.
 - Relatórios e auditorias de segurança redigidos.
@@ -35,6 +40,8 @@
 
 ### Segurança
 
+- Erros de caminho estruturados e redigidos, sem exposição de paths locais.
+- `git --pre-push` bloqueia path safety inseguro e `.sdd-master/` na raiz do pacote.
 - Ferramentas externas não são instaladas automaticamente.
 - Scanners externos só rodam com opt-in explícito.
 - Valores sensíveis são redigidos em relatórios.

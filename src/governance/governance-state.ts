@@ -1,5 +1,6 @@
-import { existsSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
+import { safeWriteFile } from "../filesystem/safe-write.js";
 import type { GovernanceStatus } from "./governance-types.js";
 
 export function getGovernanceStatus(cwd: string): GovernanceStatus {
@@ -65,7 +66,7 @@ export function updateGovernanceProjectState(cwd: string, status: GovernanceStat
 `;
   const content = readFileSync(path, "utf8");
   const next = upsertBlock(content, "## Governança", block);
-  writeFileSync(path, next, "utf8");
+  safeWriteFile(cwd, ".sdd-master/project-state.md", next);
   return true;
 }
 

@@ -1,5 +1,6 @@
-import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
+import { safeWriteFile } from "../filesystem/safe-write.js";
 import { getImplementReadiness } from "../governance/blockers.js";
 import { ensureBlocker } from "./blockers.js";
 import type { GateOptions, GateResult, GateWrite } from "./gate-types.js";
@@ -27,15 +28,13 @@ export function runQuality(cwd: string, options: GateOptions): GateResult {
 function writeQuality(cwd: string, id: string, options: GateOptions): GateWrite {
   const path = `.sdd-master/quality/${id}.md`;
   const fullPath = join(cwd, path);
-  mkdirSync(dirname(fullPath), { recursive: true });
-  writeFileSync(fullPath, qualityContent(id, options), "utf8");
+  safeWriteFile(cwd, path, qualityContent(id, options));
   return { path, status: "created" };
 }
 
 function writeQualityIndex(cwd: string): GateWrite {
   const path = ".sdd-master/quality/quality-index.md";
   const fullPath = join(cwd, path);
-  mkdirSync(dirname(fullPath), { recursive: true });
   const existed = existsSync(fullPath);
   const rows = readdirSync(dirname(fullPath))
     .filter((file) => file.startsWith("QUALITY-") && file.endsWith(".md"))
@@ -44,7 +43,7 @@ function writeQualityIndex(cwd: string): GateWrite {
       const status = content.match(/^## Status\n(.+)$/m)?.[1] ?? "passed";
       return `- ${file.replace(".md", "")}: ${status}`;
     });
-  writeFileSync(fullPath, `# Índice de qualidade\n\n${rows.join("\n")}\n`, "utf8");
+  safeWriteFile(cwd, path, `# Índice de qualidade\n\n${rows.join("\n")}\n`);
   return { path, status: existed ? "updated" : "created" };
 }
 

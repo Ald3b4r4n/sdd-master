@@ -22,6 +22,7 @@ import {
 } from "./doctor-checks.js";
 import { runGitSecurityCheck } from "../git/git-checks.js";
 import type { DoctorCheck, DoctorReport, DoctorStatus } from "./doctor-types.js";
+import { getPathSafetyState } from "../filesystem/path-safety-state.js";
 
 export function runDoctor(cwd: string): DoctorReport {
   const internal = checkInternalStructure(cwd);
@@ -44,6 +45,13 @@ export function runDoctor(cwd: string): DoctorReport {
   const security = checkSensitiveFiles(cwd);
   const git = getGitInfo(cwd);
   const gitSecurity = runGitSecurityCheck(cwd, "default");
+  const pathSafety = getPathSafetyState(cwd);
+  const pathSafetyCheck: DoctorCheck = {
+    id: "path-safety",
+    label: "Path Safety",
+    status: pathSafety.status === "blocked" ? "fail" : pathSafety.status === "warning" ? "warn" : "pass",
+    details: pathSafety.details
+  };
   const gitSecurityCheck: DoctorCheck = {
     id: "git-security",
     label: "Git/Security",
@@ -77,7 +85,8 @@ export function runDoctor(cwd: string): DoctorReport {
     gitignore,
     security.check,
     git.check,
-    gitSecurityCheck
+    gitSecurityCheck,
+    pathSafetyCheck
   ];
   const projectState = readProjectState(cwd);
   const status = getOverallStatus(checks);
@@ -103,6 +112,7 @@ export function runDoctor(cwd: string): DoctorReport {
     implementGuard: implementGuard.info,
     assistedImplement: assistedImplement.info,
     delivery: delivery.info,
+    pathSafety,
     gitSecurity: {
       status: gitSecurity.status,
       forbiddenFiles: gitSecurity.security.forbiddenFiles,

@@ -1,5 +1,6 @@
-import { existsSync, mkdirSync, writeFileSync } from "node:fs";
-import { dirname, join } from "node:path";
+import { existsSync } from "node:fs";
+import { safeMkdir, safeWriteFile } from "../filesystem/safe-write.js";
+import { resolveInsideProject } from "../filesystem/path-safety.js";
 import { officialTemplates } from "./official-templates.js";
 
 export type TemplateWriteResult = {
@@ -9,22 +10,22 @@ export type TemplateWriteResult = {
 };
 
 export function writeOfficialTemplates(cwd: string): TemplateWriteResult {
-  const templatesRoot = join(cwd, ".sdd-master", "templates");
+  const templatesRoot = resolveInsideProject(cwd, ".sdd-master/templates");
   let created = 0;
   let existing = 0;
 
-  mkdirSync(templatesRoot, { recursive: true });
+  safeMkdir(cwd, ".sdd-master/templates");
 
   for (const template of officialTemplates) {
-    const targetPath = join(templatesRoot, template.path);
-    mkdirSync(dirname(targetPath), { recursive: true });
+    const relativePath = `.sdd-master/templates/${template.path}`;
+    const targetPath = resolveInsideProject(cwd, relativePath);
 
     if (existsSync(targetPath)) {
       existing += 1;
       continue;
     }
 
-    writeFileSync(targetPath, template.content, "utf8");
+    safeWriteFile(cwd, relativePath, template.content);
     created += 1;
   }
 

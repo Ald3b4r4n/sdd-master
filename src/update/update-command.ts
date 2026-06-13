@@ -1,6 +1,5 @@
-import { mkdirSync, writeFileSync } from "node:fs";
-import { dirname, join } from "node:path";
 import type { CliOutput, CliRuntime } from "../cli/output.js";
+import { safeWriteFile } from "../filesystem/safe-write.js";
 import { getNotInitializedMessage, isWorkflowInitialized } from "../workflow/workflow-guards.js";
 import { createUpdateBackup } from "./update-backup.js";
 import { createUpdatePlan } from "./update-plan.js";
@@ -162,9 +161,7 @@ function parseUpdateArgs(args: string[]): { ok: true; options: UpdateOptions } |
 }
 
 function write(cwd: string, relativePath: string, content: string): void {
-  const path = join(cwd, relativePath);
-  mkdirSync(dirname(path), { recursive: true });
-  writeFileSync(path, content, "utf8");
+  safeWriteFile(cwd, relativePath, content);
 }
 
 export function getUpdateHelp(): string {

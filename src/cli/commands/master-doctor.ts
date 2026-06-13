@@ -4,7 +4,7 @@ import type { CliOutput, CliRuntime } from "../output.js";
 
 export function runDoctorCommand(args: string[], output: CliOutput, runtime: CliRuntime): number {
   const json = args.includes("--json");
-  const unknown = args.find((arg) => arg !== "--json");
+  const unknown = args.find((arg) => !["--json", "--path-safety"].includes(arg));
 
   if (unknown) {
     output.stderr(`Opção desconhecida para doctor: ${unknown}\n`);

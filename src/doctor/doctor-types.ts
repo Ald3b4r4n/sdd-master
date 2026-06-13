@@ -1,3 +1,5 @@
+import type { PathSafetyState } from "../filesystem/path-safety-state.js";
+
 export type DoctorStatus = "healthy" | "warning" | "broken";
 export type DoctorCheckStatus = "pass" | "warn" | "fail";
 
@@ -212,6 +214,7 @@ export type DoctorReport = {
   implementGuard: DoctorImplementGuardInfo;
   assistedImplement: DoctorAssistedImplementInfo;
   delivery: DoctorDeliveryInfo;
+  pathSafety: PathSafetyState;
   gitSecurity: {
     status: "clean" | "warning" | "blocked";
     forbiddenFiles: string[];

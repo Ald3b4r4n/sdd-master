@@ -1,5 +1,6 @@
-import { existsSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
+import { safeWriteFile } from "../filesystem/safe-write.js";
 
 type ProjectStatePatch = {
   currentPhase: string;
@@ -29,7 +30,7 @@ export function updateWorkflowProjectState(cwd: string, patch: ProjectStatePatch
   }
 
   content = upsertWorkflowRegistry(content, patch.registry);
-  writeFileSync(path, content, "utf8");
+  safeWriteFile(cwd, ".sdd-master/project-state.md", content);
   return true;
 }
 

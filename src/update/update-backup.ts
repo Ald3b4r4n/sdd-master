@@ -1,5 +1,7 @@
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
-import { dirname, join } from "node:path";
+import { existsSync, readFileSync } from "node:fs";
+import { join } from "node:path";
+import { resolveInsideProject } from "../filesystem/path-safety.js";
+import { safeMkdir, safeWriteFile } from "../filesystem/safe-write.js";
 import type { UpdatePlan } from "./update-types.js";
 
 export function createUpdateBackup(cwd: string, plan: UpdatePlan, timestampSlug: string, timestamp: string): string | undefined {
@@ -10,24 +12,22 @@ export function createUpdateBackup(cwd: string, plan: UpdatePlan, timestampSlug:
   }
 
   const backupPath = `.sdd-master/backups/update-${timestampSlug}`;
-  const backupRoot = join(cwd, backupPath);
-  mkdirSync(join(backupRoot, "files"), { recursive: true });
+  safeMkdir(cwd, `${backupPath}/files`);
   const copied: string[] = [];
 
   for (const file of files) {
-    const source = join(cwd, file);
+    const source = resolveInsideProject(cwd, file);
     if (!existsSync(source)) {
       continue;
     }
 
-    const target = join(backupRoot, "files", file);
-    mkdirSync(dirname(target), { recursive: true });
-    writeFileSync(target, readFileSync(source, "utf8"), "utf8");
+    safeWriteFile(cwd, `${backupPath}/files/${file}`, readFileSync(source, "utf8"));
     copied.push(file);
   }
 
-  writeFileSync(
-    join(backupRoot, "manifest.md"),
+  safeWriteFile(
+    cwd,
+    `${backupPath}/manifest.md`,
     `# Backup de Update — SDD Master
 
 ## Data
@@ -47,8 +47,7 @@ ${copied.length > 0 ? copied.map((file) => `- ${file}`).join("\n") : "- Nenhum a
 
 ## Observação
 Este backup foi criado antes de qualquer alteração.
-`,
-    "utf8"
+`
   );
 
   return backupPath;

@@ -1,5 +1,6 @@
-import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
-import { dirname, join } from "node:path";
+import { existsSync, readFileSync, readdirSync } from "node:fs";
+import { join } from "node:path";
+import { safeMkdir, safeWriteFile } from "../filesystem/safe-write.js";
 import { ensureExtensionInfrastructure, writeExtensionApproval, writeExtensionUsage } from "../extensions/extension-registry.js";
 import type { SkillOptions, SkillRecord, SkillStatus } from "./skill-types.js";
 import { nextSkillId, normalizeSkillCategory, suggestedSkillSource } from "./skill-registry.js";
@@ -28,7 +29,7 @@ export function updateSkillStatus(
       /^## Histórico\n\| Data \| Evento \| Responsável \|\n\|---\|---\|---\|([\s\S]*)$/m,
       `## Histórico\n| Data | Evento | Responsável |\n|---|---|---|$1\n| ${today()} | ${eventForStatus(status)} | SDD Master |`
     );
-  writeFileSync(path, content.endsWith("\n") ? content : `${content}\n`, "utf8");
+  safeWriteFile(cwd, `.sdd-master/skills/${record.id}.md`, content.endsWith("\n") ? content : `${content}\n`);
 
   const approval = status === "Aprovada" || status === "Rejeitada"
     ? writeExtensionApproval(
@@ -199,9 +200,9 @@ Nenhuma skill é instalada globalmente ou executada automaticamente.
 ${records.length > 0 ? records.join("\n") : "- Nenhuma skill registrada"}
 `
   );
-  mkdirSync(join(cwd, ".agents", "skills", "approved"), { recursive: true });
-  mkdirSync(join(cwd, ".agents", "skills", "installed"), { recursive: true });
-  mkdirSync(join(cwd, ".agents", "skills", "reports"), { recursive: true });
+  safeMkdir(cwd, ".agents/skills/approved");
+  safeMkdir(cwd, ".agents/skills/installed");
+  safeMkdir(cwd, ".agents/skills/reports");
 
   return [".sdd-master/skills/skills-index.md", ".agents/skills/registry.md"];
 }
@@ -220,9 +221,7 @@ function nextUsageId(cwd: string): string {
 }
 
 function write(cwd: string, relativePath: string, content: string): void {
-  const path = join(cwd, relativePath);
-  mkdirSync(dirname(path), { recursive: true });
-  writeFileSync(path, content, "utf8");
+  safeWriteFile(cwd, relativePath, content);
 }
 
 function eventForStatus(status: SkillStatus): string {

@@ -1,5 +1,6 @@
-import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
+import { safeWriteFile } from "../filesystem/safe-write.js";
 import { getImplementReadiness } from "./blockers.js";
 import { getGovernanceStatus, nextGovernanceId, updateGovernanceProjectState } from "./governance-state.js";
 import type { GovernanceOptions, GovernanceResult, GovernanceWrite } from "./governance-types.js";
@@ -37,15 +38,13 @@ export function runApprove(cwd: string, options: GovernanceOptions): GovernanceR
 function writeApproval(cwd: string, id: string, options: GovernanceOptions): GovernanceWrite {
   const path = `.sdd-master/approvals/${id}.md`;
   const fullPath = join(cwd, path);
-  mkdirSync(dirname(fullPath), { recursive: true });
-  writeFileSync(fullPath, approvalContent(id, options), "utf8");
+  safeWriteFile(cwd, path, approvalContent(id, options));
   return { path, status: "created" };
 }
 
 function writeApprovalsIndex(cwd: string): GovernanceWrite {
   const path = ".sdd-master/approvals/approvals-index.md";
   const fullPath = join(cwd, path);
-  mkdirSync(dirname(fullPath), { recursive: true });
   const existed = existsSync(fullPath);
   const rows = existsSync(dirname(fullPath))
     ? readdirSync(dirname(fullPath))
@@ -58,7 +57,7 @@ function writeApprovalsIndex(cwd: string): GovernanceWrite {
         })
     : [];
 
-  writeFileSync(fullPath, `# Índice de aprovações\n\n${rows.join("\n")}\n`, "utf8");
+  safeWriteFile(cwd, path, `# Índice de aprovações\n\n${rows.join("\n")}\n`);
   return { path, status: existed ? "updated" : "created" };
 }
 

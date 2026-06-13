@@ -1,5 +1,6 @@
-import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
-import { dirname, join } from "node:path";
+import { existsSync, readdirSync, readFileSync } from "node:fs";
+import { join } from "node:path";
+import { safeMkdir, safeWriteFile } from "../filesystem/safe-write.js";
 import { ensureExtensionPolicy } from "./extension-policy.js";
 import type { ExtensionRegistryEntry } from "./extension-types.js";
 import { calculateSupplyChainRisk, getExtensionHealth, isRemoteSource } from "./supply-chain.js";
@@ -14,7 +15,7 @@ export function ensureExtensionInfrastructure(cwd: string): string[] {
     ".agents/skills/installed",
     ".agents/skills/reports"
   ];
-  for (const path of paths) mkdirSync(join(cwd, path), { recursive: true });
+  for (const path of paths) safeMkdir(cwd, path);
   ensureExtensionPolicy(cwd);
   return [".sdd-master/extensions/extension-policy.md"];
 }
@@ -208,9 +209,7 @@ function nextId(cwd: string, directoryName: string, prefix: string): string {
 }
 
 function write(cwd: string, relativePath: string, content: string): void {
-  const path = join(cwd, relativePath);
-  mkdirSync(dirname(path), { recursive: true });
-  writeFileSync(path, content, "utf8");
+  safeWriteFile(cwd, relativePath, content);
 }
 
 function bullets(items: string[]): string {

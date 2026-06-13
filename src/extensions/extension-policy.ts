@@ -1,13 +1,11 @@
-import { mkdirSync, writeFileSync } from "node:fs";
-import { dirname, join } from "node:path";
+import { safeWriteFile } from "../filesystem/safe-write.js";
 
 export const extensionPolicyPath = ".sdd-master/extensions/extension-policy.md";
 
 export function ensureExtensionPolicy(cwd: string): string {
-  const path = join(cwd, extensionPolicyPath);
-  mkdirSync(dirname(path), { recursive: true });
-  writeFileSync(
-    path,
+  safeWriteFile(
+    cwd,
+    extensionPolicyPath,
     `# Política de Extensões — SDD Master
 
 ## Regras obrigatórias
@@ -39,7 +37,6 @@ export function ensureExtensionPolicy(cwd: string): string {
 
 Obrigatória antes de instalação local ou uso real.
 `,
-    "utf8"
   );
   return extensionPolicyPath;
 }
