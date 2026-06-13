@@ -96,6 +96,15 @@ export type DoctorUiuxInfo = {
   blockers: string[];
 };
 
+export type DoctorUpdateInfo = {
+  installedVersion: string;
+  templateVersion: string;
+  lastUpdate: string;
+  latestBackup: string;
+  conflicts: number;
+  missingMetadata: boolean;
+};
+
 export type DoctorGateInfo = {
   quality: {
     total: number;
@@ -140,6 +149,7 @@ export type DoctorReport = {
   gates: DoctorGateInfo;
   skills: DoctorSkillInfo;
   uiux: DoctorUiuxInfo;
+  update: DoctorUpdateInfo;
   implementReadiness: DoctorImplementReadinessInfo;
   implementGuard: DoctorImplementGuardInfo;
   gitSecurity: {

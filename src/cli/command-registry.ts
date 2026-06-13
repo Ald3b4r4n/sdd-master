@@ -5,7 +5,6 @@ import { runDoctorCommand } from "./commands/master-doctor.js";
 import { runMasterGitCommand } from "./commands/master-git.js";
 import { runInitCommand } from "./commands/master-init.js";
 import { getMasterCommandHelp } from "./commands/master-help.js";
-import { getPlannedCommandOutput } from "./commands/planned-command.js";
 import { getRootHelp } from "./commands/root-help.js";
 import { getStatusOutput } from "./commands/master-status.js";
 import { getVersionOutput } from "./commands/master-version.js";
@@ -14,6 +13,7 @@ import { runGovernanceCommand } from "../governance/governance-runner.js";
 import { runImplementCommand } from "../implementation/implement-command.js";
 import { runSkillsCommand } from "../skills/skill-command.js";
 import { runUiuxCommand } from "../uiux/uiux-command.js";
+import { runUpdateCommand } from "../update/update-command.js";
 import { runWorkflowCommand } from "../workflow/workflow-runner.js";
 
 export async function runCommand(
@@ -51,6 +51,8 @@ export async function runCommand(
       return runSkillsCommand(command.args, output, runtime);
     case "master-uiux":
       return runUiuxCommand(command.args, output, runtime);
+    case "master-update":
+      return runUpdateCommand(command.args, output, runtime);
     case "master-workflow":
       return runWorkflowCommand(command.command, command.args, output, runtime);
     case "master-governance":
@@ -59,9 +61,6 @@ export async function runCommand(
       return runGateCommand(command.command, command.args, output, runtime);
     case "master-implement":
       return runImplementCommand(command.args, output, runtime);
-    case "planned-command":
-      output.stdout(getPlannedCommandOutput(command.command));
-      return 0;
     case "unknown":
       output.stderr(getUnknownCommandOutput(command.command, command.scope));
       return 1;

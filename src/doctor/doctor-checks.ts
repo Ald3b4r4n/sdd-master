@@ -9,6 +9,7 @@ import { getImplementGuardStatus } from "../implementation/implement-readiness.j
 import { getSkillStatus } from "../skills/skill-registry.js";
 import { officialTemplates } from "../templates/official-templates.js";
 import { getUiuxStatus } from "../uiux/uiux-gates.js";
+import { getUpdateStatus } from "../update/update-state.js";
 import type {
   DoctorAgentInfo,
   DoctorCheck,
@@ -21,7 +22,8 @@ import type {
   DoctorProjectState,
   DoctorSecurityInfo,
   DoctorTemplateInfo,
-  DoctorUiuxInfo
+  DoctorUiuxInfo,
+  DoctorUpdateInfo
 } from "./doctor-types.js";
 import { getWorkflowStatus } from "../workflow/workflow-runner.js";
 
@@ -410,6 +412,29 @@ export function checkUiux(cwd: string): {
       id: "uiux",
       label: "UI/UX e design gates",
       status: info.applicable && info.blockers.length > 0 ? "warn" : "pass",
+      details
+    },
+    info
+  };
+}
+
+export function checkUpdate(cwd: string): {
+  check: DoctorCheck;
+  info: DoctorUpdateInfo;
+} {
+  const info = getUpdateStatus(cwd);
+  const details = [
+    info.missingMetadata ? "Metadados de versão ausentes. Recomenda-se: sdd master update --dry-run" : "",
+    info.conflicts > 0 ? `Conflitos de update registrados: ${info.conflicts}` : "",
+    info.latestBackup === "não detectado" ? "Nenhum backup de update detectado." : "",
+    info.lastUpdate === "não detectado" ? "Último update não registrado." : ""
+  ].filter(Boolean);
+
+  return {
+    check: {
+      id: "update",
+      label: "Update seguro",
+      status: info.missingMetadata || info.conflicts > 0 ? "warn" : "pass",
       details
     },
     info

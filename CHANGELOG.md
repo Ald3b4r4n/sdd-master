@@ -36,6 +36,12 @@
 - Registro de skills candidatas, aprovadas, instaladas localmente e usadas.
 - Gates de UI/UX, design system, acessibilidade, SEO, responsividade e performance.
 - Integração dos gates de design com `status`, `doctor` e `implement`.
+- Comando `sdd master update` real e seguro.
+- Modo `--dry-run` para plano de atualização.
+- Modo `--apply` com backup local.
+- Versionamento inicial de templates oficiais.
+- Relatórios de update em `.sdd-master/reports/`.
+- Detecção de conflitos e preservação de arquivos locais.
 
 ## [0.1.0-prototype.1] - 2026-06-11
 

@@ -8,6 +8,7 @@ import { getGovernanceStatus } from "../../governance/governance-state.js";
 import { getImplementGuardStatus } from "../../implementation/implement-readiness.js";
 import { getSkillStatus } from "../../skills/skill-registry.js";
 import { getUiuxStatus } from "../../uiux/uiux-gates.js";
+import { getUpdateStatus } from "../../update/update-state.js";
 import { getWorkflowStatus } from "../../workflow/workflow-runner.js";
 
 export function getStatusOutput(cwd: string): string {
@@ -43,6 +44,7 @@ function getInstalledStatus(cwd: string): string {
   const implementGuard = getImplementGuardStatus(cwd);
   const skills = getSkillStatus(cwd);
   const uiux = getUiuxStatus(cwd);
+  const update = getUpdateStatus(cwd);
 
   return `SDD Master — Status
 
@@ -114,6 +116,13 @@ UI/UX:
   Responsividade: ${formatMixedGate(uiux.responsiveness)}
   Performance: ${formatMixedGate(uiux.performance)}
   Bloqueios: ${uiux.blockers.length}
+
+Update:
+  Versão instalada: ${update.installedVersion}
+  Versão dos templates: ${update.templateVersion}
+  Último update: ${update.lastUpdate}
+  Backup mais recente: ${update.latestBackup}
+  Conflitos de update: ${update.conflicts}
 
 Implementação:
   Pronta: ${implementReadiness.ready ? "Sim" : "Não"}

@@ -88,6 +88,7 @@ node dist/cli/main.js master help
 | `sdd master git` | Disponível | Valida Git e segurança |
 | `sdd master skills` | Disponível | Gerencia skills locais e relatórios |
 | `sdd master uiux` | Disponível | Cria gates de design e interface |
+| `sdd master update` | Disponível | Atualiza instalação local com backup |
 | `sdd master discovery` | Disponível | Cria discovery inicial |
 | `sdd master requirements` | Disponível | Cria requisitos iniciais |
 | `sdd master spec` | Disponível | Cria especificação inicial |
@@ -295,6 +296,26 @@ Regras:
 - toda skill usada aparece em relatório;
 - UI/UX, acessibilidade, SEO e responsividade bloqueiam implementação quando aplicável.
 
+## Update seguro
+
+O comando `sdd master update` atualiza uma instalação local do SDD Master sem apagar histórico.
+
+Exemplos:
+
+```bash
+sdd master update --dry-run
+sdd master update --apply --yes
+```
+
+Regras:
+
+- cria backup antes de aplicar mudanças;
+- não sobrescreve documentos preenchidos sem segurança;
+- preserva decisões humanas;
+- registra relatório em `.sdd-master/reports/`;
+- nunca cria `.env`;
+- nunca apaga rastreabilidade.
+
 ## Implement Guard
 
 O comando `sdd master implement` existe como guardião de implementação.
@@ -419,6 +440,7 @@ Nunca publique `.env`, tokens, credenciais, chaves privadas, certificados, dados
 - [Desenvolvimento local](docs/03-codigo/desenvolvimento-local.md)
 - [Workflow SDD](docs/03-codigo/workflow-sdd.md)
 - [Skills locais e UI/UX](docs/03-codigo/skills-uiux.md)
+- [Update seguro](docs/03-codigo/update-seguro.md)
 
 ## Roadmap
 

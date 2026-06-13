@@ -5,6 +5,7 @@ import { parseAgent as parseSupportedAgent, parseLanguage as parseSupportedLangu
 import { updateProjectStateAgentsBlock, writeAgentFiles } from "../../agents/agent-writer.js";
 import type { AgentLanguage, SupportedAgent } from "../../agents/agent-types.js";
 import { version } from "../../index.js";
+import { templateVersion } from "../../templates/official-templates.js";
 import { writeOfficialTemplates } from "../../templates/template-writer.js";
 import type { CliOutput, CliRuntime } from "../output.js";
 
@@ -426,6 +427,14 @@ function getProjectStateContent(
 - IA/agente principal: ${options.agent}
 - Versão do SDD Master: ${version}
 - Data de inicialização: ${new Date().toISOString()}
+
+## SDD Master
+
+- Versão instalada: ${version}
+- Versão dos templates: ${templateVersion}
+- Data da instalação: ${new Date().toISOString()}
+- Último update:
+- Canal recomendado: prototype
 
 ## Estado atual
 - Fase atual: PHASE-01 — Discovery

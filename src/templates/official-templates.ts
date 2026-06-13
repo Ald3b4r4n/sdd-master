@@ -3,6 +3,9 @@ export type OfficialTemplate = {
   content: string;
 };
 
+export const templateVersion = "0.1.0";
+export const templateCompatibility = ">=0.1.0-prototype.1";
+
 type TemplateDefinition = {
   path: string;
   title: string;
@@ -42,7 +45,9 @@ const commonTraceability = `## Rastreabilidade
 
 const templateReadme: OfficialTemplate = {
   path: "README.md",
-  content: `# SDD Master — Templates
+  content: withTemplateMetadata(
+    "templates-readme",
+    `# SDD Master — Templates
 
 ## O que são
 Esta pasta contém a biblioteca local de templates oficiais do SDD Master.
@@ -71,6 +76,7 @@ Templates oficiais podem ser versionados localmente como parte da governança SD
 ## Aprovação
 Documentos reais criados a partir destes templates precisam ser revisados e aprovados pelo fluxo SDD Master antes de guiar implementação.
 `
+  )
 };
 
 const definitions: TemplateDefinition[] = [
@@ -1245,9 +1251,32 @@ export const officialTemplates: OfficialTemplate[] = [
 ];
 
 function createTemplateContent(definition: TemplateDefinition): string {
-  return `# ${definition.title}
+  return withTemplateMetadata(
+    definition.path,
+    `# ${definition.title}
 
 ${commonMetadata}
 ${definition.specificContent}
-${commonTraceability}`.replace("| 0.1 | AAAA-MM-DD | Criação inicial | SDD Master | PHASE-XX |", `| 0.1 | AAAA-MM-DD | Criação inicial | SDD Master | ${definition.phase} |`);
+${commonTraceability}`.replace("| 0.1 | AAAA-MM-DD | Criação inicial | SDD Master | PHASE-XX |", `| 0.1 | AAAA-MM-DD | Criação inicial | SDD Master | ${definition.phase} |`)
+  );
+}
+
+export function withTemplateMetadata(templateId: string, content: string): string {
+  if (content.includes("## Template metadata")) {
+    return content;
+  }
+
+  const lines = content.split("\n");
+  const title = lines.shift() ?? "";
+  const body = lines.join("\n").replace(/^\n/, "");
+
+  return `${title}
+
+## Template metadata
+- Template ID: ${templateId}
+- Template version: ${templateVersion}
+- SDD Master compatibility: ${templateCompatibility}
+- Managed by: SDD Master
+
+${body}`;
 }

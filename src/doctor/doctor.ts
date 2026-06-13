@@ -11,6 +11,7 @@ import {
   checkSensitiveFiles,
   checkTemplates,
   checkUiux,
+  checkUpdate,
   checkWorkflow,
   getGitInfo,
   readProjectState
@@ -29,6 +30,7 @@ export function runDoctor(cwd: string): DoctorReport {
   const gates = checkGates(cwd);
   const skills = checkSkills(cwd);
   const uiux = checkUiux(cwd);
+  const update = checkUpdate(cwd);
   const implementReadiness = checkImplementReadiness(cwd);
   const implementGuard = checkImplementGuard(cwd);
   const security = checkSensitiveFiles(cwd);
@@ -57,6 +59,7 @@ export function runDoctor(cwd: string): DoctorReport {
     gates.check,
     skills.check,
     uiux.check,
+    update.check,
     implementReadiness.check,
     implementGuard.check,
     gitignore,
@@ -81,6 +84,7 @@ export function runDoctor(cwd: string): DoctorReport {
     gates: gates.info,
     skills: skills.info,
     uiux: uiux.info,
+    update: update.info,
     implementReadiness: implementReadiness.info,
     implementGuard: implementGuard.info,
     gitSecurity: {

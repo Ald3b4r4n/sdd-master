@@ -137,6 +137,17 @@ sdd master implement --json --yes --phase="PHASE-01" --target="TASK-001"
 
 ```bash
 sdd master update
+sdd master update --dry-run
+sdd master update --apply --yes
+sdd master update --dry-run --json
 ```
 
-Planejado para atualizar templates e estrutura em bloco futuro.
+Atualiza uma instalação SDD Master em projeto consumidor com plano, backup, relatório e detecção de conflitos.
+
+Regras:
+
+- `--dry-run` mostra o plano sem alterar arquivos;
+- `--apply --yes` aplica apenas mudanças seguras;
+- backup local é criado antes de alterações em arquivos existentes;
+- templates sem marcador gerenciado ou modificados localmente são preservados;
+- nenhum histórico é apagado.

@@ -46,11 +46,22 @@ const commandHelps: Record<string, CommandHelp> = {
   },
   update: {
     command: "update",
-    status: "Planejado.",
-    purpose: "Atualizar templates, documentação base e estrutura controlada do framework.",
-    whenUsed: "Será usado quando o pacote evoluir e um projeto consumidor precisar sincronizar padrões.",
-    example: "sdd master update",
-    security: ["Deve preservar arquivos do usuário.", "Deve evitar sobrescrever segredos ou .env real."]
+    status: "Disponível no BLOCO 22.",
+    purpose: "Atualizar uma instalação local do SDD Master com plano, backup e relatório.",
+    whenUsed: "Use quando o pacote evoluir e um projeto consumidor precisar sincronizar templates e metadados.",
+    example: "sdd master update --dry-run",
+    details: [
+      "Flags: --help, --json, --yes, -y, --dry-run, --apply, --force, --templates, --agents, --docs, --project-state, --backup.",
+      "Dry-run mostra o plano sem alterar arquivos.",
+      "Apply cria backup antes de alterações seguras.",
+      "Conflitos são preservados e registrados."
+    ],
+    security: [
+      "Nunca apaga histórico.",
+      "Nunca sobrescreve decisão humana.",
+      "Não cria .env real.",
+      "Não executa release, deploy ou publicação npm."
+    ]
   },
   status: {
     command: "status",
@@ -393,7 +404,6 @@ Comandos disponíveis:
   sdd master implement  Verifica readiness em modo guard/dry-run
 
 Comandos planejados:
-  sdd master update
   sdd master release
   sdd master deploy
 

@@ -97,6 +97,13 @@ UI/UX:
   Responsividade: ${formatMixedGate(report.uiux.responsiveness)}
   Performance: ${formatMixedGate(report.uiux.performance)}
 
+Update:
+  Versão instalada: ${report.update.installedVersion}
+  Versão dos templates: ${report.update.templateVersion}
+  Último update: ${report.update.lastUpdate}
+  Backup mais recente: ${report.update.latestBackup}
+  Conflitos de update: ${report.update.conflicts}
+
 Implementação:
   Pronta: ${report.implementReadiness.ready ? "Sim" : "Não"}
   Bloqueios:

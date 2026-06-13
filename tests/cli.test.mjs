@@ -1064,12 +1064,99 @@ describe("SDD Master package foundation", () => {
     assert.equal(existsSync(join(rootDir, ".env")), false);
   });
 
-  it("keeps update as a safe stub", () => {
-    const result = runCli(["master", "update"]);
+  it("implements safe update with dry-run, backups, reports and conflicts", () => {
+    withTempProject((projectDir) => {
+      const withoutInit = runCli(["master", "update", "--dry-run"], projectDir);
+      assert.notEqual(withoutInit.status, 0);
+      assert.match(withoutInit.stderr, /SDD Master não inicializado/);
 
-    assert.equal(result.status, 0);
-    assert.match(result.stdout, /Comando planejado: sdd master update/);
-    assert.match(result.stdout, /Nenhuma alteração foi feita/);
+      assert.equal(runCli(["master", "update", "--help"], projectDir).status, 0);
+      assert.equal(runCli(["master", "help", "update"], projectDir).status, 0);
+      assert.equal(initTempProject(projectDir).status, 0);
+
+      const projectStatePath = join(projectDir, ".sdd-master", "project-state.md");
+      const originalState = readFileSync(projectStatePath, "utf8");
+      const oldState = originalState.replace(/\n## SDD Master\n[\s\S]*?(?=\n## Estado atual)/, "");
+      writeFileSync(projectStatePath, oldState, "utf8");
+
+      const missingTemplatePath = join(
+        projectDir,
+        ".sdd-master",
+        "templates",
+        "workflow",
+        "test-result-template.md"
+      );
+      rmSync(missingTemplatePath, { force: true });
+
+      const modifiedTemplatePath = join(
+        projectDir,
+        ".sdd-master",
+        "templates",
+        "workflow",
+        "task-template.md"
+      );
+      writeFileSync(modifiedTemplatePath, "# Template local preenchido\n\nDecisão humana preservada.\n", "utf8");
+      const customFilePath = join(projectDir, ".sdd-master", "templates", "workflow", "custom-local.md");
+      writeFileSync(customFilePath, "# Arquivo local\n", "utf8");
+
+      const beforeDryRunState = readFileSync(projectStatePath, "utf8");
+      const dryRun = runCli(["master", "update", "--dry-run"], projectDir);
+      assert.equal(dryRun.status, 0, dryRun.stderr);
+      assert.match(dryRun.stdout, /Modo:\s+dry-run/);
+      assert.match(dryRun.stdout, /Nenhuma alteração foi feita/);
+      assert.equal(readFileSync(projectStatePath, "utf8"), beforeDryRunState);
+      assert.equal(existsSync(missingTemplatePath), false);
+
+      const dryRunJson = JSON.parse(runCli(["master", "update", "--dry-run", "--json"], projectDir).stdout);
+      assert.equal(Array.isArray(dryRunJson.created), true);
+      assert.equal(Array.isArray(dryRunJson.updated), true);
+      assert.equal(Array.isArray(dryRunJson.preserved), true);
+      assert.equal(Array.isArray(dryRunJson.conflicts), true);
+      assert.equal(dryRunJson.created.includes(".sdd-master/templates/workflow/test-result-template.md"), true);
+      assert.equal(
+        dryRunJson.conflicts.some((conflict) => conflict.path === ".sdd-master/templates/workflow/task-template.md"),
+        true
+      );
+
+      const apply = runCli(["master", "update", "--apply", "--yes", "--json"], projectDir);
+      assert.equal(apply.status, 0, apply.stderr);
+      const applied = JSON.parse(apply.stdout);
+      assert.equal(applied.status, "partial");
+      assert.equal(applied.created.includes(".sdd-master/templates/workflow/test-result-template.md"), true);
+      assert.equal(applied.projectStateUpdated, true);
+      assert.equal(typeof applied.reportPath, "string");
+      assert.equal(typeof applied.backupPath, "string");
+
+      assert.equal(existsSync(missingTemplatePath), true);
+      assert.equal(readFileSync(modifiedTemplatePath, "utf8"), "# Template local preenchido\n\nDecisão humana preservada.\n");
+      assert.equal(existsSync(customFilePath), true);
+      assert.match(readFileSync(projectStatePath, "utf8"), /## SDD Master/);
+      assert.match(readFileSync(projectStatePath, "utf8"), /Versão dos templates: 0\.1\.0/);
+      assert.equal(existsSync(join(projectDir, applied.backupPath, "manifest.md")), true);
+      assert.match(readFileSync(join(projectDir, applied.reportPath), "utf8"), /## Status\npartial/);
+      assert.equal(existsSync(join(projectDir, ".env")), false);
+
+      const force = runCli(["master", "update", "--apply", "--yes", "--force", "--json"], projectDir);
+      assert.equal(force.status, 0, force.stderr);
+      assert.equal(existsSync(customFilePath), true);
+
+      const status = runCli(["master", "status"], projectDir);
+      assert.equal(status.status, 0);
+      assert.match(status.stdout, /Update:/);
+      assert.match(status.stdout, /Versão dos templates:/);
+
+      const doctorJson = JSON.parse(runCli(["master", "doctor", "--json"], projectDir).stdout);
+      assert.equal(typeof doctorJson.update, "object");
+      assert.equal(
+        doctorJson.checks.some((check) => check.id === "update"),
+        true
+      );
+    });
+
+    assert.equal(existsSync(join(rootDir, ".sdd-master")), false);
+    assert.equal(existsSync(join(rootDir, "SDD Master Roadmap.pdf")), true);
+    assert.equal(existsSync(join(rootDir, "SDD Master — Checklist de Implementação v0.1.pdf")), true);
+    assert.equal(existsSync(join(rootDir, "SDD Master — Documento Mestre v0.1.pdf")), true);
   });
 
   it("returns an error for unknown master commands", () => {

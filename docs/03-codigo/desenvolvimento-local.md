@@ -69,6 +69,17 @@ npm run check
 node dist/cli/main.js master help
 ```
 
+## Testar update seguro
+
+Use diretórios temporários ou projetos consumidores de teste. Não execute `init` ou `update` real na raiz do pacote.
+
+```bash
+node dist/cli/main.js master update --dry-run
+node dist/cli/main.js master update --apply --yes
+```
+
+O update deve criar backup apenas dos arquivos alterados, registrar relatório em `.sdd-master/reports/` e preservar documentos preenchidos ou sem marcador `Managed by: SDD Master`.
+
 ## Fluxo recomendado
 
 1. Editar código TypeScript em `src/`.
