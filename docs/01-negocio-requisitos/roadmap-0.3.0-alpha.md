@@ -56,3 +56,7 @@ Transformar o SDD Master de prototype publicado em alpha operacional validado em
 - Execucao remota de skills.
 - Execucao remota de plugins.
 - Publicacao npm automatizada.
+# Correção anterior ao BLOCO 28
+
+O BLOCO 27A completa o registry seguro de extensões antes do avanço para segurança avançada opcional.
+O próximo bloco recomendado permanece o BLOCO 28, com integrações opt-in como gitleaks/trufflehog.

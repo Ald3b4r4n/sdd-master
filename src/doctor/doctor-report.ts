@@ -95,6 +95,17 @@ Plugins:
   Instaladas localmente: ${report.plugins.installedLocal}
   Usadas: ${report.plugins.used}
 
+Extensões:
+  Status: ${report.extensions.status}
+  Policy: ${report.extensions.policy}
+  Registry: ${report.extensions.registry}
+  Plugin registry: ${report.extensions.pluginRegistry}
+  Skills registry: ${report.extensions.skillsRegistry}
+  Riscos supply chain: ${report.extensions.supplyChainRisks}
+  Usadas sem aprovação: ${report.extensions.unapprovedUsed}
+  Bloqueadas/rejeitadas: ${report.extensions.blockedOrRejected}
+  Origens remotas: ${report.extensions.remoteSources}
+
 UI/UX:
   Aplicável: ${report.uiux.applicable ? "Sim" : "Não"}
   Design system: ${report.uiux.designSystem ? "OK" : "Pendente"}

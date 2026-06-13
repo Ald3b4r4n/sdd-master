@@ -372,10 +372,11 @@ const commandHelps: Record<string, CommandHelp> = {
     example: 'sdd master skills --yes --title="Skill de UI/UX" --category="uiux"',
     creates: [".sdd-master/skills/SKILL-001.md", ".agents/skills/registry.md", ".agents/skills/installed/"],
     details: [
-      "Flags: --help, --json, --yes, -y, --title, --phase, --type, --status, --category, --source, --skill, --reason, --approve, --install-local, --mark-used, --report, --target.",
+      "Flags: --help, --json, --yes, -y, --title, --phase, --type, --status, --category, --source, --skill, --reason, --permission, --approve, --reject, --install-local, --mark-used, --report, --target.",
       "Instalação local cria apenas metadados.",
       "Toda skill usada deve aparecer em relatório.",
       "Registry local fica em .agents/skills/registry.md.",
+      "Registry consolidado e policy ficam em .sdd-master/extensions/.",
       "Skills alimentam UI/UX e implement readiness quando usadas."
     ],
     security: [
@@ -387,16 +388,16 @@ const commandHelps: Record<string, CommandHelp> = {
   },
   plugins: {
     command: "plugins",
-    status: "Disponível no BLOCO 27.",
+    status: "Corrigido e completo no BLOCO 27A.",
     purpose: "Registrar, aprovar, instalar localmente como metadado e reportar uso de plugins/extensões seguras.",
     whenUsed: "Use quando o projeto precisar controlar plugins locais com política de supply chain segura.",
     example: 'sdd master plugins --yes --title="Plugin de integração" --category="integration"',
-    creates: [".sdd-master/plugins/PLUGIN-001.md", ".agents/plugins/registry.md", ".agents/plugins/installed/"],
+    creates: [".sdd-master/extensions/plugins/PLUGIN-001.md", ".sdd-master/extensions/registry.md", ".agents/skills/installed/"],
     details: [
-      "Flags: --help, --json, --yes, -y, --title, --phase, --type, --status, --category, --source, --plugin, --extension, --reason, --approve, --install-local, --mark-used, --report, --target.",
+      "Flags: --help, --json, --yes, -y, --title, --phase, --id, --type, --status, --category, --source, --version, --reason, --permission, --approve, --reject, --audit, --install-local, --mark-used, --report, --target.",
       "Instalação local cria apenas metadados.",
       "Nenhum código remoto é baixado ou executado.",
-      "Registry local fica em .sdd-master/plugins/ e .agents/plugins/.",
+      "Registry, approvals, audits, usage e reports ficam em .sdd-master/extensions/.",
       "Todo plugin usado deve aparecer em relatório."
     ],
     security: [

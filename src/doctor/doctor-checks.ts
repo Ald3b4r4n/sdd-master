@@ -7,6 +7,7 @@ import { getImplementReadiness } from "../governance/blockers.js";
 import { getGovernanceStatus } from "../governance/governance-state.js";
 import { getAssistedImplementStatus, getImplementGuardStatus } from "../implementation/implement-readiness.js";
 import { getDeliveryStatus } from "../delivery/delivery-status.js";
+import { getExtensionStatus } from "../extensions/extension-state.js";
 import { getPluginStatus } from "../plugins/plugin-registry.js";
 import { getSkillStatus } from "../skills/skill-registry.js";
 import { officialTemplates } from "../templates/official-templates.js";
@@ -22,6 +23,7 @@ import type {
   DoctorImplementGuardInfo,
   DoctorImplementReadinessInfo,
   DoctorDeliveryInfo,
+  DoctorExtensionInfo,
   DoctorPluginInfo,
   DoctorSkillInfo,
   DoctorProjectState,
@@ -54,7 +56,7 @@ const internalPaths = [
   ".sdd-master/backlog",
   ".sdd-master/scope",
   ".sdd-master/skills",
-  ".sdd-master/plugins",
+  ".sdd-master/extensions",
   ".sdd-master/releases",
   ".sdd-master/deliveries",
   ".sdd-master/db",
@@ -68,7 +70,7 @@ const publicDocs = [
   "docs/03-codigo"
 ];
 
-const agentPaths = [".agents", ".agents/skills", ".agents/plugins"];
+const agentPaths = [".agents", ".agents/skills"];
 
 const minimumTemplates = [
   "README.md",
@@ -444,6 +446,25 @@ export function checkPlugins(cwd: string): {
       id: "plugins",
       label: "Plugins locais",
       status: info.used > 0 && info.usageReports === 0 ? "fail" : details.length === 0 ? "pass" : "warn",
+      details
+    },
+    info
+  };
+}
+
+export function checkExtensions(cwd: string): {
+  check: DoctorCheck;
+  info: DoctorExtensionInfo;
+} {
+  const info = getExtensionStatus(cwd);
+  const details = info.status === "not-started"
+    ? ["Extensões não iniciadas."]
+    : [...info.blockers, ...info.warnings, ...(info.policy === "missing" ? ["Extension policy ausente."] : [])];
+  return {
+    check: {
+      id: "extensions",
+      label: "Extensões e supply chain",
+      status: info.status === "broken" ? "fail" : info.status === "healthy" ? "pass" : "warn",
       details
     },
     info

@@ -2,6 +2,12 @@
 
 ## [Unreleased]
 
+### Corrigido
+
+- Completa implementação do registry seguro de plugins/extensões iniciado no BLOCO 27.
+- Adicionada política de extensão, auditoria de supply chain e relatórios consolidados.
+- Corrigida integração de plugins/skills com `implement`, `status` e `doctor`.
+
 ### Adicionado
 
 - Implement assistido controlado em `sdd master implement`.

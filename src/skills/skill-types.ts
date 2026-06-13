@@ -20,7 +20,9 @@ export type SkillOptions = {
   source?: string;
   skill?: string;
   reason?: string;
+  permissions: string[];
   approve: boolean;
+  reject: boolean;
   installLocal: boolean;
   markUsed: boolean;
   report: boolean;
@@ -34,6 +36,7 @@ export type SkillRecord = {
   source: string;
   status: SkillStatus;
   reason: string;
+  permissions: string[];
 };
 
 export type SkillStatusSummary = {

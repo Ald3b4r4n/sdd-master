@@ -116,15 +116,16 @@ O registry local fica em `.agents/skills/registry.md`.
 ## Plugins locais
 
 ```bash
-sdd master plugins --yes --title="Plugin de integração" --category="integration" --source="Registry local controlado"
-sdd master plugins --yes --plugin="PLUGIN-001" --approve
-sdd master plugins --yes --plugin="PLUGIN-001" --install-local
-sdd master plugins --yes --plugin="PLUGIN-001" --mark-used --phase="PHASE-01" --target="plugin-review"
+sdd master plugins --yes --title="Plugin de integração" --category="other" --source="Registry local controlado" --version="1.0.0" --permission="docs/**"
+sdd master plugins --yes --id="PLUGIN-001" --audit
+sdd master plugins --yes --id="PLUGIN-001" --approve
+sdd master plugins --yes --id="PLUGIN-001" --install-local
+sdd master plugins --yes --id="PLUGIN-001" --mark-used --phase="PHASE-01" --target="plugin-review"
 sdd master plugins --json --report
 ```
 
 `plugins` registra extensões locais, aprovação humana, instalação local como metadado e uso em relatório. O comando não instala globalmente, não baixa código remoto, não executa plugin externo e não cria `.env`.
-O registry local fica em `.agents/plugins/registry.md`.
+O registry consolidado fica em `.sdd-master/extensions/registry.md`, com policy, approvals, audits, usage e reports no mesmo domínio. A instalação local cria somente metadados em `.agents/skills/installed/`.
 
 ## UI/UX e design gates
 

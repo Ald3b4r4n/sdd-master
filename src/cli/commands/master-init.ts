@@ -8,6 +8,7 @@ import { version } from "../../index.js";
 import { templateVersion } from "../../templates/official-templates.js";
 import { writeOfficialTemplates } from "../../templates/template-writer.js";
 import type { CliOutput, CliRuntime } from "../output.js";
+import { ensureExtensionInfrastructure, writeExtensionRegistry } from "../../extensions/extension-registry.js";
 
 type Language = AgentLanguage;
 type Agent = SupportedAgent | "other";
@@ -53,7 +54,12 @@ const sddDirectories = [
   ".sdd-master/backlog",
   ".sdd-master/scope",
   ".sdd-master/skills",
-  ".sdd-master/plugins",
+  ".sdd-master/extensions",
+  ".sdd-master/extensions/plugins",
+  ".sdd-master/extensions/approvals",
+  ".sdd-master/extensions/audits",
+  ".sdd-master/extensions/usage",
+  ".sdd-master/extensions/reports",
   ".sdd-master/releases",
   ".sdd-master/deliveries",
   ".sdd-master/db",
@@ -62,8 +68,7 @@ const sddDirectories = [
   "docs/01-negocio-requisitos",
   "docs/02-tecnica-arquitetura",
   "docs/03-codigo",
-  ".agents/skills",
-  ".agents/plugins"
+  ".agents/skills"
 ];
 
 const gitignoreEntries = [
@@ -286,6 +291,8 @@ Recomendação:
   for (const directory of sddDirectories) {
     mkdirSync(join(cwd, directory), { recursive: true });
   }
+  ensureExtensionInfrastructure(cwd);
+  writeExtensionRegistry(cwd, []);
 
   writeFileIfMissing(join(cwd, ".sdd-master", "constitution.md"), getConstitutionContent());
   writeFileIfMissing(

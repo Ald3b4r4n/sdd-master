@@ -7,6 +7,7 @@ import {
   checkImplementGuard,
   checkImplementReadiness,
   checkDelivery,
+  checkExtensions,
   checkInternalStructure,
   checkPublicDocs,
   checkPlugins,
@@ -33,6 +34,7 @@ export function runDoctor(cwd: string): DoctorReport {
   const gates = checkGates(cwd);
   const skills = checkSkills(cwd);
   const plugins = checkPlugins(cwd);
+  const extensions = checkExtensions(cwd);
   const uiux = checkUiux(cwd);
   const update = checkUpdate(cwd);
   const implementReadiness = checkImplementReadiness(cwd);
@@ -65,6 +67,7 @@ export function runDoctor(cwd: string): DoctorReport {
     gates.check,
     skills.check,
     plugins.check,
+    extensions.check,
     uiux.check,
     update.check,
     implementReadiness.check,
@@ -93,6 +96,7 @@ export function runDoctor(cwd: string): DoctorReport {
     gates: gates.info,
     skills: skills.info,
     plugins: plugins.info,
+    extensions: extensions.info,
     uiux: uiux.info,
     update: update.info,
     implementReadiness: implementReadiness.info,

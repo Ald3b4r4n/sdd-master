@@ -5,6 +5,7 @@ import { getGateStatus } from "../../gates/gate-state.js";
 import { runGitSecurityCheck } from "../../git/git-checks.js";
 import { getImplementReadiness } from "../../governance/blockers.js";
 import { getDeliveryStatus } from "../../delivery/delivery-status.js";
+import { getExtensionStatus } from "../../extensions/extension-state.js";
 import { getGovernanceStatus } from "../../governance/governance-state.js";
 import { getAssistedImplementStatus, getImplementGuardStatus } from "../../implementation/implement-readiness.js";
 import { getPluginStatus } from "../../plugins/plugin-registry.js";
@@ -46,6 +47,7 @@ function getInstalledStatus(cwd: string): string {
   const implementGuard = getImplementGuardStatus(cwd);
   const assistedImplement = getAssistedImplementStatus(cwd);
   const plugins = getPluginStatus(cwd);
+  const extensions = getExtensionStatus(cwd);
   const skills = getSkillStatus(cwd);
   const uiux = getUiuxStatus(cwd);
   const update = getUpdateStatus(cwd);
@@ -71,7 +73,6 @@ Templates:
 Agentes / IAs:
 ${formatAgentFiles(agentFiles)}
   .agents/skills/: ${formatStatus(existsSync(join(cwd, ".agents", "skills")))}
-  .agents/plugins/: ${formatStatus(existsSync(join(cwd, ".agents", "plugins")))}
 
 Git/Security:
   .env real detectado: ${gitSecurity.security.forbiddenFiles.some((file) => file === ".env" || file.startsWith(".env.")) ? "Sim" : "Não"}
@@ -112,13 +113,19 @@ Skills:
   Candidatas: ${skills.candidates}
   Aprovadas: ${skills.approved}
   Instaladas localmente: ${skills.installedLocal}
-  Usadas: ${skills.used}
+  Skills usadas: ${skills.used}
+  Skills sem aprovação: ${extensions.unapprovedUsed}
+  Skills com origem remota: ${extensions.remoteSources}
 
-Plugins:
-  Candidatas: ${plugins.candidates}
-  Aprovadas: ${plugins.approved}
-  Instaladas localmente: ${plugins.installedLocal}
-  Usadas: ${plugins.used}
+Extensões:
+  Plugins candidatos: ${plugins.candidates}
+  Plugins aprovados: ${plugins.approved}
+  Plugins instalados localmente: ${plugins.installedLocal}
+  Plugins usados: ${plugins.used}
+  Plugins bloqueados: ${plugins.blocked}
+  Riscos supply chain: ${extensions.supplyChainRisks}
+  Policy: ${extensions.policy}
+  Registry: ${extensions.registry}
 
 UI/UX:
   Aplicável: ${uiux.applicable ? "Sim" : "Não"}

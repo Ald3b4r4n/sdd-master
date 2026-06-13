@@ -1,6 +1,7 @@
 import type { CliOutput, CliRuntime } from "../cli/output.js";
 import { getNotInitializedMessage, isWorkflowInitialized } from "../workflow/workflow-guards.js";
 import { getSkillRecord, getSkillStatus } from "./skill-registry.js";
+import { reportExtensions, syncExtensionArtifacts } from "../plugins/plugin-writer.js";
 import { formatSkillJson, formatSkillText } from "./skill-report.js";
 import type { SkillCommandResult, SkillOptions } from "./skill-types.js";
 import { createSkill, installSkillLocal, markSkillUsed, updateSkillStatus } from "./skill-writer.js";
@@ -34,10 +35,11 @@ export async function runSkillsCommand(args: string[], output: CliOutput, runtim
 
 function executeSkills(cwd: string, options: SkillOptions): SkillCommandResult {
   if (options.report) {
+    const report = reportExtensions(cwd);
     return {
       status: "reported",
-      createdFiles: [],
-      updatedFiles: [],
+      createdFiles: report.createdFiles,
+      updatedFiles: report.updatedFiles,
       summary: getSkillStatus(cwd),
       message: "Relatório de skills gerado."
     };
@@ -45,11 +47,12 @@ function executeSkills(cwd: string, options: SkillOptions): SkillCommandResult {
 
   if (!options.skill) {
     const created = createSkill(cwd, options);
+    const registry = syncExtensionArtifacts(cwd);
     return {
       status: "created",
       skill: created.id,
       createdFiles: created.createdFiles,
-      updatedFiles: created.updatedFiles,
+      updatedFiles: [...created.updatedFiles, ...registry],
       summary: getSkillStatus(cwd),
       message: "Skill candidata registrada localmente."
     };
@@ -66,35 +69,55 @@ function executeSkills(cwd: string, options: SkillOptions): SkillCommandResult {
 
   if (options.approve) {
     const updated = updateSkillStatus(cwd, record, "Aprovada", options.reason ?? "Aprovada para uso local no projeto.");
+    const registry = syncExtensionArtifacts(cwd);
     return {
       status: "updated",
       skill: record.id,
-      createdFiles: [],
-      updatedFiles: updated.updatedFiles,
+      createdFiles: updated.createdFiles,
+      updatedFiles: [...updated.updatedFiles, ...registry],
       summary: getSkillStatus(cwd),
       message: "Skill aprovada para uso local."
     };
   }
 
+  if (options.reject) {
+    const updated = updateSkillStatus(cwd, record, "Rejeitada", options.reason ?? "Rejeitada por revisão humana.");
+    const registry = syncExtensionArtifacts(cwd);
+    return {
+      status: "updated",
+      skill: record.id,
+      createdFiles: updated.createdFiles,
+      updatedFiles: [...updated.updatedFiles, ...registry],
+      summary: getSkillStatus(cwd),
+      message: "Skill rejeitada."
+    };
+  }
+
   if (options.installLocal) {
     const installed = installSkillLocal(cwd, record);
+    const registry = syncExtensionArtifacts(cwd);
     return {
       status: "updated",
       skill: record.id,
       createdFiles: installed.createdFiles,
-      updatedFiles: installed.updatedFiles,
+      updatedFiles: [...installed.updatedFiles, ...registry],
       summary: getSkillStatus(cwd),
       message: "Skill instalada localmente como metadado."
     };
   }
 
   if (options.markUsed) {
+    if (record.status === "Rejeitada") throw new Error("Skill rejeitada não pode ser usada.");
+    if (record.status !== "Aprovada" && record.status !== "Instalada localmente" && record.status !== "Usada") {
+      throw new Error("Skill precisa de aprovação humana antes de uso.");
+    }
     const used = markSkillUsed(cwd, record, options);
+    const registry = syncExtensionArtifacts(cwd);
     return {
       status: "updated",
       skill: record.id,
       createdFiles: used.createdFiles,
-      updatedFiles: used.updatedFiles,
+      updatedFiles: [...used.updatedFiles, ...registry],
       summary: getSkillStatus(cwd),
       message: "Uso de skill registrado."
     };
@@ -108,9 +131,11 @@ function parseSkillArgs(args: string[]): { ok: true; options: SkillOptions } | {
     yes: false,
     json: false,
     approve: false,
+    reject: false,
     installLocal: false,
     markUsed: false,
-    report: false
+    report: false,
+    permissions: []
   };
 
   for (let index = 0; index < args.length; index += 1) {
@@ -131,6 +156,11 @@ function parseSkillArgs(args: string[]): { ok: true; options: SkillOptions } | {
       continue;
     }
 
+    if (arg === "--reject") {
+      options.reject = true;
+      continue;
+    }
+
     if (arg === "--install-local") {
       options.installLocal = true;
       continue;
@@ -146,7 +176,7 @@ function parseSkillArgs(args: string[]): { ok: true; options: SkillOptions } | {
       continue;
     }
 
-    const name = ["title", "phase", "type", "status", "category", "source", "skill", "reason", "profile", "target"].find(
+    const name = ["title", "phase", "type", "status", "category", "source", "skill", "reason", "profile", "target", "permission"].find(
       (option) => arg === `--${option}` || arg.startsWith(`--${option}=`)
     );
 
@@ -173,6 +203,7 @@ function parseSkillArgs(args: string[]): { ok: true; options: SkillOptions } | {
     if (name === "skill") options.skill = value;
     if (name === "reason") options.reason = value;
     if (name === "target") options.target = value;
+    if (name === "permission") options.permissions.push(...value.split(",").map((item) => item.trim()).filter(Boolean));
   }
 
   return { ok: true, options };
@@ -208,16 +239,21 @@ Flags:
   --reason
   --profile
   --approve
+  --reject
   --install-local
   --mark-used
   --report
   --target
+  --permission
 
 Regras:
   Instalação local cria apenas arquivos de metadados.
   Instalação global é proibida.
   Skills externas exigem aprovação humana antes de instalação local.
   Registry local fica em .agents/skills/registry.md.
+  Registry consolidado e policy ficam em .sdd-master/extensions/.
+  Skills rejeitadas não podem ser usadas.
+  Origens remotas são riscos de supply chain.
   Toda skill usada deve aparecer em relatório.
   Skills alimentam os gates de UI/UX e implement readiness quando usadas.
 `;

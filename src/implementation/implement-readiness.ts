@@ -1,6 +1,7 @@
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { runGitSecurityCheck } from "../git/git-checks.js";
+import { getExtensionStatus } from "../extensions/extension-state.js";
 import { getImplementReadiness } from "../governance/blockers.js";
 import { getGovernanceStatus } from "../governance/governance-state.js";
 import { getPluginStatus } from "../plugins/plugin-registry.js";
@@ -23,11 +24,13 @@ export function getImplementationReadiness(cwd: string, task = "TASK-001"): {
   const uiux = getUiuxStatus(cwd);
   const skills = getSkillStatus(cwd);
   const plugins = getPluginStatus(cwd);
+  const extensions = getExtensionStatus(cwd);
   const blockers = [...base.blockers, ...testGates.reasons, ...uiux.blockers];
 
   if (gitSecurity.status === "blocked") {
     blockers.push("Git/Security bloqueado");
   }
+  blockers.push(...extensions.blockers);
 
   const gates: ImplementGate[] = [
     gate("Discovery", workflow.discovery, ".sdd-master/discovery/initial-discovery.md"),
@@ -50,6 +53,9 @@ export function getImplementationReadiness(cwd: string, task = "TASK-001"): {
     mixedGate("Performance", uiux.performance, ".sdd-master/uiux/performance-checklist.md"),
     gate("Skills usage report", skills.used === 0 || skills.usageReports > 0, `${skills.usageReports} relatório(s) para ${skills.used} skill(s) usada(s)`),
     gate("Plugins usage report", plugins.used === 0 || plugins.usageReports > 0, `${plugins.usageReports} relatório(s) para ${plugins.used} plugin(s) usado(s)`),
+    gate("Extension policy", extensions.policy === "OK" || extensions.status === "not-started", extensions.policy),
+    gate("Extension approvals", extensions.unapprovedUsed === 0, `${extensions.unapprovedUsed} extensão(ões) usada(s) sem aprovação`),
+    gate("Extension supply chain", extensions.unauditedRemoteUsed === 0, `${extensions.unauditedRemoteUsed} origem(ns) remota(s) usada(s) sem auditoria`),
     gate("Test gates", testGates.ok, testGates.evidence),
     gate("Security/Git", gitSecurity.status !== "blocked", gitSecurity.recommendation)
   ];

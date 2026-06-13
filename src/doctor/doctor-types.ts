@@ -92,6 +92,21 @@ export type DoctorPluginInfo = {
   usageReports: number;
 };
 
+export type DoctorExtensionInfo = {
+  policy: "not-started" | "OK" | "missing";
+  registry: "not-started" | "OK" | "missing";
+  pluginRegistry: "not-started" | "OK" | "missing";
+  skillsRegistry: "not-started" | "OK" | "missing";
+  supplyChainRisks: number;
+  unapprovedUsed: number;
+  blockedOrRejected: number;
+  remoteSources: number;
+  unauditedRemoteUsed: number;
+  status: "not-started" | "healthy" | "warning" | "broken";
+  blockers: string[];
+  warnings: string[];
+};
+
 export type DoctorUiuxInfo = {
   applicable: boolean;
   profile: string;
@@ -182,6 +197,7 @@ export type DoctorReport = {
   gates: DoctorGateInfo;
   skills: DoctorSkillInfo;
   plugins: DoctorPluginInfo;
+  extensions: DoctorExtensionInfo;
   uiux: DoctorUiuxInfo;
   update: DoctorUpdateInfo;
   implementReadiness: DoctorImplementReadinessInfo;

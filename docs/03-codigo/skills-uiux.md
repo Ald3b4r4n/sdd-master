@@ -35,3 +35,8 @@ sdd master uiux --yes --type="responsiveness" --phase="PHASE-01" --profile="WEB"
 ```
 
 Perfis com interface exigem UI/UX aprovado, design system, acessibilidade e responsividade antes da implementação. Perfis `WEB`, `SAAS` e `E-COMMERCE` também exigem SEO.
+# Integração de skills com extensões
+
+Skills registradas por `sdd master skills` também aparecem em `.sdd-master/extensions/registry.md`.
+Permissões declaradas são preservadas, aprovação humana é obrigatória antes do uso e skills rejeitadas não podem ser usadas.
+`--report` gera o relatório consolidado de plugins e skills em `.sdd-master/extensions/reports/`.

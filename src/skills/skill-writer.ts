@@ -1,9 +1,11 @@
 import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
+import { ensureExtensionInfrastructure, writeExtensionApproval, writeExtensionUsage } from "../extensions/extension-registry.js";
 import type { SkillOptions, SkillRecord, SkillStatus } from "./skill-types.js";
 import { nextSkillId, normalizeSkillCategory, suggestedSkillSource } from "./skill-registry.js";
 
 export function createSkill(cwd: string, options: SkillOptions): { id: string; createdFiles: string[]; updatedFiles: string[] } {
+  ensureExtensionInfrastructure(cwd);
   const id = nextSkillId(cwd);
   const path = `.sdd-master/skills/${id}.md`;
   write(cwd, path, skillContent(id, options));
@@ -17,7 +19,7 @@ export function updateSkillStatus(
   record: SkillRecord,
   status: SkillStatus,
   reason = record.reason
-): { updatedFiles: string[] } {
+): { createdFiles: string[]; updatedFiles: string[] } {
   const path = join(cwd, ".sdd-master", "skills", `${record.id}.md`);
   const content = readFileSync(path, "utf8")
     .replace(/^## Status\n[\s\S]*?(?=\n## )/m, `## Status\n${status}`)
@@ -28,7 +30,18 @@ export function updateSkillStatus(
     );
   writeFileSync(path, content.endsWith("\n") ? content : `${content}\n`, "utf8");
 
-  return { updatedFiles: [`.sdd-master/skills/${record.id}.md`, ...updateSkillIndexes(cwd)] };
+  const approval = status === "Aprovada" || status === "Rejeitada"
+    ? writeExtensionApproval(
+        cwd,
+        { id: record.id, kind: "skill", title: record.title, source: record.source, status, permissions: record.permissions },
+        status === "Aprovada" ? "approved" : "rejected",
+        reason
+      )
+    : undefined;
+  return {
+    createdFiles: approval ? [approval] : [],
+    updatedFiles: [`.sdd-master/skills/${record.id}.md`, ...updateSkillIndexes(cwd)]
+  };
 }
 
 export function installSkillLocal(cwd: string, record: SkillRecord): { createdFiles: string[]; updatedFiles: string[] } {
@@ -54,7 +67,7 @@ ${record.source}
   );
   const updated = updateSkillStatus(cwd, record, "Instalada localmente", record.reason);
 
-  return { createdFiles: [path], updatedFiles: updated.updatedFiles };
+  return { createdFiles: [path, ...updated.createdFiles], updatedFiles: updated.updatedFiles };
 }
 
 export function markSkillUsed(
@@ -90,9 +103,15 @@ Toda skill usada deve aparecer no relatório do agente.
 - Não criou .env.
 `
   );
+  const extensionUsage = writeExtensionUsage(
+    cwd,
+    { id: record.id, kind: "skill", title: record.title, source: record.source, status: record.status, permissions: record.permissions },
+    options.phase ?? "PHASE-01",
+    options.reason ?? record.reason
+  );
   const updated = updateSkillStatus(cwd, record, "Usada", record.reason);
 
-  return { createdFiles: [path], updatedFiles: updated.updatedFiles };
+  return { createdFiles: [path, extensionUsage, ...updated.createdFiles], updatedFiles: updated.updatedFiles };
 }
 
 function skillContent(id: string, options: SkillOptions): string {
@@ -120,7 +139,7 @@ ${options.reason ?? "-"}
 - Supply chain até aprovação humana.
 
 ## Permissões necessárias
--
+${options.permissions.length > 0 ? options.permissions.map((permission) => `- ${permission}`).join("\n") : "-"}
 
 ## Compatibilidade
 - Codex:

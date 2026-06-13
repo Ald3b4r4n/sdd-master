@@ -67,7 +67,11 @@ function parseSkillRecord(id: string, content: string): SkillRecord {
     category: normalizeSkillCategory(section(content, "Categoria")),
     source: section(content, "Fonte") || "Não informada",
     status: normalizeStatus(section(content, "Status")),
-    reason: section(content, "Motivo") || "-"
+    reason: section(content, "Motivo") || "-",
+    permissions: section(content, "Permissões necessárias")
+      .split("\n")
+      .map((item) => item.replace(/^-\s*/, "").trim())
+      .filter((item) => item && item !== "-")
   };
 }
 

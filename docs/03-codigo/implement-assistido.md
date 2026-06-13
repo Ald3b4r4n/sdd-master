@@ -63,3 +63,8 @@ Os artefatos registram aprovacao humana como pendente. Eles nao autorizam altera
 ## Preparacao para 0.3.0-alpha
 
 Este fluxo prepara a fase `0.3.0-alpha` ao separar planejamento, seguranca, testes e handoff antes da execucao real.
+# Extensões e skills
+
+Sessões e handoffs incluem a seção `Extensões/skills usadas`.
+O readiness bloqueia extensão usada sem aprovação e alerta para origem remota usada sem auditoria.
+O implement assistido continua com `codeChanged: false`.

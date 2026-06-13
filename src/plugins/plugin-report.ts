@@ -42,7 +42,11 @@ function formatSummary(summary: PluginStatusSummary): string {
   Aprovadas: ${summary.approved}
   Instaladas localmente: ${summary.installedLocal}
   Usadas: ${summary.used}
-  Relatórios de uso: ${summary.usageReports}`;
+  Bloqueadas/rejeitadas: ${summary.blocked}
+  Origens remotas: ${summary.remoteSources}
+  Riscos supply chain: ${summary.supplyChainRisks}
+  Relatórios de uso: ${summary.usageReports}
+  Auditorias: ${summary.audits}`;
 }
 
 function formatList(items: string[]): string {

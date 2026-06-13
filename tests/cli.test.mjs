@@ -16,6 +16,17 @@ import { describe, it } from "node:test";
 
 const rootDir = process.cwd();
 const cliPath = join(rootDir, "dist", "cli", "main.js");
+const expectedRootPdfs = [
+  "SDD Master — Checklist de Implementação v0.1.pdf",
+  "SDD Master — Documento Mestre v0.1.pdf",
+  "SDD Master Roadmap.pdf"
+];
+const rootPdfsPresentAtStart = expectedRootPdfs.filter((pdf) => existsSync(join(rootDir, pdf)));
+
+function assertRootPdfsPreserved() {
+  const presentNow = expectedRootPdfs.filter((pdf) => existsSync(join(rootDir, pdf)));
+  assert.deepEqual(presentNow, rootPdfsPresentAtStart);
+}
 
 function runCli(args, cwd = rootDir) {
   return spawnSync(process.execPath, [cliPath, ...args], {
@@ -154,10 +165,10 @@ describe("SDD Master package foundation", () => {
 
     assert.equal(contextual.status, 0);
     assert.equal(direct.status, 0);
-    assert.match(contextual.stdout, /Disponível no BLOCO 27/);
+    assert.match(contextual.stdout, /Corrigido e completo no BLOCO 27A/);
     assert.match(contextual.stdout, /sdd master plugins/);
-    assert.match(direct.stdout, /Registry local controlado/);
-    assert.match(direct.stdout, /Nenhum código remoto é baixado ou executado/);
+    assert.match(direct.stdout, /Registry e policy ficam em \.sdd-master\/extensions/);
+    assert.match(direct.stdout, /não executam código e não baixam código remoto/i);
   });
 
   it("shows basic status without requiring .sdd-master", () => {
@@ -206,7 +217,12 @@ describe("SDD Master package foundation", () => {
         ".sdd-master/backlog",
         ".sdd-master/scope",
         ".sdd-master/skills",
-        ".sdd-master/plugins",
+        ".sdd-master/extensions",
+        ".sdd-master/extensions/plugins",
+        ".sdd-master/extensions/approvals",
+        ".sdd-master/extensions/audits",
+        ".sdd-master/extensions/usage",
+        ".sdd-master/extensions/reports",
         ".sdd-master/releases",
         ".sdd-master/deliveries",
         ".sdd-master/db",
@@ -215,8 +231,7 @@ describe("SDD Master package foundation", () => {
         "docs/01-negocio-requisitos",
         "docs/02-tecnica-arquitetura",
         "docs/03-codigo",
-        ".agents/skills",
-        ".agents/plugins"
+        ".agents/skills"
       ];
       const templateCategories = [
         "requirements",
@@ -233,6 +248,8 @@ describe("SDD Master package foundation", () => {
 
       assert.equal(existsSync(join(projectDir, ".sdd-master")), true);
       assert.equal(existsSync(join(projectDir, ".sdd-master", "constitution.md")), true);
+      assert.equal(existsSync(join(projectDir, ".sdd-master", "extensions", "extension-policy.md")), true);
+      assert.equal(existsSync(join(projectDir, ".sdd-master", "extensions", "registry.md")), true);
       assert.equal(existsSync(join(projectDir, ".sdd-master", "project-state.md")), true);
       assert.equal(existsSync(join(projectDir, ".sdd-master", "templates", "README.md")), true);
       assert.equal(existsSync(join(projectDir, "AGENTS.md")), true);
@@ -439,8 +456,7 @@ describe("SDD Master package foundation", () => {
       assert.match(status.stdout, /\.sdd-master\/templates\/: OK/);
       assert.match(status.stdout, /AGENTS\.md: OK/);
       assert.match(status.stdout, /\.agents\/skills\/: OK/);
-      assert.match(status.stdout, /\.agents\/plugins\/: OK/);
-      assert.match(status.stdout, /Plugins:/);
+      assert.match(status.stdout, /Extensões:/);
       assert.match(status.stdout, /\/sdd-master-discovery/);
     });
   });
@@ -582,38 +598,51 @@ describe("SDD Master package foundation", () => {
           "plugins",
           "--yes",
           "--title=Plugin de integração",
+          "--type=local-metadata",
           "--category=integration",
           "--source=Registry local controlado",
+          "--version=1.0.0",
+          "--permission=docs/**",
           "--reason=Extensão local controlada."
         ],
         projectDir
       );
       assert.equal(plugin.status, 0, plugin.stderr);
-      assert.equal(existsSync(join(projectDir, ".sdd-master", "plugins", "PLUGIN-001.md")), true);
-      assert.match(readFileSync(join(projectDir, ".sdd-master", "plugins", "PLUGIN-001.md"), "utf8"), /Instalação global\nProibida/);
+      const pluginPath = join(projectDir, ".sdd-master", "extensions", "plugins", "PLUGIN-001.md");
+      assert.equal(existsSync(pluginPath), true);
+      assert.match(readFileSync(pluginPath, "utf8"), /Instalação global\nProibida/);
+      assert.match(readFileSync(pluginPath, "utf8"), /## Versão declarada\n1\.0\.0/);
+      assert.match(readFileSync(pluginPath, "utf8"), /docs\/\*\*/);
 
       const pluginJson = JSON.parse(runCli(["master", "plugins", "--json", "--report"], projectDir).stdout);
       assert.equal(pluginJson.summary.candidates, 1);
+      assert.equal(existsSync(join(projectDir, ".sdd-master", "extensions", "reports", "extension-report-001.md")), true);
+
+      const pluginAudit = runCli(["master", "plugins", "--yes", "--id=PLUGIN-001", "--audit"], projectDir);
+      assert.equal(pluginAudit.status, 0, pluginAudit.stderr);
+      assert.equal(existsSync(join(projectDir, ".sdd-master", "extensions", "audits", "EXTENSION-AUDIT-001.md")), true);
 
       const pluginApprove = runCli(
-        ["master", "plugins", "--yes", "--plugin=PLUGIN-001", "--approve", "--reason=Aprovado para uso local."],
+        ["master", "plugins", "--yes", "--id=PLUGIN-001", "--approve", "--reason=Aprovado para uso local."],
         projectDir
       );
       assert.equal(pluginApprove.status, 0, pluginApprove.stderr);
-      assert.match(readFileSync(join(projectDir, ".sdd-master", "plugins", "PLUGIN-001.md"), "utf8"), /## Status\nAprovada/);
+      assert.match(readFileSync(pluginPath, "utf8"), /## Status\nAprovado/);
+      assert.equal(existsSync(join(projectDir, ".sdd-master", "extensions", "approvals", "EXTENSION-APPROVAL-002.md")), true);
 
-      const pluginInstall = runCli(["master", "plugins", "--yes", "--plugin=PLUGIN-001", "--install-local"], projectDir);
+      const pluginInstall = runCli(["master", "plugins", "--yes", "--id=PLUGIN-001", "--install-local"], projectDir);
       assert.equal(pluginInstall.status, 0, pluginInstall.stderr);
-      const installedPlugin = readFileSync(join(projectDir, ".agents", "plugins", "installed", "PLUGIN-001.md"), "utf8");
-      assert.match(installedPlugin, /Ele não executa código automaticamente/);
-      assert.match(installedPlugin, /Ele não baixou código remoto/);
+      const installedPlugin = readFileSync(join(projectDir, ".agents", "skills", "installed", "PLUGIN-001.md"), "utf8");
+      assert.match(installedPlugin, /Ele não executa código/);
+      assert.match(installedPlugin, /Ele não baixa código remoto/);
 
       const pluginUsed = runCli(
-        ["master", "plugins", "--yes", "--plugin=PLUGIN-001", "--mark-used", "--phase=PHASE-01", "--target=plugin-review"],
+        ["master", "plugins", "--yes", "--id=PLUGIN-001", "--mark-used", "--phase=PHASE-01", "--target=plugin-review"],
         projectDir
       );
       assert.equal(pluginUsed.status, 0, pluginUsed.stderr);
-      assert.equal(existsSync(join(projectDir, ".sdd-master", "plugins", "usage", "PLUGIN-USAGE-001.md")), true);
+      assert.equal(existsSync(join(projectDir, ".sdd-master", "extensions", "usage", "EXTENSION-USAGE-002.md")), true);
+      assert.match(readFileSync(join(projectDir, ".sdd-master", "extensions", "registry.md"), "utf8"), /PLUGIN-001/);
 
       const pluginImplement = JSON.parse(
         runCli(["master", "implement", "--json", "--yes", "--phase=PHASE-01", "--task=TASK-001"], projectDir).stdout
@@ -665,12 +694,13 @@ describe("SDD Master package foundation", () => {
       const status = runCli(["master", "status"], projectDir);
       assert.equal(status.status, 0);
       assert.match(status.stdout, /Skills:/);
-      assert.match(status.stdout, /Plugins:/);
+      assert.match(status.stdout, /Extensões:/);
       assert.match(status.stdout, /UI\/UX:/);
 
       const doctorJson = JSON.parse(runCli(["master", "doctor", "--json"], projectDir).stdout);
       assert.equal(typeof doctorJson.skills, "object");
       assert.equal(typeof doctorJson.plugins, "object");
+      assert.equal(typeof doctorJson.extensions, "object");
       assert.equal(typeof doctorJson.uiux, "object");
       assert.equal(doctorJson.uiux.seo, true);
     });
@@ -731,6 +761,72 @@ describe("SDD Master package foundation", () => {
     assert.equal(runCli(["master", "skills", "--help"]).status, 0);
     assert.equal(runCli(["master", "uiux", "--help"]).status, 0);
     assert.equal(existsSync(join(rootDir, ".sdd-master")), false);
+  });
+
+  it("enforces extension approvals, rejection and supply-chain diagnostics", () => {
+    withTempProject((projectDir) => {
+      const withoutInit = runCli(["master", "plugins", "--yes", "--title=Plugin"], projectDir);
+      assert.notEqual(withoutInit.status, 0);
+      assert.match(withoutInit.stderr, /SDD Master não inicializado/);
+      assert.equal(runCli(["master", "plugins", "--help"], projectDir).status, 0);
+      assert.equal(runCli(["master", "help", "plugins"], projectDir).status, 0);
+
+      assert.equal(initTempProject(projectDir).status, 0);
+      const candidate = runCli(
+        ["master", "plugins", "--yes", "--title=Remote candidate", "--source=https://example.invalid/plugin", "--permission=network,shell"],
+        projectDir
+      );
+      assert.equal(candidate.status, 0, candidate.stderr);
+
+      const candidateUse = runCli(["master", "plugins", "--yes", "--id=PLUGIN-001", "--mark-used"], projectDir);
+      assert.notEqual(candidateUse.status, 0);
+      assert.match(candidateUse.stderr, /aprovação humana/);
+
+      const reject = runCli(["master", "plugins", "--yes", "--id=PLUGIN-001", "--reject", "--reason=Risco excessivo"], projectDir);
+      assert.equal(reject.status, 0, reject.stderr);
+      const rejectedUse = runCli(["master", "plugins", "--yes", "--id=PLUGIN-001", "--mark-used"], projectDir);
+      assert.notEqual(rejectedUse.status, 0);
+      assert.match(rejectedUse.stderr, /rejeitado\/bloqueado/);
+
+      const missingSource = runCli(["master", "plugins", "--yes", "--title=Missing source"], projectDir);
+      assert.equal(missingSource.status, 0, missingSource.stderr);
+      const doctor = JSON.parse(runCli(["master", "doctor", "--json"], projectDir).stdout);
+      assert.equal(doctor.extensions.status, "broken");
+      assert.equal(doctor.extensions.remoteSources, 1);
+      assert.equal(doctor.extensions.blockedOrRejected, 1);
+      assert.equal(doctor.extensions.supplyChainRisks >= 2, true);
+      assert.equal(doctor.extensions.blockers.some((item) => /sem origem declarada/.test(item)), true);
+      assert.equal(existsSync(join(projectDir, ".env")), false);
+    });
+
+    withTempProject((projectDir) => {
+      assert.equal(initTempProject(projectDir).status, 0);
+      assert.equal(
+        runCli(["master", "plugins", "--yes", "--title=Manual corruption", "--source=manual"], projectDir).status,
+        0
+      );
+      const pluginPath = join(projectDir, ".sdd-master", "extensions", "plugins", "PLUGIN-001.md");
+      writeFileSync(
+        pluginPath,
+        readFileSync(pluginPath, "utf8").replace("## Status\nCandidato", "## Status\nUsado"),
+        "utf8"
+      );
+
+      const doctor = JSON.parse(runCli(["master", "doctor", "--json"], projectDir).stdout);
+      assert.equal(doctor.extensions.status, "broken");
+      assert.equal(doctor.extensions.unapprovedUsed, 1);
+
+      const implement = JSON.parse(
+        runCli(["master", "implement", "--json", "--yes", "--prepare", "--phase=PHASE-01", "--task=TASK-001"], projectDir).stdout
+      );
+      assert.equal(implement.blockers.some((item) => /sem aprovação humana/.test(item)), true);
+      const handoff = readFileSync(
+        join(projectDir, ".sdd-master", "implementation", "handoffs", "AGENT-HANDOFF-001.md"),
+        "utf8"
+      );
+      assert.match(handoff, /## Extensões\/skills usadas/);
+      assert.match(handoff, /PLUGIN-001/);
+    });
   });
 
   it("agents command preserves existing files unless force is used", () => {
@@ -1219,9 +1315,7 @@ describe("SDD Master package foundation", () => {
     });
 
     assert.equal(existsSync(join(rootDir, ".sdd-master")), false);
-    assert.equal(existsSync(join(rootDir, "SDD Master Roadmap.pdf")), true);
-    assert.equal(existsSync(join(rootDir, "SDD Master — Checklist de Implementação v0.1.pdf")), true);
-    assert.equal(existsSync(join(rootDir, "SDD Master — Documento Mestre v0.1.pdf")), true);
+    assertRootPdfsPreserved();
   });
 
   it("returns an error for unknown master commands", () => {
@@ -1283,11 +1377,6 @@ describe("SDD Master package foundation", () => {
   });
 
   it("does not depend on untracked PDF files for CLI behavior", () => {
-    const expectedPdfs = [
-      "SDD Master — Checklist de Implementação v0.1.pdf",
-      "SDD Master — Documento Mestre v0.1.pdf",
-      "SDD Master Roadmap.pdf"
-    ];
     const result = runCli(["master", "help", "status"]);
     const doctor = runCli(["master", "doctor"]);
 
@@ -1296,9 +1385,7 @@ describe("SDD Master package foundation", () => {
     assert.match(result.stdout, /sdd master status/);
     assert.match(doctor.stdout, /SDD Master — Doctor/);
 
-    for (const pdf of expectedPdfs) {
-      assert.equal(existsSync(join(rootDir, pdf)), true, `${pdf} should remain in place`);
-    }
+    assertRootPdfsPreserved();
   });
 
   it("includes mandatory public project files", () => {
@@ -1563,9 +1650,7 @@ describe("SDD Master package foundation", () => {
     });
 
     assert.equal(existsSync(join(rootDir, ".sdd-master")), false);
-    assert.equal(existsSync(join(rootDir, "SDD Master Roadmap.pdf")), true);
-    assert.equal(existsSync(join(rootDir, "SDD Master — Checklist de Implementação v0.1.pdf")), true);
-    assert.equal(existsSync(join(rootDir, "SDD Master — Documento Mestre v0.1.pdf")), true);
+    assertRootPdfsPreserved();
   });
 
   it("implements governance commands and formal implement gates safely", () => {
@@ -1755,9 +1840,7 @@ describe("SDD Master package foundation", () => {
     });
 
     assert.equal(existsSync(join(rootDir, ".sdd-master")), false);
-    assert.equal(existsSync(join(rootDir, "SDD Master Roadmap.pdf")), true);
-    assert.equal(existsSync(join(rootDir, "SDD Master — Checklist de Implementação v0.1.pdf")), true);
-    assert.equal(existsSync(join(rootDir, "SDD Master — Documento Mestre v0.1.pdf")), true);
+    assertRootPdfsPreserved();
   });
 
   it("implements quality audit docs and blocker gates safely", () => {
@@ -1937,9 +2020,7 @@ describe("SDD Master package foundation", () => {
     });
 
     assert.equal(existsSync(join(rootDir, ".sdd-master")), false);
-    assert.equal(existsSync(join(rootDir, "SDD Master Roadmap.pdf")), true);
-    assert.equal(existsSync(join(rootDir, "SDD Master — Checklist de Implementação v0.1.pdf")), true);
-    assert.equal(existsSync(join(rootDir, "SDD Master — Documento Mestre v0.1.pdf")), true);
+    assertRootPdfsPreserved();
 
     const prePush = runCli(["master", "git", "--pre-push"], rootDir);
     assert.notEqual(prePush.stdout, "");
@@ -2150,9 +2231,7 @@ describe("SDD Master package foundation", () => {
     });
 
     assert.equal(existsSync(join(rootDir, ".sdd-master")), false);
-    assert.equal(existsSync(join(rootDir, "SDD Master Roadmap.pdf")), true);
-    assert.equal(existsSync(join(rootDir, "SDD Master — Checklist de Implementação v0.1.pdf")), true);
-    assert.equal(existsSync(join(rootDir, "SDD Master — Documento Mestre v0.1.pdf")), true);
+    assertRootPdfsPreserved();
 
     const prePush = runCli(["master", "git", "--pre-push"], rootDir);
     assert.notEqual(prePush.stdout, "");
@@ -2695,12 +2774,7 @@ describe("SDD Master package foundation", () => {
     assert.match(localDevelopment, /## Simulando o CI localmente/);
     assert.match(localDevelopment, /npm run check/);
 
-    assert.equal(existsSync(join(rootDir, "SDD Master Roadmap.pdf")), true);
-    assert.equal(
-      existsSync(join(rootDir, "SDD Master — Checklist de Implementação v0.1.pdf")),
-      true
-    );
-    assert.equal(existsSync(join(rootDir, "SDD Master — Documento Mestre v0.1.pdf")), true);
+    assertRootPdfsPreserved();
 
     const reviewedFiles = [
       ci,

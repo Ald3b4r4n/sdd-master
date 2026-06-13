@@ -383,9 +383,12 @@ O SDD Master também controla plugins/extensoes locais com política de supply c
 Comandos:
 
 ```bash
-sdd master plugins --yes --title="Plugin de integração" --category="integration" --source="Registry local controlado"
-sdd master plugins --yes --plugin="PLUGIN-001" --approve
-sdd master plugins --yes --plugin="PLUGIN-001" --install-local
+sdd master plugins --yes --title="Plugin de integração" --category="other" --source="Registry local controlado" --version="1.0.0" --permission="docs/**"
+sdd master plugins --yes --id="PLUGIN-001" --audit
+sdd master plugins --yes --id="PLUGIN-001" --approve
+sdd master plugins --yes --id="PLUGIN-001" --install-local
+sdd master plugins --yes --id="PLUGIN-001" --mark-used --phase="PHASE-01"
+sdd master plugins --json --report
 ```
 
 Regras:
@@ -393,8 +396,12 @@ Regras:
 - plugins são locais;
 - nada é instalado globalmente por padrão;
 - plugins externos exigem aprovação humana;
-- registry local fica em `.agents/plugins/registry.md`;
+- policy e registry consolidado ficam em `.sdd-master/extensions/`;
+- plugins ficam em `.sdd-master/extensions/plugins/`;
+- approvals, audits, usage e reports ficam em `.sdd-master/extensions/`;
+- instalação local cria somente metadados em `.agents/skills/installed/`;
 - nenhum código remoto é baixado ou executado;
+- plugins candidatos, rejeitados ou bloqueados não podem ser usados;
 - todo plugin usado aparece em relatório.
 
 ## Update seguro

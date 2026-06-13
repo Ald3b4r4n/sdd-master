@@ -10,7 +10,7 @@ O entrypoint fica em `src/cli/main.ts`. A CLI usa parser simples, registry de co
 
 ## Init
 
-`sdd master init` cria a estrutura inicial no projeto consumidor, incluindo `.sdd-master/`, `docs/`, `.agents/skills/`, `.agents/plugins/`, templates oficiais e arquivos de agente.
+`sdd master init` cria a estrutura inicial no projeto consumidor, incluindo `.sdd-master/`, `docs/`, `.agents/skills/`, `.sdd-master/extensions/`, templates oficiais e arquivos de agente.
 
 ## Templates
 

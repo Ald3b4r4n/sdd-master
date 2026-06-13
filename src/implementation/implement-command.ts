@@ -2,6 +2,7 @@ import { existsSync, mkdirSync, readdirSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import type { CliOutput, CliRuntime } from "../cli/output.js";
 import { getNotInitializedMessage, isWorkflowInitialized } from "../workflow/workflow-guards.js";
+import { formatUsedExtensions } from "../extensions/extension-state.js";
 import { getImplementationReadiness } from "./implement-readiness.js";
 import { formatImplementJson, formatImplementText } from "./implement-report.js";
 import type { ImplementOptions, ImplementResult } from "./implement-types.js";
@@ -243,7 +244,7 @@ function writeAssistedPackage(
   const approvalId = nextNestedImplementId(cwd, "approvals", "IMPLEMENT-APPROVAL-");
   const riskId = nextNestedImplementId(cwd, "risks", "IMPLEMENT-RISK-");
 
-  created.push(writeImplementationFile(cwd, `sessions/${sessionId}.md`, assistedSessionContent(sessionId, options, readiness)));
+  created.push(writeImplementationFile(cwd, `sessions/${sessionId}.md`, assistedSessionContent(cwd, sessionId, options, readiness)));
 
   if (options.prepare || options.manifest) {
     created.push(writeImplementationFile(cwd, `manifests/${manifestId}.md`, changeManifestContent(manifestId, options)));
@@ -254,7 +255,7 @@ function writeAssistedPackage(
   }
 
   if (options.prepare || options.handoff) {
-    created.push(writeImplementationFile(cwd, `handoffs/${handoffId}.md`, handoffContent(handoffId, sessionId, manifestId, testContractId, options)));
+    created.push(writeImplementationFile(cwd, `handoffs/${handoffId}.md`, handoffContent(handoffId, sessionId, manifestId, testContractId, options, cwd)));
   }
 
   created.push(writeImplementationFile(cwd, `approvals/${approvalId}.md`, approvalContent(approvalId, options)));
@@ -263,6 +264,7 @@ function writeAssistedPackage(
 }
 
 function assistedSessionContent(
+  cwd: string,
   id: string,
   options: ImplementOptions,
   readiness: ReturnType<typeof getImplementationReadiness>
@@ -298,6 +300,9 @@ ${formatBullets(options.forbiddenFiles)}
 
 ## Documentação que deve ser atualizada
 - docs/
+
+## Extensões/skills usadas
+${formatUsedExtensions(cwd)}
 
 ## Gates avaliados
 ${readiness.gates.map((gate) => `- ${gate.gate}: ${gate.status} (${gate.evidence})`).join("\n")}
@@ -398,7 +403,8 @@ function handoffContent(
   sessionId: string,
   manifestId: string,
   testContractId: string,
-  options: ImplementOptions
+  options: ImplementOptions,
+  cwd?: string
 ): string {
   return `# ${id} — Handoff para Agente de IA
 
@@ -437,6 +443,9 @@ ${formatBullets(options.allowedFiles)}
 
 ## Arquivos proibidos
 ${formatBullets(options.forbiddenFiles)}
+
+## Extensões/skills usadas
+${cwd ? formatUsedExtensions(cwd) : "- Nenhuma extensão/skill usada."}
 
 ## Saída esperada do agente
 - Resumo do que foi alterado.
