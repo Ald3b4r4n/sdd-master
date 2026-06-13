@@ -35,7 +35,10 @@
 ### Observação
 
 - Esta versão é beta, não estável.
-- Instalação após publicação: `npm install -g sdd-master@beta`.
+- npm publish real foi executado com a dist-tag `beta`.
+- GitHub prerelease `v0.5.0-beta` foi publicada como prerelease.
+- Instalação recomendada: `npm install -g sdd-master@beta`.
+- A dist-tag `latest` permanece em `0.1.0-prototype.1`.
 
 ## [0.3.0-alpha] - 2026-06-13
 

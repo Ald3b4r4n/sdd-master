@@ -2,9 +2,9 @@
 
 ## Status
 
-Preparação de publicação beta para `sdd-master@0.5.0-beta`.
+Publicação beta concluída para `sdd-master@0.5.0-beta`.
 
-Versão prerelease preparada: `0.5.0-beta`.
+Versão prerelease publicada: `0.5.0-beta`.
 
 ## npm
 
@@ -26,11 +26,12 @@ Dist-tag:
 beta
 ```
 
-Observação: a publicação beta deve ser feita com `npm publish --access public --tag beta`. A instalação pública pretendida para este estágio é `sdd-master@beta`.
+Observação: a publicação beta foi feita com `npm publish --access public --tag beta`. A instalação pública para este estágio é `sdd-master@beta`.
 
 Dist-tags verificadas:
 
 - `alpha`: `0.3.0-alpha`
+- `beta`: `0.5.0-beta`
 - `prototype`: `0.2.0-prototype`
 - `latest`: `0.1.0-prototype.1`
 
@@ -44,21 +45,21 @@ até existir uma release estável.
 
 ## Antes de publicar
 
-- [ ] Confirmar nome do pacote no npm.
-- [ ] Confirmar login npm.
-- [ ] Confirmar versão em `package.json`.
-- [ ] Confirmar tag Git correspondente `v0.5.0-beta` somente após autorização.
-- [ ] Confirmar GitHub prerelease.
-- [ ] Executar `npm run check`.
-- [ ] Executar `npm publish --dry-run --access public --tag beta`.
-- [ ] Confirmar no output do dry-run que a tag npm planejada é `beta`.
-- [ ] Registrar que `latest` permanece em `0.1.0-prototype.1`.
-- [ ] Executar `sdd master git --pre-push`.
-- [ ] Confirmar ausência de `.env`.
-- [ ] Confirmar ausência de segredos.
-- [ ] Confirmar ausência de `.sdd-master/` na raiz.
-- [ ] Confirmar que PDFs locais não entram no pacote.
-- [ ] Confirmar aprovação humana explícita.
+- [x] Confirmar nome do pacote no npm.
+- [x] Confirmar login npm.
+- [x] Confirmar versão em `package.json`.
+- [x] Confirmar tag Git correspondente `v0.5.0-beta` somente após autorização.
+- [x] Confirmar GitHub prerelease.
+- [x] Executar `npm run check`.
+- [x] Executar `npm publish --dry-run --access public --tag beta`.
+- [x] Confirmar no output do dry-run que a tag npm planejada é `beta`.
+- [x] Registrar que `latest` permanece em `0.1.0-prototype.1`.
+- [x] Executar `sdd master git --pre-push`.
+- [x] Confirmar ausência de `.env`.
+- [x] Confirmar ausência de segredos.
+- [x] Confirmar ausência de `.sdd-master/` na raiz.
+- [x] Confirmar que PDFs locais não entram no pacote.
+- [x] Confirmar aprovação humana explícita.
 
 ## Comando de publicação real
 
@@ -69,3 +70,10 @@ npm publish --access public --tag beta
 ## Regra
 
 Não executar nova publicação real sem autorização humana explícita.
+
+## Resultado
+
+- `npm publish --access public --tag beta`: executado.
+- Primeira tentativa: bloqueada por TLS local (`UNABLE_TO_VERIFY_LEAF_SIGNATURE`).
+- Repetição autorizada: executada com `NODE_OPTIONS=--use-system-ca`.
+- `strict-ssl=false`: não usado.

@@ -49,17 +49,17 @@ O SDD Master combina:
 ## Instalação via npm
 
 ```bash
-npm install -g sdd-master@alpha
+npm install -g sdd-master@beta
 sdd master help
 ```
 
-O pacote está publicado como alpha e ainda não representa uma release estável. Use a dist-tag `alpha` para instalar esta versão.
+O pacote está publicado como beta e ainda não representa uma release estável. Use a dist-tag `beta` para instalar esta versão.
 
 ```text
-sdd-master@0.3.0-alpha
+sdd-master@0.5.0-beta
 ```
 
-O registry mantém `latest` apontando para `0.1.0-prototype.1`. A dist-tag `prototype` aponta para `0.2.0-prototype`, a dist-tag `alpha` aponta para `0.3.0-alpha`, e a instalação recomendada para este estágio é `sdd-master@alpha`.
+O registry mantém `latest` apontando para `0.1.0-prototype.1`. A dist-tag `prototype` aponta para `0.2.0-prototype`, a dist-tag `alpha` aponta para `0.3.0-alpha`, a dist-tag `beta` aponta para `0.5.0-beta`, e a instalação recomendada para este estágio é `sdd-master@beta`.
 
 Evite usar:
 
@@ -74,25 +74,25 @@ até existir uma release estável.
 A versão pública atual recomendada continua sendo:
 
 ```bash
-npm install -g sdd-master@alpha
+npm install -g sdd-master@beta
 ```
 
 Versão:
 
 ```text
-0.3.0-alpha
+0.5.0-beta
 ```
 
 Status:
 
 - npm publicado;
 - GitHub prerelease publicada;
-- alpha, não estável;
-- dist-tag `alpha` publicada.
+- beta, não estável;
+- dist-tag `beta` publicada.
 
-## Próxima prerelease beta
+## Prerelease beta
 
-A versão beta preparada é:
+A versão beta publicada é:
 
 ```text
 0.5.0-beta
@@ -108,19 +108,19 @@ Ela consolida:
 - fluxo E2E beta;
 - documentação beta.
 
-A publicação pretendida deve usar:
+A publicação foi feita com:
 
 ```bash
 npm publish --access public --tag beta
 ```
 
-Após publicação, a instalação pretendida será:
+A instalação recomendada é:
 
 ```bash
 npm install -g sdd-master@beta
 ```
 
-A dist-tag `alpha` continuará disponível para `0.3.0-alpha`. Não use `latest` manualmente enquanto não houver release estável.
+A dist-tag `alpha` continua disponível para `0.3.0-alpha`. Não use `latest` manualmente enquanto não houver release estável.
 
 ## O que mudou em 0.2.0-prototype
 
@@ -615,7 +615,7 @@ O SDD Master possui:
 - GitHub prerelease;
 - publicação npm prototype;
 - publicação npm alpha;
-- preparação beta com `npm publish --dry-run --access public --tag beta`.
+- publicação npm beta com `npm publish --access public --tag beta`.
 
 A publicação final da GitHub Release exige aprovação humana explícita.
 

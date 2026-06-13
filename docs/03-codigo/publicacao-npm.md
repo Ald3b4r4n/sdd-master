@@ -1,10 +1,8 @@
 # Publicação npm
 
-A publicação npm controlada atual do SDD Master é a versão alpha `0.3.0-alpha`.
+A publicação npm controlada atual do SDD Master é a versão beta `0.5.0-beta`.
 
-Ela foi publicada com autorização humana explícita usando `npm publish --access public --tag alpha`.
-
-A próxima publicação preparada é a beta `0.5.0-beta`, que deve usar `npm publish --access public --tag beta`.
+Ela foi publicada com autorização humana explícita usando `npm publish --access public --tag beta`.
 
 ## npm
 
@@ -12,25 +10,27 @@ Publicado no npm:
 
 ```bash
 npm install -g sdd-master@alpha
+npm install -g sdd-master@beta
 ```
 
 Versão publicada:
 
 ```text
-sdd-master@0.3.0-alpha
+sdd-master@0.5.0-beta
 ```
 
 Dist-tag:
 
 ```text
-alpha
+beta
 ```
 
-`0.3.0-alpha` foi publicado com `npm publish --access public --tag alpha`. A instalação recomendada neste estágio é `sdd-master@alpha`, porque a versão é alpha e não é release estável.
+`0.5.0-beta` foi publicado com `npm publish --access public --tag beta`. A instalação recomendada neste estágio é `sdd-master@beta`, porque a versão é beta e não é release estável.
 
 Estado real das dist-tags após publicação:
 
 - `alpha`: `0.3.0-alpha`
+- `beta`: `0.5.0-beta`
 - `prototype`: `0.2.0-prototype`
 - `latest`: `0.1.0-prototype.1`
 
@@ -49,12 +49,12 @@ Execute:
 ```bash
 npm run check
 npm run release:check
-npm publish --dry-run --access public --tag alpha
+npm publish --dry-run --access public --tag beta
 ```
 
 O dry-run ajudou a confirmar quais arquivos entrariam no pacote e se a configuração npm estava coerente antes da publicação real.
 
-Como `0.3.0-alpha` é uma versão prerelease alpha, a publicação usou a tag npm `alpha` para evitar publicação acidental como `latest`. O comando deve informar `--tag alpha` explicitamente em novas prereleases alpha.
+Como `0.5.0-beta` é uma versão prerelease beta, a publicação usou a tag npm `beta` para evitar publicação acidental como `latest`. A primeira tentativa real falhou por TLS local (`UNABLE_TO_VERIFY_LEAF_SIGNATURE`) e foi repetida com `NODE_OPTIONS=--use-system-ca`, sem alterar `strict-ssl`.
 
 ## Antes de novas publicações npm
 
@@ -90,9 +90,9 @@ Antes de uma publicação real:
 - Confirmar acesso ao pacote ou escopo npm.
 - Confirmar que `npm publish --dry-run --access public --tag beta` passou.
 - Confirmar que o output do dry-run aponta para a dist-tag planejada.
-- Registrar o estado real de `latest` e orientar instalação por `sdd-master@alpha` quando a alpha for o canal recomendado.
+- Registrar o estado real de `latest` e orientar instalação por `sdd-master@beta` quando a beta for o canal recomendado.
 - Confirmar aprovação humana explícita.
 
 ## Publicação real
 
-Novas publicações reais exigem fase própria, aprovação humana e comando manual intencional. Este documento registra a publicação prototype já realizada em `0.2.0-prototype`, com `prototype` apontando para `0.2.0-prototype`, a publicação alpha de `0.3.0-alpha`, com `alpha` apontando para `0.3.0-alpha`, e a preparação beta de `0.5.0-beta`. `latest` permanece em `0.1.0-prototype.1`. Não autoriza novas publicações.
+Novas publicações reais exigem fase própria, aprovação humana e comando manual intencional. Este documento registra a publicação prototype já realizada em `0.2.0-prototype`, com `prototype` apontando para `0.2.0-prototype`, a publicação alpha de `0.3.0-alpha`, com `alpha` apontando para `0.3.0-alpha`, e a publicação beta de `0.5.0-beta`, com `beta` apontando para `0.5.0-beta`. `latest` permanece em `0.1.0-prototype.1`. Não autoriza novas publicações.
