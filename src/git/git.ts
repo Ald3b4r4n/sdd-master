@@ -39,7 +39,11 @@ Uso:
   sdd master git --pre-push
 
 Bloqueia:
-  .env real, arquivos sensíveis, segredos suspeitos e .sdd-master/ pendente em pre-push.
+  .env real, arquivos sensíveis, segredos suspeitos, relatório avançado blocked,
+  saída não redigida e .sdd-master/ pendente em pre-push.
+
+Ferramentas externas:
+  gitleaks/trufflehog ausentes não bloqueiam por padrão.
 
 Segurança:
   Este comando não executa commit.

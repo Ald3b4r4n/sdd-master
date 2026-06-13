@@ -13,6 +13,7 @@ import {
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, it } from "node:test";
+import { redactSensitiveText } from "../dist/security/redaction.js";
 
 const rootDir = process.cwd();
 const cliPath = join(rootDir, "dist", "cli", "main.js");
@@ -28,10 +29,11 @@ function assertRootPdfsPreserved() {
   assert.deepEqual(presentNow, rootPdfsPresentAtStart);
 }
 
-function runCli(args, cwd = rootDir) {
+function runCli(args, cwd = rootDir, options = {}) {
   return spawnSync(process.execPath, [cliPath, ...args], {
     cwd,
-    encoding: "utf8"
+    encoding: "utf8",
+    env: options.env
   });
 }
 
@@ -827,6 +829,194 @@ describe("SDD Master package foundation", () => {
       assert.match(handoff, /## Extensões\/skills usadas/);
       assert.match(handoff, /PLUGIN-001/);
     });
+  });
+
+  it("implements opt-in advanced security without installing or executing external scanners by default", () => {
+    const isolatedEnv = { ...process.env, PATH: mkdtempSync(join(tmpdir(), "sdd-empty-path-")) };
+    try {
+      const help = runCli(["master", "security", "--help"]);
+      const contextual = runCli(["master", "help", "security"]);
+      assert.equal(help.status, 0);
+      assert.equal(contextual.status, 0);
+      assert.match(help.stdout, /Scanners externos só rodam com --run-external/);
+      assert.match(contextual.stdout, /Disponível no BLOCO 28/);
+
+      withTempProject((projectDir) => {
+        const builtin = JSON.parse(runCli(["master", "security", "--json"], projectDir, { env: isolatedEnv }).stdout);
+        assert.equal(builtin.status, "clean");
+        assert.equal(builtin.externalExecution, false);
+        assert.equal(builtin.tools.gitleaks.result, "not-requested");
+        assert.equal(builtin.tools.trufflehog.result, "not-requested");
+        assert.equal(existsSync(join(projectDir, ".sdd-master")), false);
+
+        const reportWithoutInit = runCli(["master", "security", "--report"], projectDir, { env: isolatedEnv });
+        assert.notEqual(reportWithoutInit.status, 0);
+        assert.match(reportWithoutInit.stderr, /não inicializado/);
+
+        const detected = runCli(["master", "security", "--detect-tools", "--json"], projectDir, { env: isolatedEnv });
+        assert.equal(detected.status, 0, detected.stderr);
+        const detectedJson = JSON.parse(detected.stdout);
+        assert.equal(detectedJson.tools.gitleaks.result, "missing");
+        assert.equal(detectedJson.tools.trufflehog.result, "missing");
+        assert.equal(detectedJson.status, "warning");
+
+        const optInMissing = runCli(
+          ["master", "security", "--run-external", "--tool=gitleaks", "--json"],
+          projectDir,
+          { env: isolatedEnv }
+        );
+        assert.equal(optInMissing.status, 0);
+        const optInJson = JSON.parse(optInMissing.stdout);
+        assert.equal(optInJson.externalExecution, true);
+        assert.equal(optInJson.tools.gitleaks.executed, false);
+        assert.equal(optInJson.tools.gitleaks.result, "missing");
+
+        const strict = runCli(
+          ["master", "security", "--detect-tools", "--tool=all", "--strict", "--json"],
+          projectDir,
+          { env: isolatedEnv }
+        );
+        assert.notEqual(strict.status, 0);
+        assert.equal(JSON.parse(strict.stdout).status, "blocked");
+        assert.equal(existsSync(join(projectDir, ".env")), false);
+      });
+    } finally {
+      rmSync(isolatedEnv.PATH, { recursive: true, force: true });
+    }
+  });
+
+  it("creates redacted security reports and integrates security gates", () => {
+    const fakeGithubToken = `gh${"p"}_${"ABCDEFGHIJKLMNOPQRSTUVWXYZ"}${"1234567890"}`;
+    const fakeNpmToken = `${"npm"}_${"ABCDEFGHIJKLMNOPQRSTUVWXYZ"}${"1234567890"}`;
+    const fakePrivateKey = [
+      `-----${"BEGIN"} ${"PRIVATE"} ${"KEY"}-----`,
+      "fake-private-material",
+      `-----${"END"} ${"PRIVATE"} ${"KEY"}-----`
+    ].join("\n");
+    const fakeValues = [
+      "token=fake-token-value-123456789",
+      fakeGithubToken,
+      fakeNpmToken,
+      fakePrivateKey
+    ];
+    const redacted = redactSensitiveText(fakeValues.join("\n"));
+    assert.doesNotMatch(redacted, /fake-token-value|ghp_|npm_|fake-private-material/);
+    assert.match(redacted, /\[REDACTED\]/);
+
+    withTempProject((projectDir) => {
+      assert.equal(initTempProject(projectDir).status, 0);
+      const result = runCli(["master", "security", "--report", "--audit", "--json"], projectDir);
+      assert.equal(result.status, 0, result.stderr);
+      const json = JSON.parse(result.stdout);
+      assert.equal(json.externalExecution, false);
+      assert.equal(existsSync(join(projectDir, ".sdd-master", "security", "security-policy.md")), true);
+      assert.equal(
+        existsSync(join(projectDir, ".sdd-master", "security", "reports", "SECURITY-REPORT-001.md")),
+        true
+      );
+      assert.equal(
+        existsSync(join(projectDir, ".sdd-master", "security", "audits", "SECURITY-AUDIT-001.md")),
+        true
+      );
+      assert.equal(
+        existsSync(join(projectDir, ".sdd-master", "security", "external-tools", "EXTERNAL-TOOLS-001.md")),
+        true
+      );
+
+      const doctor = JSON.parse(runCli(["master", "doctor", "--json"], projectDir).stdout);
+      assert.equal(doctor.security.policy, "OK");
+      assert.equal(doctor.security.lastReport, "SECURITY-REPORT-001");
+      assert.equal(doctor.security.redaction, "enabled");
+      assert.equal(doctor.security.unredactedOutput, false);
+      const status = runCli(["master", "status"], projectDir);
+      assert.match(status.stdout, /Segurança:/);
+      assert.match(status.stdout, /Último relatório: SECURITY-REPORT-001/);
+
+      const implement = runCli(
+        ["master", "implement", "--yes", "--prepare", "--phase=PHASE-01", "--task=TASK-001", "--json"],
+        projectDir
+      );
+      assert.notEqual(implement.status, 0);
+      const handoff = readFileSync(
+        join(projectDir, ".sdd-master", "implementation", "handoffs", "AGENT-HANDOFF-001.md"),
+        "utf8"
+      );
+      assert.match(handoff, /## Segurança/);
+      assert.match(handoff, /Último relatório de segurança: SECURITY-REPORT-001/);
+      assert.equal(existsSync(join(projectDir, ".env")), false);
+    });
+
+    withTempProject((projectDir) => {
+      assert.equal(initTempProject(projectDir).status, 0);
+      const fixture = join(projectDir, "fake-secret.txt");
+      const fakeToken = `gh${"p"}_${"ABCDEFGHIJKLMNOPQRSTUVWXYZ"}${"1234567890"}`;
+      writeFileSync(fixture, fakeToken, "utf8");
+      const report = runCli(["master", "security", "--report", "--json"], projectDir);
+      assert.notEqual(report.status, 0);
+      const content = readFileSync(
+        join(projectDir, ".sdd-master", "security", "reports", "SECURITY-REPORT-001.md"),
+        "utf8"
+      );
+      assert.doesNotMatch(content, new RegExp(fakeToken));
+      assert.match(content, /\[REDACTED\]/);
+      rmSync(fixture, { force: true });
+    });
+
+    withTempProject((projectDir) => {
+      assert.equal(initTempProject(projectDir).status, 0);
+      const securityDir = join(projectDir, ".sdd-master", "security", "reports");
+      const fakeToken = `npm${"_"}${"ABCDEFGHIJKLMNOPQRSTUVWXYZ"}${"1234567890"}`;
+      mkdirSync(securityDir, { recursive: true });
+      writeFileSync(
+        join(securityDir, "SECURITY-REPORT-001.md"),
+        `# SECURITY-REPORT-001\n\n## Resultado\nclean\n\n## Achados\nValor: ${fakeToken}\n`,
+        "utf8"
+      );
+      const doctor = JSON.parse(runCli(["master", "doctor", "--json"], projectDir).stdout);
+      assert.equal(doctor.status, "broken");
+      assert.equal(doctor.security.unredactedOutput, true);
+      assert.equal(doctor.security.redaction, "broken");
+    });
+
+    withTempProject((projectDir) => {
+      assert.equal(initTempProject(projectDir).status, 0);
+      const securityDir = join(projectDir, ".sdd-master", "security", "reports");
+      mkdirSync(securityDir, { recursive: true });
+      writeFileSync(
+        join(securityDir, "SECURITY-REPORT-001.md"),
+        "# SECURITY-REPORT-001 — Relatório de Segurança\n\n## Resultado\nblocked\n\n## Observação\nRelatório redigido.\n",
+        "utf8"
+      );
+
+      assert.equal(runGit(["init"], projectDir).status, 0);
+      assert.equal(runGit(["config", "user.email", "tests@example.invalid"], projectDir).status, 0);
+      assert.equal(runGit(["config", "user.name", "SDD Tests"], projectDir).status, 0);
+      assert.equal(runGit(["add", "."], projectDir).status, 0);
+      assert.equal(runGit(["commit", "-m", "test fixture"], projectDir).status, 0);
+
+      const prePush = runCli(["master", "git", "--pre-push"], projectDir);
+      assert.match(prePush.stdout, /Status geral:\s+blocked/);
+      assert.match(prePush.stdout, /Último relatório de segurança está blocked/);
+
+      const release = runCli(
+        ["master", "release", "--yes", "--json", "--version=0.3.0-alpha", "--channel=alpha", "--type=local"],
+        projectDir
+      );
+      assert.notEqual(release.status, 0);
+      const releaseJson = JSON.parse(release.stdout);
+      assert.equal(releaseJson.gates.find((gate) => gate.gate === "Advanced Security")?.status, "Pendente");
+
+      const deploy = runCli(
+        ["master", "deploy", "--yes", "--json", "--environment=staging", "--provider=manual", "--strategy=manual"],
+        projectDir
+      );
+      assert.notEqual(deploy.status, 0);
+      const deployJson = JSON.parse(deploy.stdout);
+      assert.equal(deployJson.gates.find((gate) => gate.gate === "Advanced Security")?.status, "Pendente");
+    });
+
+    assert.equal(existsSync(join(rootDir, ".sdd-master")), false);
+    assertRootPdfsPreserved();
   });
 
   it("agents command preserves existing files unless force is used", () => {

@@ -10,6 +10,10 @@
 
 ### Adicionado
 
+- Comando `sdd master security`.
+- Segurança avançada opcional com detecção de `gitleaks` e `trufflehog`.
+- Relatórios e auditorias de segurança redigidos.
+- Integração de segurança com `doctor`, `status`, `git --pre-push`, `release`, `deploy` e `implement`.
 - Implement assistido controlado em `sdd master implement`.
 - Comando `sdd master plugins`.
 - Sessões de implementação em `.sdd-master/implementation/sessions/`.
@@ -28,6 +32,12 @@
 - Matriz de maturidade do SDD Master.
 - Roadmap para `0.3.0-alpha`.
 - Auditoria de segurança da fase publicada.
+
+### Segurança
+
+- Ferramentas externas não são instaladas automaticamente.
+- Scanners externos só rodam com opt-in explícito.
+- Valores sensíveis são redigidos em relatórios.
 
 ## [0.2.0-prototype] - 2026-06-13
 

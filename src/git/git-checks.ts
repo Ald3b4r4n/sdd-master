@@ -3,6 +3,7 @@ import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { findForbiddenFiles, requiredGitignoreEntries } from "../security/sensitive-files.js";
 import { scanForSecrets } from "../security/secret-scan.js";
+import { getAdvancedSecurityState } from "../security/security-readiness.js";
 import type { EnvExampleInfo, GitInfo, GitMode, GitSecurityReport, GitignoreInfo } from "./git-types.js";
 
 export function runGitSecurityCheck(cwd: string, mode: GitMode): GitSecurityReport {
@@ -11,6 +12,7 @@ export function runGitSecurityCheck(cwd: string, mode: GitMode): GitSecurityRepo
   const suspectedSecrets = scanForSecrets(cwd);
   const gitignore = getGitignoreInfo(cwd);
   const envExample = getEnvExampleInfo(cwd);
+  const advancedSecurity = getAdvancedSecurityState(cwd);
   const internalFilesStaged = git.stagedFiles.filter((file) => file.startsWith(".sdd-master/"));
   const internalFilesPending = [...git.stagedFiles, ...git.modifiedFiles, ...git.untrackedFiles].filter((file) =>
     file.startsWith(".sdd-master/")
@@ -31,6 +33,9 @@ export function runGitSecurityCheck(cwd: string, mode: GitMode): GitSecurityRepo
   }
   if (mode === "pre-push" && internalFilesStaged.length > 0) {
     blockers.push(".sdd-master/ staged para push remoto.");
+  }
+  if (mode === "pre-push" && advancedSecurity.status === "blocked") {
+    blockers.push(...advancedSecurity.blockers);
   }
 
   return {

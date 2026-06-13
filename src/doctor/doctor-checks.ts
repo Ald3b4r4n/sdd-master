@@ -8,6 +8,7 @@ import { getGovernanceStatus } from "../governance/governance-state.js";
 import { getAssistedImplementStatus, getImplementGuardStatus } from "../implementation/implement-readiness.js";
 import { getDeliveryStatus } from "../delivery/delivery-status.js";
 import { getExtensionStatus } from "../extensions/extension-state.js";
+import { getAdvancedSecurityState } from "../security/security-readiness.js";
 import { getPluginStatus } from "../plugins/plugin-registry.js";
 import { getSkillStatus } from "../skills/skill-registry.js";
 import { officialTemplates } from "../templates/official-templates.js";
@@ -199,17 +200,35 @@ export function checkSensitiveFiles(cwd: string): {
 } {
   const sensitiveFiles = findSensitiveFiles(cwd);
   const hasRealEnv = sensitiveFiles.some((file) => file === ".env" || file.startsWith(".env."));
+  const advanced = getAdvancedSecurityState(cwd);
+  const details = [
+    ...sensitiveFiles,
+    ...advanced.blockers,
+    ...advanced.warnings
+  ];
 
   return {
     check: {
       id: "sensitive-files",
       label: "Arquivos sensíveis",
-      status: sensitiveFiles.length === 0 ? "pass" : "fail",
-      details: sensitiveFiles
+      status: sensitiveFiles.length > 0 || advanced.status === "blocked"
+        ? "fail"
+        : advanced.status === "warning"
+          ? "warn"
+          : "pass",
+      details
     },
     info: {
       hasRealEnv,
-      sensitiveFiles
+      sensitiveFiles,
+      policy: advanced.policy,
+      builtin: advanced.builtin,
+      externalTools: advanced.externalTools,
+      lastReport: advanced.lastReport,
+      lastAudit: advanced.lastAudit,
+      redaction: advanced.redaction,
+      unredactedOutput: advanced.unredactedOutput,
+      advancedStatus: advanced.status
     }
   };
 }

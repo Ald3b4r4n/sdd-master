@@ -6,6 +6,7 @@ import { runGitSecurityCheck } from "../../git/git-checks.js";
 import { getImplementReadiness } from "../../governance/blockers.js";
 import { getDeliveryStatus } from "../../delivery/delivery-status.js";
 import { getExtensionStatus } from "../../extensions/extension-state.js";
+import { getAdvancedSecurityState } from "../../security/security-readiness.js";
 import { getGovernanceStatus } from "../../governance/governance-state.js";
 import { getAssistedImplementStatus, getImplementGuardStatus } from "../../implementation/implement-readiness.js";
 import { getPluginStatus } from "../../plugins/plugin-registry.js";
@@ -52,6 +53,7 @@ function getInstalledStatus(cwd: string): string {
   const uiux = getUiuxStatus(cwd);
   const update = getUpdateStatus(cwd);
   const delivery = getDeliveryStatus(cwd);
+  const advancedSecurity = getAdvancedSecurityState(cwd);
 
   return `SDD Master — Status
 
@@ -78,6 +80,14 @@ Git/Security:
   .env real detectado: ${gitSecurity.security.forbiddenFiles.some((file) => file === ".env" || file.startsWith(".env.")) ? "Sim" : "Não"}
   Segredos suspeitos: ${gitSecurity.security.suspectedSecrets.length > 0 ? "Sim" : "Não"}
   .gitignore: ${gitSecurity.security.gitignore.missingEntries.length === 0 ? "OK" : "Atenção"}
+
+Segurança:
+  Builtin: ${advancedSecurity.builtin}
+  Ferramentas externas: ${advancedSecurity.externalTools}
+  Último relatório: ${advancedSecurity.lastReport}
+  Última auditoria: ${advancedSecurity.lastAudit}
+  Resultado: ${advancedSecurity.status}
+  Redaction: ${advancedSecurity.redaction}
 
 Workflow inicial:
   Discovery: ${formatStatus(workflow.discovery)}

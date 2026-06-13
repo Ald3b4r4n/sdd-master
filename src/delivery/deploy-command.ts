@@ -272,7 +272,12 @@ Flags:
   --checklist
 
 Gates:
-  Release guard, security/git, env vars, secrets, database, rollback, observability, backup, documentation e aprovação humana.
+  Release guard, security/git, advanced security, env vars, secrets, database, rollback,
+  observability, backup, documentation e aprovação humana.
+
+Segurança avançada:
+  Relatório/auditoria blocked ou saída não redigida bloqueiam o deploy.
+  Ferramentas externas ausentes não bloqueiam por padrão.
 
 Risco:
   Deploy real exige autorização humana explícita fora deste comando.

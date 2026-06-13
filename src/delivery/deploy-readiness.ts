@@ -2,11 +2,13 @@ import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { getGateStatus } from "../gates/gate-state.js";
 import { runGitSecurityCheck } from "../git/git-checks.js";
+import { getAdvancedSecurityState } from "../security/security-readiness.js";
 import type { DeliveryGate, DeployOptions, DeployReadiness } from "./delivery-types.js";
 
 export function getDeployReadiness(cwd: string, options: DeployOptions): DeployReadiness {
   const gates = getGateStatus(cwd);
   const git = runGitSecurityCheck(cwd, "pre-push");
+  const security = getAdvancedSecurityState(cwd);
   const releaseBlocked = latestReleaseBlocked(cwd);
   const rollbackDocumented = existsSync(join(cwd, ".sdd-master", "rollback")) || existsSync(join(cwd, "docs", "03-codigo", "release-deploy-guards.md"));
   const deployDocs = existsSync(join(cwd, "docs", "03-codigo"));
@@ -17,6 +19,7 @@ export function getDeployReadiness(cwd: string, options: DeployOptions): DeployR
   const gateRows: DeliveryGate[] = [
     gate("Release Guard", !releaseBlocked, releaseBlocked ? "Último release guard bloqueado" : "Sem release guard bloqueado"),
     gate("Security/Git", git.status !== "blocked", git.status),
+    gate("Advanced Security", security.status !== "blocked", security.status),
     gate("Env Vars", !envValuesDetected, "Nomes registrados sem valores"),
     gate("Secrets", git.security.suspectedSecrets.length === 0, `${git.security.suspectedSecrets.length} suspeitos`),
     naGate("Database", "Não declarado neste guard"),
@@ -35,7 +38,8 @@ export function getDeployReadiness(cwd: string, options: DeployOptions): DeployR
     git.security.suspectedSecrets.length > 0 ? "Segredos detectados." : "",
     git.security.forbiddenFiles.some((file) => file === ".env" || file.startsWith(".env.")) ? ".env real detectado." : "",
     !deployDocs ? "Documentação de deploy ausente." : "",
-    git.status === "blocked" ? "sdd master git --pre-push blocked." : ""
+    git.status === "blocked" ? "sdd master git --pre-push blocked." : "",
+    security.status === "blocked" ? security.blockers.join(" ") : ""
   ].filter(Boolean);
 
   return {

@@ -18,6 +18,7 @@ Ele registra:
 - plano de release em `.sdd-master/releases/`;
 - checklist em `.sdd-master/releases/checklists/`;
 - gates de workflow, governanca, quality, audit, docs, blockers, implement guard, test gates, UI/UX, security/git, package check, npm dry-run e release notes.
+- gate de segurança avançada para relatório/auditoria `blocked` e saída não redigida.
 
 O comando nao cria tag, nao publica npm e nao cria GitHub Release.
 
@@ -32,6 +33,12 @@ Ele registra:
 - ambiente, provider, estrategia, rollback, observability, env vars e secrets por nome.
 
 O comando nao acessa servidor, nao envia arquivos, nao usa SSH/SFTP/FTP/rsync/scp e nao executa scripts remotos.
+
+## Segurança avançada
+
+Release e deploy são bloqueados quando o último relatório de segurança está `blocked`, a auditoria decide `Bloqueado` ou um artefato contém valor suspeito não redigido.
+
+A ausência de `gitleaks` ou `trufflehog` não bloqueia por padrão. Esses scanners continuam opcionais e não são executados pelos guards.
 
 ## Plano versus execucao real
 

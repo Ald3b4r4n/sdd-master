@@ -39,7 +39,8 @@ const commandHelps: Record<string, CommandHelp> = {
     example: "sdd master doctor",
     security: [
       "Suporta saída JSON com sdd master doctor --json.",
-      "Verifica .sdd-master/, docs, templates oficiais, .gitignore, arquivos sensíveis e Git básico.",
+      "Verifica .sdd-master/, docs, templates oficiais, .gitignore, arquivos sensíveis, Git e relatórios avançados.",
+      "Ferramentas externas ausentes não quebram o doctor por padrão.",
       "Não deve expor segredos em logs.",
       "Deve relatar problemas sem alterar arquivos."
     ]
@@ -223,7 +224,7 @@ const commandHelps: Record<string, CommandHelp> = {
     details: [
       "Nesta versão prototype, não altera código do projeto consumidor.",
       "Dry-run é o comportamento padrão.",
-      "Verifica discovery, requirements, spec, plan, tasks, approvals, clarifications, scope, quality, audit, docs, blockers, test gates e security/git."
+      "Verifica discovery, requirements, spec, plan, tasks, approvals, clarifications, scope, quality, audit, docs, blockers, test gates, security/git e segurança avançada."
     ],
     security: ["Não executa comandos arbitrários.", "Não roda scripts fornecidos pelo usuário.", "codeChanged sempre é false neste bloco."]
   },
@@ -291,10 +292,35 @@ const commandHelps: Record<string, CommandHelp> = {
     example: "sdd master git",
     details: [
       "Suporta --json, --pre-commit e --pre-push.",
-      "Bloqueia .env real, arquivos sensíveis, segredos suspeitos e .sdd-master/ pendente em pre-push.",
+      "Bloqueia .env real, arquivos sensíveis, segredos suspeitos, security report blocked e .sdd-master/ pendente em pre-push.",
       "Não executa git add, commit, push, tag ou release."
     ],
     security: ["Não faz commit automaticamente.", "Não faz push automaticamente.", "Push exige autorização humana explícita."]
+  },
+  security: {
+    command: "security",
+    status: "Disponível no BLOCO 28.",
+    purpose: "Executar segurança builtin e integrar gitleaks/trufflehog de forma local, opcional e redigida.",
+    whenUsed: "Use para criar relatórios de segurança ou consultar scanners externos instalados manualmente.",
+    example: 'sdd master security --detect-tools --json',
+    creates: [
+      ".sdd-master/security/security-policy.md",
+      ".sdd-master/security/reports/SECURITY-REPORT-001.md",
+      ".sdd-master/security/audits/SECURITY-AUDIT-001.md",
+      ".sdd-master/security/external-tools/EXTERNAL-TOOLS-001.md"
+    ],
+    details: [
+      "Builtin é o modo padrão.",
+      "gitleaks e trufflehog são opcionais e só executam com --run-external.",
+      "Ferramentas ausentes não bloqueiam por padrão; --strict pode exigir disponibilidade.",
+      "Relatórios persistem apenas achados redigidos."
+    ],
+    security: [
+      "Não instala ou baixa scanners.",
+      "Não envia código a serviços externos.",
+      "Não imprime nem salva segredos reais.",
+      "Achados críticos bloqueiam pre-push, release e deploy."
+    ]
   },
   release: {
     command: "release",
@@ -311,7 +337,7 @@ const commandHelps: Record<string, CommandHelp> = {
       "Flags: --help, --json, --yes, -y, --phase, --title, --target, --environment, --dry-run, --version, --channel, --type, --checklist.",
       "Dry-run é o comportamento padrão.",
       "Mesmo sem --dry-run, este bloco continua sendo apenas guard/checklist.",
-      "Valida workflow, aprovações, clarificações, escopo, quality, audit, docs, blockers, implement guard, test gates, UI/UX, security/git, package check, npm dry-run e release notes."
+      "Valida workflow, aprovações, clarificações, escopo, quality, audit, docs, blockers, implement guard, test gates, UI/UX, security/git, segurança avançada, package check, npm dry-run e release notes."
     ],
     security: [
       "Não cria tag automaticamente.",
@@ -335,7 +361,7 @@ const commandHelps: Record<string, CommandHelp> = {
       "Flags: --help, --json, --yes, -y, --phase, --title, --target, --environment, --dry-run, --provider, --strategy, --checklist.",
       "Dry-run é o comportamento padrão.",
       "Mesmo sem --dry-run, este bloco continua sendo apenas guard/checklist.",
-      "Valida release guard, security/git, env vars sem valores, secrets, database, rollback, observability, backup, documentation e aprovação humana."
+      "Valida release guard, security/git, segurança avançada, env vars sem valores, secrets, database, rollback, observability, backup, documentation e aprovação humana."
     ],
     security: [
       "Não acessa servidor.",
@@ -442,6 +468,7 @@ Comandos disponíveis:
   sdd master doctor     Diagnostica a instalação SDD Master
   sdd master agents     Gera arquivos de instrução para IAs/agentes
   sdd master git        Diagnostica Git e segurança local
+  sdd master security   Executa segurança avançada opcional e redigida
   sdd master skills     Gerencia skills locais e relatórios de uso
   sdd master plugins    Gerencia plugins locais e política de supply chain
   sdd master uiux       Cria gates de design, accessibility, SEO e responsividade

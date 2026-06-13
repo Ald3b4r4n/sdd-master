@@ -47,6 +47,13 @@ Segurança:
   .env real detectado: ${report.security.hasRealEnv ? "Sim" : "Não"}
   Arquivos sensíveis detectados: ${report.security.sensitiveFiles.length > 0 ? "Sim" : "Não"}
   .gitignore: ${getCheckStatus(report, "gitignore") === "pass" ? "OK" : "Atenção"}
+  Security policy: ${report.security.policy}
+  Builtin: ${report.security.builtin}
+  Ferramentas externas: ${report.security.externalTools}
+  Último relatório: ${report.security.lastReport}
+  Última auditoria: ${report.security.lastAudit}
+  Redaction: ${report.security.redaction}
+  Saída não redigida: ${report.security.unredactedOutput ? "Sim" : "Não"}
 
 Git:
   Repositório Git: ${report.git.isRepository ? "Sim" : "Não"}

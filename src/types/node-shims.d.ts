@@ -33,7 +33,7 @@ declare module "node:child_process" {
     options?: {
       cwd?: string;
       encoding?: "utf8";
-      stdio?: ["ignore", "pipe", "ignore"];
+      stdio?: ["ignore", "pipe", "ignore" | "pipe"];
     }
   ): string;
 }

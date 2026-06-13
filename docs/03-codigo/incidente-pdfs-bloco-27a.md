@@ -18,3 +18,4 @@
 - Nenhum PDF substituto foi gerado.
 - Os testes preservam PDFs que existirem no início da execução e não dependem da presença deles.
 - PDFs permanecem fora do commit e do pacote npm.
+- O comando de segurança e scanners externos não recriam, recuperam ou substituem esses PDFs.

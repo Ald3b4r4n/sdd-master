@@ -2,6 +2,7 @@ import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import { getGateStatus } from "../gates/gate-state.js";
 import { runGitSecurityCheck } from "../git/git-checks.js";
+import { getAdvancedSecurityState } from "../security/security-readiness.js";
 import { getGovernanceStatus } from "../governance/governance-state.js";
 import { getImplementGuardStatus, getImplementationReadiness } from "../implementation/implement-readiness.js";
 import { getUiuxStatus } from "../uiux/uiux-gates.js";
@@ -16,6 +17,7 @@ export function getReleaseReadiness(cwd: string, options: ReleaseOptions): Relea
   const implementGuard = getImplementGuardStatus(cwd);
   const uiux = getUiuxStatus(cwd);
   const git = runGitSecurityCheck(cwd, "pre-push");
+  const security = getAdvancedSecurityState(cwd);
   const releaseNotesRequired = options.type !== "local";
   const hasReleaseNotes = existsSync(join(cwd, "releases", `github-v${options.version}-notes.md`));
 
@@ -36,6 +38,7 @@ export function getReleaseReadiness(cwd: string, options: ReleaseOptions): Relea
     gate("Test Gates", implementGuard.testGates === "OK", implementGuard.testGates),
     uiux.applicable ? gate("UI/UX", uiux.blockers.length === 0, `${uiux.blockers.length} bloqueios`) : naGate("UI/UX", "Perfil sem UI visual obrigatória"),
     gate("Security/Git", git.status !== "blocked", git.status),
+    gate("Advanced Security", security.status !== "blocked", security.status),
     gate("Package Check", existsSync(join(cwd, "package.json")), "package.json presente"),
     options.type === "npm" || options.type === "full" ? pendingGate("npm Dry-run", "Dry-run npm deve ser executado manualmente") : naGate("npm Dry-run", "Não exigido para release local"),
     releaseNotesRequired ? gate("GitHub Release Notes", hasReleaseNotes, `releases/github-v${options.version}-notes.md`) : naGate("GitHub Release Notes", "Recomendado para release local")
@@ -50,6 +53,7 @@ export function getReleaseReadiness(cwd: string, options: ReleaseOptions): Relea
     !implement.ready || implementGuard.latestStatus === "blocked" ? "Implement guard bloqueado." : "",
     implementGuard.testGates !== "OK" ? "Testes obrigatórios não definidos." : "",
     git.status === "blocked" ? "sdd master git --pre-push blocked." : "",
+    security.status === "blocked" ? security.blockers.join(" ") : "",
     git.security.forbiddenFiles.some((file) => file === ".env" || file.startsWith(".env.")) ? ".env real detectado." : "",
     git.security.suspectedSecrets.length > 0 ? "Segredo detectado." : "",
     existsSync(join(cwd, ".sdd-master")) && isPackageRoot(cwd) ? ".sdd-master/ na raiz do pacote." : "",

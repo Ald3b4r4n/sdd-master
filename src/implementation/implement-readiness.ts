@@ -2,6 +2,7 @@ import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { runGitSecurityCheck } from "../git/git-checks.js";
 import { getExtensionStatus } from "../extensions/extension-state.js";
+import { getAdvancedSecurityState } from "../security/security-readiness.js";
 import { getImplementReadiness } from "../governance/blockers.js";
 import { getGovernanceStatus } from "../governance/governance-state.js";
 import { getPluginStatus } from "../plugins/plugin-registry.js";
@@ -25,12 +26,14 @@ export function getImplementationReadiness(cwd: string, task = "TASK-001"): {
   const skills = getSkillStatus(cwd);
   const plugins = getPluginStatus(cwd);
   const extensions = getExtensionStatus(cwd);
+  const security = getAdvancedSecurityState(cwd);
   const blockers = [...base.blockers, ...testGates.reasons, ...uiux.blockers];
 
   if (gitSecurity.status === "blocked") {
     blockers.push("Git/Security bloqueado");
   }
   blockers.push(...extensions.blockers);
+  blockers.push(...security.blockers);
 
   const gates: ImplementGate[] = [
     gate("Discovery", workflow.discovery, ".sdd-master/discovery/initial-discovery.md"),
@@ -56,6 +59,7 @@ export function getImplementationReadiness(cwd: string, task = "TASK-001"): {
     gate("Extension policy", extensions.policy === "OK" || extensions.status === "not-started", extensions.policy),
     gate("Extension approvals", extensions.unapprovedUsed === 0, `${extensions.unapprovedUsed} extensão(ões) usada(s) sem aprovação`),
     gate("Extension supply chain", extensions.unauditedRemoteUsed === 0, `${extensions.unauditedRemoteUsed} origem(ns) remota(s) usada(s) sem auditoria`),
+    gate("Advanced security", security.status !== "blocked", security.status),
     gate("Test gates", testGates.ok, testGates.evidence),
     gate("Security/Git", gitSecurity.status !== "blocked", gitSecurity.recommendation)
   ];

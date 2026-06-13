@@ -127,6 +127,18 @@ sdd master plugins --json --report
 `plugins` registra extensões locais, aprovação humana, instalação local como metadado e uso em relatório. O comando não instala globalmente, não baixa código remoto, não executa plugin externo e não cria `.env`.
 O registry consolidado fica em `.sdd-master/extensions/registry.md`, com policy, approvals, audits, usage e reports no mesmo domínio. A instalação local cria somente metadados em `.agents/skills/installed/`.
 
+## Segurança avançada opt-in
+
+```bash
+sdd master security
+sdd master security --detect-tools --json
+sdd master security --report --audit
+sdd master security --run-external --tool="gitleaks" --report
+```
+
+O modo padrão executa apenas o scanner builtin. `gitleaks` e `trufflehog` só executam com `--run-external`, nunca são instalados automaticamente e não recebem source remoto.
+Relatórios são redigidos antes de persistência.
+
 ## UI/UX e design gates
 
 ```bash

@@ -68,3 +68,9 @@ Este fluxo prepara a fase `0.3.0-alpha` ao separar planejamento, seguranca, test
 Sessões e handoffs incluem a seção `Extensões/skills usadas`.
 O readiness bloqueia extensão usada sem aprovação e alerta para origem remota usada sem auditoria.
 O implement assistido continua com `codeChanged: false`.
+
+## Segurança avançada opt-in
+
+O handoff inclui último relatório de segurança, uso de scanner externo, estado de redaction e pendências.
+Relatório/auditoria `blocked` ou saída não redigida entram no readiness como bloqueio.
+O implement não executa scanners externos.

@@ -260,7 +260,12 @@ Flags:
   --checklist
 
 Gates:
-  Workflow, approvals, clarifications, scope, quality, audit, docs, blockers, implement guard, test gates, UI/UX, security/git, package check, npm dry-run e release notes.
+  Workflow, approvals, clarifications, scope, quality, audit, docs, blockers, implement guard,
+  test gates, UI/UX, security/git, advanced security, package check, npm dry-run e release notes.
+
+Segurança avançada:
+  Relatório/auditoria blocked ou saída não redigida bloqueiam a release.
+  gitleaks/trufflehog ausentes não bloqueiam por padrão.
 
 Risco:
   Release real exige autorização humana explícita fora deste comando.

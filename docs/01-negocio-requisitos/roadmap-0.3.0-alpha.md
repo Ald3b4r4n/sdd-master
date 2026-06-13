@@ -38,7 +38,7 @@ Transformar o SDD Master de prototype publicado em alpha operacional validado em
 
 ### 5. Seguranca
 
-- Avaliar integracao opcional com gitleaks/trufflehog.
+- Validar em projetos reais a integração opt-in já implementada para gitleaks/trufflehog.
 - Melhorar allowlist segura.
 - Melhorar auditoria de dependencias.
 
@@ -59,4 +59,5 @@ Transformar o SDD Master de prototype publicado em alpha operacional validado em
 # Correção anterior ao BLOCO 28
 
 O BLOCO 27A completa o registry seguro de extensões antes do avanço para segurança avançada opcional.
-O próximo bloco recomendado permanece o BLOCO 28, com integrações opt-in como gitleaks/trufflehog.
+O BLOCO 28 adiciona segurança avançada opt-in com redaction e gates integrados.
+O próximo bloco recomendado é o BLOCO 29, com hardening multiambiente Windows/Linux/macOS e path safety.

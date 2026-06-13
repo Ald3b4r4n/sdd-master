@@ -29,7 +29,8 @@ Auditoria documental e local da versao `0.2.0-prototype`.
 
 ## Riscos
 
-- Secret scanning heuristico.
+- Secret scanning builtin continua heurístico.
+- Integrações opcionais com `gitleaks` e `trufflehog` dependem de instalação manual.
 - `latest` ainda aponta para prerelease anterior.
 - Certificados dependem do ambiente.
 - PDFs locais untracked.
@@ -39,3 +40,10 @@ Auditoria documental e local da versao `0.2.0-prototype`.
 - Status: aprovado para manter publicado como prototype.
 - Apto para manter publicado: sim.
 - Apto para proxima fase: sim, com foco em validacao real para `0.3.0-alpha`.
+
+## Evolução no BLOCO 28
+
+- `sdd master security` adiciona relatórios e auditorias redigidos.
+- Scanners externos exigem opt-in explícito.
+- Ausência de scanner externo não bloqueia por padrão.
+- Resultado `blocked` integra pre-push, release, deploy e implement.

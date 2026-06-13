@@ -4,6 +4,7 @@ import type { CliOutput, CliRuntime } from "../cli/output.js";
 import { getNotInitializedMessage, isWorkflowInitialized } from "../workflow/workflow-guards.js";
 import { formatUsedExtensions } from "../extensions/extension-state.js";
 import { getImplementationReadiness } from "./implement-readiness.js";
+import { formatSecurityHandoff } from "../security/security-readiness.js";
 import { formatImplementJson, formatImplementText } from "./implement-report.js";
 import type { ImplementOptions, ImplementResult } from "./implement-types.js";
 
@@ -304,6 +305,9 @@ ${formatBullets(options.forbiddenFiles)}
 ## Extensões/skills usadas
 ${formatUsedExtensions(cwd)}
 
+## Segurança
+${formatSecurityHandoff(cwd)}
+
 ## Gates avaliados
 ${readiness.gates.map((gate) => `- ${gate.gate}: ${gate.status} (${gate.evidence})`).join("\n")}
 
@@ -446,6 +450,9 @@ ${formatBullets(options.forbiddenFiles)}
 
 ## Extensões/skills usadas
 ${cwd ? formatUsedExtensions(cwd) : "- Nenhuma extensão/skill usada."}
+
+## Segurança
+${cwd ? formatSecurityHandoff(cwd) : "- Último relatório de segurança: não iniciado\n- Scanner externo usado: Não\n- Redaction: not-started\n- Pendências: Nenhuma"}
 
 ## Saída esperada do agente
 - Resumo do que foi alterado.
@@ -626,7 +633,8 @@ Flags:
   --output=text|json
 
 Gates:
-  Discovery, requirements, spec, plan, tasks, approvals, clarifications, scope, quality, audit, docs, blockers, test gates e security/git.
+  Discovery, requirements, spec, plan, tasks, approvals, clarifications, scope, quality, audit,
+  docs, blockers, test gates, security/git e advanced security.
 
 Arquivos permitidos/proibidos:
   --allowed-files define padrões candidatos.

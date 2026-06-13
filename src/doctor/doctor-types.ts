@@ -27,6 +27,14 @@ export type DoctorGitInfo = {
 export type DoctorSecurityInfo = {
   hasRealEnv: boolean;
   sensitiveFiles: string[];
+  policy: "not-started" | "OK" | "missing";
+  builtin: "not-started" | "clean" | "blocked";
+  externalTools: "not-started" | "available" | "partial" | "missing";
+  lastReport: string;
+  lastAudit: string;
+  redaction: "not-started" | "enabled" | "broken";
+  unredactedOutput: boolean;
+  advancedStatus: "not-started" | "clean" | "warning" | "blocked";
 };
 
 export type DoctorTemplateInfo = {

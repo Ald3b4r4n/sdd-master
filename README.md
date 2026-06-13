@@ -404,6 +404,26 @@ Regras:
 - plugins candidatos, rejeitados ou bloqueados não podem ser usados;
 - todo plugin usado aparece em relatório.
 
+## Segurança avançada opt-in
+
+O SDD Master possui segurança builtin e pode integrar scanners externos de forma opcional.
+
+```bash
+sdd master security
+sdd master security --detect-tools
+sdd master security --run-external --tool="gitleaks" --report
+sdd master security --run-external --tool="trufflehog" --report
+```
+
+Regras:
+
+- ferramentas externas não são instaladas automaticamente;
+- execução externa exige opt-in explícito com `--run-external`;
+- somente modos locais/filesystem compatíveis são aceitos;
+- valores sensíveis são redigidos e nunca persistidos em saída bruta;
+- ausência de ferramenta externa não bloqueia por padrão;
+- relatório ou auditoria `blocked` bloqueia pre-push, release e deploy.
+
 ## Update seguro
 
 O comando `sdd master update` atualiza uma instalação local do SDD Master sem apagar histórico.

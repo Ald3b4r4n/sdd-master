@@ -14,6 +14,7 @@ Comandos principais:
   sdd master doctor     Diagnostica a instalação
   sdd master agents     Gera instruções para IAs/agentes
   sdd master git        Diagnostica Git e segurança local
+  sdd master security   Executa segurança builtin e scanners externos opt-in
   sdd master update     Planejado: atualiza templates e estrutura
 
 Use:

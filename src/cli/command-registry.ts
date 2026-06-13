@@ -14,6 +14,7 @@ import { runImplementCommand } from "../implementation/implement-command.js";
 import { runDeployCommand } from "../delivery/deploy-command.js";
 import { runReleaseCommand } from "../delivery/release-command.js";
 import { runPluginsCommand } from "../plugins/plugin-command.js";
+import { runSecurityCommand } from "../security/security-command.js";
 import { runSkillsCommand } from "../skills/skill-command.js";
 import { runUiuxCommand } from "../uiux/uiux-command.js";
 import { runUpdateCommand } from "../update/update-command.js";
@@ -50,6 +51,8 @@ export async function runCommand(
       return runAgentsCommand(command.args, output, runtime);
     case "master-git":
       return runMasterGitCommand(command.args, output, runtime);
+    case "master-security":
+      return runSecurityCommand(command.args, output, runtime);
     case "master-skills":
       return runSkillsCommand(command.args, output, runtime);
     case "master-plugins":
