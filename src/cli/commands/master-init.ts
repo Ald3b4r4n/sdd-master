@@ -53,6 +53,7 @@ const sddDirectories = [
   ".sdd-master/backlog",
   ".sdd-master/scope",
   ".sdd-master/skills",
+  ".sdd-master/plugins",
   ".sdd-master/releases",
   ".sdd-master/deliveries",
   ".sdd-master/db",
@@ -61,7 +62,8 @@ const sddDirectories = [
   "docs/01-negocio-requisitos",
   "docs/02-tecnica-arquitetura",
   "docs/03-codigo",
-  ".agents/skills"
+  ".agents/skills",
+  ".agents/plugins"
 ];
 
 const gitignoreEntries = [

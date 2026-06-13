@@ -29,7 +29,7 @@ O guard verifica:
 - acessibilidade quando o perfil exige interface;
 - SEO para `WEB`, `SAAS` e `E-COMMERCE`;
 - responsividade para perfis com tela;
-- relatório de skills usadas;
+- relatório de skills e plugins usados;
 - test gates;
 - segurança/Git.
 

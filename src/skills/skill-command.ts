@@ -185,7 +185,7 @@ Status:
   Disponível no BLOCO 21.
 
 Finalidade:
-  Registrar, aprovar, instalar localmente como metadado e reportar uso de skills.
+  Registrar, aprovar, instalar localmente como metadado em registry local e reportar uso de skills.
 
 Uso:
   sdd master skills --yes --title="Antigravity UI polish" --category="uiux" --source="https://github.com/sickn33/antigravity-awesome-skills/"
@@ -217,6 +217,7 @@ Regras:
   Instalação local cria apenas arquivos de metadados.
   Instalação global é proibida.
   Skills externas exigem aprovação humana antes de instalação local.
+  Registry local fica em .agents/skills/registry.md.
   Toda skill usada deve aparecer em relatório.
   Skills alimentam os gates de UI/UX e implement readiness quando usadas.
 `;

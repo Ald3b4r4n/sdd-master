@@ -17,6 +17,7 @@ Regras:
 
 - instalação global é proibida;
 - instalação local cria apenas metadados em `.agents/skills/installed/`;
+- registry local fica em `.agents/skills/registry.md`;
 - código remoto não é baixado nem executado;
 - skills externas são risco de supply chain até aprovação;
 - toda skill usada deve aparecer no relatório do agente.

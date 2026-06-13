@@ -7,6 +7,7 @@ import { getImplementReadiness } from "../../governance/blockers.js";
 import { getDeliveryStatus } from "../../delivery/delivery-status.js";
 import { getGovernanceStatus } from "../../governance/governance-state.js";
 import { getAssistedImplementStatus, getImplementGuardStatus } from "../../implementation/implement-readiness.js";
+import { getPluginStatus } from "../../plugins/plugin-registry.js";
 import { getSkillStatus } from "../../skills/skill-registry.js";
 import { getUiuxStatus } from "../../uiux/uiux-gates.js";
 import { getUpdateStatus } from "../../update/update-state.js";
@@ -44,6 +45,7 @@ function getInstalledStatus(cwd: string): string {
   const implementReadiness = getImplementReadiness(cwd);
   const implementGuard = getImplementGuardStatus(cwd);
   const assistedImplement = getAssistedImplementStatus(cwd);
+  const plugins = getPluginStatus(cwd);
   const skills = getSkillStatus(cwd);
   const uiux = getUiuxStatus(cwd);
   const update = getUpdateStatus(cwd);
@@ -69,6 +71,7 @@ Templates:
 Agentes / IAs:
 ${formatAgentFiles(agentFiles)}
   .agents/skills/: ${formatStatus(existsSync(join(cwd, ".agents", "skills")))}
+  .agents/plugins/: ${formatStatus(existsSync(join(cwd, ".agents", "plugins")))}
 
 Git/Security:
   .env real detectado: ${gitSecurity.security.forbiddenFiles.some((file) => file === ".env" || file.startsWith(".env.")) ? "Sim" : "Não"}
@@ -110,6 +113,12 @@ Skills:
   Aprovadas: ${skills.approved}
   Instaladas localmente: ${skills.installedLocal}
   Usadas: ${skills.used}
+
+Plugins:
+  Candidatas: ${plugins.candidates}
+  Aprovadas: ${plugins.approved}
+  Instaladas localmente: ${plugins.installedLocal}
+  Usadas: ${plugins.used}
 
 UI/UX:
   Aplicável: ${uiux.applicable ? "Sim" : "Não"}
@@ -157,6 +166,7 @@ Implement Assistido:
   Manifest: ${assistedImplement.manifest}
   Código alterado: ${assistedImplement.codeChanged ? "Sim" : "Não"}
   Aprovação humana: ${assistedImplement.humanApproval}
+  Política forbidden: ${assistedImplement.forbiddenPolicy}
 
 Próximo comando recomendado:
   ${workflow.nextCommand}

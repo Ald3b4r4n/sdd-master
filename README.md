@@ -103,6 +103,7 @@ Esta versão adiciona o primeiro fluxo SDD funcional:
 - quality/audit/docs/blockers;
 - implement guard;
 - skills/UIUX;
+- plugins/extensoes locais;
 - update seguro.
 
 ## Release e deploy guards
@@ -162,6 +163,7 @@ node dist/cli/main.js master help
 | `sdd master agents` | Disponível | Gera instruções multi-IA |
 | `sdd master git` | Disponível | Valida Git e segurança |
 | `sdd master skills` | Disponível | Gerencia skills locais e relatórios |
+| `sdd master plugins` | Disponível | Gerencia plugins locais e supply chain |
 | `sdd master uiux` | Disponível | Cria gates de design e interface |
 | `sdd master update` | Disponível | Atualiza instalação local com backup |
 | `sdd master discovery` | Disponível | Cria discovery inicial |
@@ -241,6 +243,7 @@ O comando verifica arquivos sensíveis, possíveis segredos, `.gitignore`, risco
 .sdd-master/
   constitution.md
   project-state.md
+  plugins/
   templates/
   audits/
   traceability/
@@ -252,6 +255,7 @@ docs/
   03-codigo/
 
 .agents/
+  plugins/
   skills/
 ```
 
@@ -368,8 +372,30 @@ Regras:
 - skills são locais;
 - nada é instalado globalmente por padrão;
 - skills externas exigem aprovação humana;
+- registry local fica em `.agents/skills/registry.md`;
 - toda skill usada aparece em relatório;
 - UI/UX, acessibilidade, SEO e responsividade bloqueiam implementação quando aplicável.
+
+## Plugins e extensoes seguras
+
+O SDD Master também controla plugins/extensoes locais com política de supply chain segura.
+
+Comandos:
+
+```bash
+sdd master plugins --yes --title="Plugin de integração" --category="integration" --source="Registry local controlado"
+sdd master plugins --yes --plugin="PLUGIN-001" --approve
+sdd master plugins --yes --plugin="PLUGIN-001" --install-local
+```
+
+Regras:
+
+- plugins são locais;
+- nada é instalado globalmente por padrão;
+- plugins externos exigem aprovação humana;
+- registry local fica em `.agents/plugins/registry.md`;
+- nenhum código remoto é baixado ou executado;
+- todo plugin usado aparece em relatório.
 
 ## Update seguro
 
@@ -411,7 +437,7 @@ Ele verifica:
 - documentação;
 - blockers;
 - UI/UX, design system, acessibilidade, SEO e responsividade quando aplicável;
-- relatório de skills usadas;
+- relatório de skills e plugins usados;
 - testes obrigatórios antes da implementação;
 - segurança/Git.
 
@@ -515,6 +541,7 @@ Nunca publique `.env`, tokens, credenciais, chaves privadas, certificados, dados
 - [Desenvolvimento local](docs/03-codigo/desenvolvimento-local.md)
 - [Workflow SDD](docs/03-codigo/workflow-sdd.md)
 - [Skills locais e UI/UX](docs/03-codigo/skills-uiux.md)
+- [Plugins e extensoes seguras](docs/03-codigo/plugins-extensoes-seguras.md)
 - [Update seguro](docs/03-codigo/update-seguro.md)
 
 ## Roadmap

@@ -89,6 +89,12 @@ Skills:
   Instaladas localmente: ${report.skills.installedLocal}
   Usadas: ${report.skills.used}
 
+Plugins:
+  Candidatas: ${report.plugins.candidates}
+  Aprovadas: ${report.plugins.approved}
+  Instaladas localmente: ${report.plugins.installedLocal}
+  Usadas: ${report.plugins.used}
+
 UI/UX:
   Aplicável: ${report.uiux.applicable ? "Sim" : "Não"}
   Design system: ${report.uiux.designSystem ? "OK" : "Pendente"}

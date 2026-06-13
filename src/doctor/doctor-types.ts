@@ -84,6 +84,14 @@ export type DoctorSkillInfo = {
   usageReports: number;
 };
 
+export type DoctorPluginInfo = {
+  candidates: number;
+  approved: number;
+  installedLocal: number;
+  used: number;
+  usageReports: number;
+};
+
 export type DoctorUiuxInfo = {
   applicable: boolean;
   profile: string;
@@ -173,6 +181,7 @@ export type DoctorReport = {
   governance: DoctorGovernanceInfo;
   gates: DoctorGateInfo;
   skills: DoctorSkillInfo;
+  plugins: DoctorPluginInfo;
   uiux: DoctorUiuxInfo;
   update: DoctorUpdateInfo;
   implementReadiness: DoctorImplementReadinessInfo;

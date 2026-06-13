@@ -42,6 +42,7 @@ Inventario referente a versao `0.2.0-prototype`.
 ## Design/Skills
 
 - `sdd master skills`
+- `sdd master plugins`
 - `sdd master uiux`
 
 ## Comandos ainda nao estaveis ou futuros
@@ -49,6 +50,5 @@ Inventario referente a versao `0.2.0-prototype`.
 - implementacao real assistida por agente;
 - release interna avancada;
 - deploy;
-- plugins;
 - busca online real de skills;
 - secret scanning externo com gitleaks/trufflehog.

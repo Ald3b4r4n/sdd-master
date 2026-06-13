@@ -5,11 +5,13 @@
 ### Adicionado
 
 - Implement assistido controlado em `sdd master implement`.
+- Comando `sdd master plugins`.
 - Sessões de implementação em `.sdd-master/implementation/sessions/`.
 - Manifestos de mudança planejada.
 - Contratos de testes antes da implementação.
 - Handoff seguro para agentes de IA.
 - Política de arquivos permitidos/proibidos para implementação.
+- Registry local de plugins e skills com política de supply chain.
 - Comando `sdd master release` como guard/checklist.
 - Comando `sdd master deploy` como guard/checklist.
 - Planos estruturados em `.sdd-master/releases/` e `.sdd-master/deliveries/`.

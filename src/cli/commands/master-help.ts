@@ -367,7 +367,7 @@ const commandHelps: Record<string, CommandHelp> = {
   skills: {
     command: "skills",
     status: "Disponível no BLOCO 21.",
-    purpose: "Registrar, aprovar, instalar localmente como metadado e reportar uso de skills.",
+    purpose: "Registrar, aprovar, instalar localmente como metadado em registry local e reportar uso de skills.",
     whenUsed: "Use quando o projeto precisar propor skills externas ou registrar skills usadas por agentes.",
     example: 'sdd master skills --yes --title="Skill de UI/UX" --category="uiux"',
     creates: [".sdd-master/skills/SKILL-001.md", ".agents/skills/registry.md", ".agents/skills/installed/"],
@@ -375,11 +375,33 @@ const commandHelps: Record<string, CommandHelp> = {
       "Flags: --help, --json, --yes, -y, --title, --phase, --type, --status, --category, --source, --skill, --reason, --approve, --install-local, --mark-used, --report, --target.",
       "Instalação local cria apenas metadados.",
       "Toda skill usada deve aparecer em relatório.",
+      "Registry local fica em .agents/skills/registry.md.",
       "Skills alimentam UI/UX e implement readiness quando usadas."
     ],
     security: [
       "Instalação global é proibida.",
       "Skills externas exigem aprovação humana.",
+      "Não baixa nem executa código remoto.",
+      "Não cria .env real."
+    ]
+  },
+  plugins: {
+    command: "plugins",
+    status: "Disponível no BLOCO 27.",
+    purpose: "Registrar, aprovar, instalar localmente como metadado e reportar uso de plugins/extensões seguras.",
+    whenUsed: "Use quando o projeto precisar controlar plugins locais com política de supply chain segura.",
+    example: 'sdd master plugins --yes --title="Plugin de integração" --category="integration"',
+    creates: [".sdd-master/plugins/PLUGIN-001.md", ".agents/plugins/registry.md", ".agents/plugins/installed/"],
+    details: [
+      "Flags: --help, --json, --yes, -y, --title, --phase, --type, --status, --category, --source, --plugin, --extension, --reason, --approve, --install-local, --mark-used, --report, --target.",
+      "Instalação local cria apenas metadados.",
+      "Nenhum código remoto é baixado ou executado.",
+      "Registry local fica em .sdd-master/plugins/ e .agents/plugins/.",
+      "Todo plugin usado deve aparecer em relatório."
+    ],
+    security: [
+      "Instalação global é proibida.",
+      "Plugins externos exigem aprovação humana.",
       "Não baixa nem executa código remoto.",
       "Não cria .env real."
     ]
@@ -420,6 +442,7 @@ Comandos disponíveis:
   sdd master agents     Gera arquivos de instrução para IAs/agentes
   sdd master git        Diagnostica Git e segurança local
   sdd master skills     Gerencia skills locais e relatórios de uso
+  sdd master plugins    Gerencia plugins locais e política de supply chain
   sdd master uiux       Cria gates de design, accessibility, SEO e responsividade
   sdd master discovery  Cria discovery inicial
   sdd master requirements Cria requisitos iniciais

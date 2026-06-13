@@ -13,6 +13,7 @@ import { runGovernanceCommand } from "../governance/governance-runner.js";
 import { runImplementCommand } from "../implementation/implement-command.js";
 import { runDeployCommand } from "../delivery/deploy-command.js";
 import { runReleaseCommand } from "../delivery/release-command.js";
+import { runPluginsCommand } from "../plugins/plugin-command.js";
 import { runSkillsCommand } from "../skills/skill-command.js";
 import { runUiuxCommand } from "../uiux/uiux-command.js";
 import { runUpdateCommand } from "../update/update-command.js";
@@ -51,6 +52,8 @@ export async function runCommand(
       return runMasterGitCommand(command.args, output, runtime);
     case "master-skills":
       return runSkillsCommand(command.args, output, runtime);
+    case "master-plugins":
+      return runPluginsCommand(command.args, output, runtime);
     case "master-uiux":
       return runUiuxCommand(command.args, output, runtime);
     case "master-update":

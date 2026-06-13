@@ -30,8 +30,10 @@ Transformar o SDD Master de prototype publicado em alpha operacional validado em
 ### 4. Plugins/skills
 
 - Evoluir skills locais.
+- Evoluir plugins locais.
 - Avaliar busca online segura.
 - Avaliar registry de skills aprovado.
+- Avaliar registry de plugins aprovado.
 - Manter instalacao local.
 
 ### 5. Seguranca
@@ -52,4 +54,5 @@ Transformar o SDD Master de prototype publicado em alpha operacional validado em
 - 1.0.0 estavel.
 - Deploy automatico real.
 - Execucao remota de skills.
+- Execucao remota de plugins.
 - Publicacao npm automatizada.

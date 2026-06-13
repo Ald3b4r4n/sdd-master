@@ -7,6 +7,7 @@ import { getImplementReadiness } from "../governance/blockers.js";
 import { getGovernanceStatus } from "../governance/governance-state.js";
 import { getAssistedImplementStatus, getImplementGuardStatus } from "../implementation/implement-readiness.js";
 import { getDeliveryStatus } from "../delivery/delivery-status.js";
+import { getPluginStatus } from "../plugins/plugin-registry.js";
 import { getSkillStatus } from "../skills/skill-registry.js";
 import { officialTemplates } from "../templates/official-templates.js";
 import { getUiuxStatus } from "../uiux/uiux-gates.js";
@@ -21,6 +22,7 @@ import type {
   DoctorImplementGuardInfo,
   DoctorImplementReadinessInfo,
   DoctorDeliveryInfo,
+  DoctorPluginInfo,
   DoctorSkillInfo,
   DoctorProjectState,
   DoctorSecurityInfo,
@@ -52,6 +54,7 @@ const internalPaths = [
   ".sdd-master/backlog",
   ".sdd-master/scope",
   ".sdd-master/skills",
+  ".sdd-master/plugins",
   ".sdd-master/releases",
   ".sdd-master/deliveries",
   ".sdd-master/db",
@@ -65,7 +68,7 @@ const publicDocs = [
   "docs/03-codigo"
 ];
 
-const agentPaths = [".agents", ".agents/skills"];
+const agentPaths = [".agents", ".agents/skills", ".agents/plugins"];
 
 const minimumTemplates = [
   "README.md",
@@ -417,6 +420,29 @@ export function checkSkills(cwd: string): {
     check: {
       id: "skills",
       label: "Skills locais",
+      status: info.used > 0 && info.usageReports === 0 ? "fail" : details.length === 0 ? "pass" : "warn",
+      details
+    },
+    info
+  };
+}
+
+export function checkPlugins(cwd: string): {
+  check: DoctorCheck;
+  info: DoctorPluginInfo;
+} {
+  const info = getPluginStatus(cwd);
+  const details = [
+    info.candidates === 0 && info.approved === 0 && info.installedLocal === 0 && info.used === 0
+      ? "Plugins não iniciados."
+      : "",
+    info.used > 0 && info.usageReports === 0 ? "Plugins usados sem relatório." : ""
+  ].filter(Boolean);
+
+  return {
+    check: {
+      id: "plugins",
+      label: "Plugins locais",
       status: info.used > 0 && info.usageReports === 0 ? "fail" : details.length === 0 ? "pass" : "warn",
       details
     },

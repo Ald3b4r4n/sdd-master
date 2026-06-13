@@ -83,7 +83,7 @@ sdd master uiux --yes --type="seo" --phase="PHASE-01" --profile="WEB"
 sdd master uiux --yes --type="responsiveness" --phase="PHASE-01" --profile="WEB"
 ```
 
-Skills externas podem ser propostas com `sdd master skills`, mas só são instaladas localmente como metadados após aprovação humana.
+Skills externas podem ser propostas com `sdd master skills`, e plugins/extensoes com `sdd master plugins`, mas ambos só entram localmente como metadados após aprovação humana.
 
 ## Release e deploy guards
 

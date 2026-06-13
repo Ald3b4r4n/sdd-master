@@ -10,7 +10,7 @@ O entrypoint fica em `src/cli/main.ts`. A CLI usa parser simples, registry de co
 
 ## Init
 
-`sdd master init` cria a estrutura inicial no projeto consumidor, incluindo `.sdd-master/`, `docs/`, `.agents/skills/`, templates oficiais e arquivos de agente.
+`sdd master init` cria a estrutura inicial no projeto consumidor, incluindo `.sdd-master/`, `docs/`, `.agents/skills/`, `.agents/plugins/`, templates oficiais e arquivos de agente.
 
 ## Templates
 
@@ -19,6 +19,8 @@ Os templates ficam versionados como dados TypeScript em `src/templates/official-
 ## Doctor
 
 `sdd master doctor` diagnostica estrutura, docs, templates, agentes, Git básico e segurança local.
+
+`sdd master plugins` registra plugins/extensoes locais com politica de supply chain segura.
 
 ## Agents
 
@@ -46,4 +48,6 @@ src/
 .sdd-master/
 docs/
 .agents/
+  plugins/
+  skills/
 ```

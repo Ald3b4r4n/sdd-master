@@ -148,6 +148,18 @@ describe("SDD Master package foundation", () => {
     assert.match(direct.stdout, /codex/);
   });
 
+  it("shows contextual help for plugins and command help", () => {
+    const contextual = runCli(["master", "help", "plugins"]);
+    const direct = runCli(["master", "plugins", "--help"]);
+
+    assert.equal(contextual.status, 0);
+    assert.equal(direct.status, 0);
+    assert.match(contextual.stdout, /Disponível no BLOCO 27/);
+    assert.match(contextual.stdout, /sdd master plugins/);
+    assert.match(direct.stdout, /Registry local controlado/);
+    assert.match(direct.stdout, /Nenhum código remoto é baixado ou executado/);
+  });
+
   it("shows basic status without requiring .sdd-master", () => {
     const result = runCli(["master", "status"]);
 
@@ -194,6 +206,7 @@ describe("SDD Master package foundation", () => {
         ".sdd-master/backlog",
         ".sdd-master/scope",
         ".sdd-master/skills",
+        ".sdd-master/plugins",
         ".sdd-master/releases",
         ".sdd-master/deliveries",
         ".sdd-master/db",
@@ -202,7 +215,8 @@ describe("SDD Master package foundation", () => {
         "docs/01-negocio-requisitos",
         "docs/02-tecnica-arquitetura",
         "docs/03-codigo",
-        ".agents/skills"
+        ".agents/skills",
+        ".agents/plugins"
       ];
       const templateCategories = [
         "requirements",
@@ -425,6 +439,8 @@ describe("SDD Master package foundation", () => {
       assert.match(status.stdout, /\.sdd-master\/templates\/: OK/);
       assert.match(status.stdout, /AGENTS\.md: OK/);
       assert.match(status.stdout, /\.agents\/skills\/: OK/);
+      assert.match(status.stdout, /\.agents\/plugins\/: OK/);
+      assert.match(status.stdout, /Plugins:/);
       assert.match(status.stdout, /\/sdd-master-discovery/);
     });
   });
@@ -559,6 +575,51 @@ describe("SDD Master package foundation", () => {
       );
       assert.equal(used.status, 0, used.stderr);
       assert.equal(existsSync(join(projectDir, ".sdd-master", "skills", "usage", "SKILL-USAGE-001.md")), true);
+
+      const plugin = runCli(
+        [
+          "master",
+          "plugins",
+          "--yes",
+          "--title=Plugin de integração",
+          "--category=integration",
+          "--source=Registry local controlado",
+          "--reason=Extensão local controlada."
+        ],
+        projectDir
+      );
+      assert.equal(plugin.status, 0, plugin.stderr);
+      assert.equal(existsSync(join(projectDir, ".sdd-master", "plugins", "PLUGIN-001.md")), true);
+      assert.match(readFileSync(join(projectDir, ".sdd-master", "plugins", "PLUGIN-001.md"), "utf8"), /Instalação global\nProibida/);
+
+      const pluginJson = JSON.parse(runCli(["master", "plugins", "--json", "--report"], projectDir).stdout);
+      assert.equal(pluginJson.summary.candidates, 1);
+
+      const pluginApprove = runCli(
+        ["master", "plugins", "--yes", "--plugin=PLUGIN-001", "--approve", "--reason=Aprovado para uso local."],
+        projectDir
+      );
+      assert.equal(pluginApprove.status, 0, pluginApprove.stderr);
+      assert.match(readFileSync(join(projectDir, ".sdd-master", "plugins", "PLUGIN-001.md"), "utf8"), /## Status\nAprovada/);
+
+      const pluginInstall = runCli(["master", "plugins", "--yes", "--plugin=PLUGIN-001", "--install-local"], projectDir);
+      assert.equal(pluginInstall.status, 0, pluginInstall.stderr);
+      const installedPlugin = readFileSync(join(projectDir, ".agents", "plugins", "installed", "PLUGIN-001.md"), "utf8");
+      assert.match(installedPlugin, /Ele não executa código automaticamente/);
+      assert.match(installedPlugin, /Ele não baixou código remoto/);
+
+      const pluginUsed = runCli(
+        ["master", "plugins", "--yes", "--plugin=PLUGIN-001", "--mark-used", "--phase=PHASE-01", "--target=plugin-review"],
+        projectDir
+      );
+      assert.equal(pluginUsed.status, 0, pluginUsed.stderr);
+      assert.equal(existsSync(join(projectDir, ".sdd-master", "plugins", "usage", "PLUGIN-USAGE-001.md")), true);
+
+      const pluginImplement = JSON.parse(
+        runCli(["master", "implement", "--json", "--yes", "--phase=PHASE-01", "--task=TASK-001"], projectDir).stdout
+      );
+      assert.equal(pluginImplement.gates.find((gate) => gate.gate === "Plugins usage report")?.status, "OK");
+
       assert.equal(existsSync(join(projectDir, ".env")), false);
       assert.equal(existsSync(join(projectDir, "node_modules")), false);
 
@@ -604,10 +665,12 @@ describe("SDD Master package foundation", () => {
       const status = runCli(["master", "status"], projectDir);
       assert.equal(status.status, 0);
       assert.match(status.stdout, /Skills:/);
+      assert.match(status.stdout, /Plugins:/);
       assert.match(status.stdout, /UI\/UX:/);
 
       const doctorJson = JSON.parse(runCli(["master", "doctor", "--json"], projectDir).stdout);
       assert.equal(typeof doctorJson.skills, "object");
+      assert.equal(typeof doctorJson.plugins, "object");
       assert.equal(typeof doctorJson.uiux, "object");
       assert.equal(doctorJson.uiux.seo, true);
     });
@@ -2480,6 +2543,7 @@ describe("SDD Master package foundation", () => {
     assert.match(readme, /## GitHub Release/);
     assert.match(readme, /npm install -g sdd-master@prototype/);
     assert.match(readme, /O que mudou em 0\.2\.0-prototype/);
+    assert.match(readme, /plugins\/extensoes locais/);
     assert.match(readme, /publicação npm prototype/);
     assert.match(readme, /--tag prototype/);
     assert.match(readme, /GitHub Release/);
@@ -2487,6 +2551,7 @@ describe("SDD Master package foundation", () => {
     assert.match(changelog, /## \[0\.2\.0-prototype\] - 2026-06-13/);
     assert.match(changelog, /Auditoria final da fase `0\.2\.0-prototype`/);
     assert.match(changelog, /sdd master update/);
+    assert.match(changelog, /sdd master plugins/);
     assert.match(changelog, /Esta versão continua sendo prototype/);
     assert.match(releaseDocV020, /0\.2\.0-prototype/);
     assert.match(releaseDocV020, /Workflow SDD inicial/);
@@ -2504,6 +2569,7 @@ describe("SDD Master package foundation", () => {
     assert.match(commandInventoryV020, /sdd master update/);
     assert.match(commandInventoryV020, /sdd master implement/);
     assert.match(commandInventoryV020, /sdd master skills/);
+    assert.match(commandInventoryV020, /sdd master plugins/);
     assert.match(commandInventoryV020, /sdd master uiux/);
     assert.match(maturityMatrix, /0\.3\.0-alpha/);
     assert.match(alphaRoadmap, /Uso real em projeto consumidor/);
