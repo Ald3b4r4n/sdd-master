@@ -59,7 +59,7 @@ O pacote está publicado como prototype e ainda não representa uma release est�
 sdd-master@0.2.0-prototype
 ```
 
-Como esta é a primeira versão publicada no npm, o registry mantém `latest` apontando para `0.1.0-prototype.1` e não permitiu remover essa dist-tag enquanto não há outra versão publicada. A instalação recomendada para este estágio continua sendo `sdd-master@prototype`.
+O registry mantém `latest` apontando para `0.1.0-prototype.1`. A dist-tag `prototype` aponta para `0.2.0-prototype`, e a instalação recomendada para este estágio continua sendo `sdd-master@prototype`.
 
 Evite usar:
 
@@ -408,7 +408,7 @@ npm publish --dry-run --access public --tag prototype
 
 Esta versão prototype usa a tag npm `prototype`, não `latest`. Use `--tag prototype` explicitamente em dry-runs e em qualquer publicação futura aprovada.
 
-A publicação real no npm e o push para GitHub exigem aprovação humana explícita.
+A publicação real no npm foi realizada com aprovação humana explícita usando `npm publish --access public --tag prototype`.
 
 ## GitHub Release
 
@@ -422,9 +422,10 @@ Status:
 
 - Tag inicial `v0.1.0-prototype` preservada sem reescrita.
 - Tag `v0.1.0-prototype.1` preservada sem reescrita.
-- GitHub prerelease `v0.2.0-prototype` pendente de autorização humana explícita.
-- npm publish real de `0.2.0-prototype` pendente de autorização humana explícita.
-- npm publish deve usar `npm publish --access public --tag prototype`.
+- GitHub prerelease `v0.2.0-prototype` publicada como prerelease.
+- npm publish real de `0.2.0-prototype` executado com a dist-tag `prototype`.
+- npm `latest` permanece em `0.1.0-prototype.1`.
+- npm `prototype` aponta para `0.2.0-prototype`.
 
 A release atual é um prototype e não representa versão final estável.
 

@@ -1,6 +1,6 @@
 # Publicação npm
 
-A próxima publicação npm controlada do SDD Master é a versão prototype `0.2.0-prototype`.
+A publicação npm controlada atual do SDD Master é a versão prototype `0.2.0-prototype`.
 
 ## npm
 
@@ -22,7 +22,7 @@ Dist-tag:
 prototype
 ```
 
-`0.2.0-prototype` deve ser publicado com `npm publish --access public --tag prototype`. A instalação recomendada neste estágio continua sendo `sdd-master@prototype`, porque a versão ainda é prototype e não é release estável.
+`0.2.0-prototype` foi publicado com `npm publish --access public --tag prototype`. A instalação recomendada neste estágio continua sendo `sdd-master@prototype`, porque a versão ainda é prototype e não é release estável.
 
 Evite usar:
 
@@ -42,7 +42,7 @@ npm run release:check
 npm publish --dry-run --access public --tag prototype
 ```
 
-O dry-run ajuda a confirmar quais arquivos entrariam no pacote e se a configuração npm está coerente, sem publicar a versão real.
+O dry-run ajudou a confirmar quais arquivos entrariam no pacote e se a configuração npm estava coerente, sem publicar a versão real.
 
 Como `0.2.0-prototype` é uma versão prerelease, a configuração do pacote usa a tag npm `prototype` para evitar publicação acidental como `latest`. O comando deve informar `--tag prototype` explicitamente.
 
@@ -80,9 +80,9 @@ Antes de uma publicação real:
 - Confirmar acesso ao pacote ou escopo npm.
 - Confirmar que `npm publish --dry-run --access public --tag prototype` passou.
 - Confirmar que o output do dry-run aponta para a dist-tag planejada.
-- Se `latest` apontar para uma versão prototype por ser a única versão publicada, registrar o risco e orientar instalação por `sdd-master@prototype`.
+- Registrar o estado real de `latest` e orientar instalação por `sdd-master@prototype`.
 - Confirmar aprovação humana explícita.
 
 ## Publicação real
 
-Novas publicações reais exigem fase própria, aprovação humana e comando manual intencional. Este documento registra a publicação prototype já realizada e não autoriza novas publicações.
+Novas publicações reais exigem fase própria, aprovação humana e comando manual intencional. Este documento registra a publicação prototype já realizada em `0.2.0-prototype`, com `prototype` apontando para `0.2.0-prototype` e `latest` permanecendo em `0.1.0-prototype.1`, e não autoriza novas publicações.
