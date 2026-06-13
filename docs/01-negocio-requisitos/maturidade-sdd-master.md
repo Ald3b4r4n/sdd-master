@@ -4,8 +4,9 @@
 
 - Produto: SDD Master
 - Versao publica atual: 0.2.0-prototype
-- Estagio: Prototype
-- Proximo estagio alvo: Alpha
+- Versao local preparada: 0.3.0-alpha
+- Estagio: Alpha preparado localmente
+- Proximo estagio alvo: Alpha publicado
 
 ## Niveis
 
@@ -21,8 +22,7 @@
 
 ## Criterios para entrar em 0.3.0-alpha
 
-- Executar uso real do SDD Master em pelo menos um projeto.
-- Validar `init`, workflow, gates e update em projeto consumidor real.
-- Implementar melhorias com base no uso real.
-- Definir politica de versao alpha.
-- Decidir estrategia para dist-tag `latest`.
+- Preparar `0.3.0-alpha` localmente sem publicar.
+- Validar `npm publish --dry-run --access public --tag alpha`.
+- Manter `latest` fora do fluxo alpha.
+- Publicar alpha somente com autorização humana explícita futura.

@@ -8,7 +8,7 @@
   <strong>Framework rígido para desenvolvimento de software com especificação, TDD, documentação, auditoria, rastreabilidade, segurança e agentes de IA.</strong>
 </p>
 
-![Version](https://img.shields.io/badge/version-0.2.0--prototype-blue)
+![Version](https://img.shields.io/badge/version-0.3.0--alpha-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
 ![Node.js](https://img.shields.io/badge/Node.js-20%2B-43853d)
 ![TypeScript](https://img.shields.io/badge/TypeScript-ready-blue)
@@ -71,7 +71,7 @@ até existir uma release estável.
 
 ## Estado atual
 
-A versão pública atual recomendada é:
+A versão pública atual recomendada continua sendo:
 
 ```bash
 npm install -g sdd-master@prototype
@@ -88,7 +88,36 @@ Status:
 - npm publicado;
 - GitHub prerelease publicada;
 - prototype, não estável;
-- próximo alvo: `0.3.0-alpha`.
+- próxima prerelease preparada localmente: `0.3.0-alpha`.
+
+## Próxima prerelease preparada
+
+A próxima prerelease em preparação é:
+
+```text
+0.3.0-alpha
+```
+
+Ela consolida:
+
+- release/deploy guards;
+- implement assistido controlado;
+- plugins/extensões seguras;
+- segurança avançada opt-in;
+- path safety multiambiente;
+- onboarding guiado.
+
+A publicação futura deverá usar:
+
+```bash
+npm publish --access public --tag alpha
+```
+
+Até a publicação real, a instalação pública recomendada continua:
+
+```bash
+npm install -g sdd-master@prototype
+```
 
 ## O que mudou em 0.2.0-prototype
 
@@ -517,44 +546,46 @@ npm run pack:dry-run
 
 Esses scripts verificam se o pacote contém os arquivos necessários para uso via CLI e se arquivos proibidos ficam fora do empacotamento npm.
 
-## Release local prototype
+## Release local alpha
 
-A versão atual é:
+A versão local preparada é:
 
 ```text
-0.2.0-prototype
+0.3.0-alpha
 ```
 
-Esta versão consolida os blocos 17 a 22, sem reescrever histórico Git nem mover tags já publicadas.
+Esta versão consolida os blocos 25 a 30, sem reescrever histórico Git nem mover tags já publicadas.
 
 Antes de qualquer publicação:
 
 ```bash
 npm run check
 npm run release:check
-npm publish --dry-run --access public --tag prototype
+npm publish --dry-run --access public --tag alpha
 ```
 
-Esta versão prototype usa a tag npm `prototype`, não `latest`. Use `--tag prototype` explicitamente em dry-runs e em qualquer publicação futura aprovada.
+Esta versão alpha preparada deve usar a tag npm `alpha`, não `latest`. Use `--tag alpha` explicitamente em dry-runs e em qualquer publicação futura aprovada.
 
-A publicação real no npm foi realizada com aprovação humana explícita usando `npm publish --access public --tag prototype`.
+Nenhuma publicação real de `0.3.0-alpha` foi realizada neste bloco.
 
 ## GitHub Release
 
-A prerelease pública preparada é:
+A prerelease local preparada para futura publicação é:
 
 ```text
-v0.2.0-prototype
+v0.3.0-alpha
 ```
 
 Status:
 
 - Tag inicial `v0.1.0-prototype` preservada sem reescrita.
 - Tag `v0.1.0-prototype.1` preservada sem reescrita.
-- GitHub prerelease `v0.2.0-prototype` publicada como prerelease.
-- npm publish real de `0.2.0-prototype` executado com a dist-tag `prototype`.
+- Tag `v0.2.0-prototype` preservada sem reescrita.
+- GitHub prerelease `v0.3.0-alpha` ainda não publicada.
+- npm publish real de `0.3.0-alpha` ainda não executado.
 - npm `latest` permanece em `0.1.0-prototype.1`.
 - npm `prototype` aponta para `0.2.0-prototype`.
+- npm `alpha` será usado somente após autorização humana futura.
 
 A release atual é um prototype e não representa versão final estável.
 
@@ -564,7 +595,7 @@ O SDD Master possui:
 
 - GitHub Release draft;
 - publicação npm prototype;
-- validação local com `npm publish --dry-run --access public --tag prototype`.
+- validação local com `npm publish --dry-run --access public --tag alpha`.
 
 A publicação final da GitHub Release exige aprovação humana explícita.
 

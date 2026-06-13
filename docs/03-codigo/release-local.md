@@ -2,7 +2,7 @@
 
 Uma release local é um ponto de controle validado no Git local. Ela consolida versão, documentação, pacote, checks e tag sem publicar artefatos externos.
 
-No SDD Master, a release local `v0.2.0-prototype` serve para deixar o projeto pronto para revisão humana antes da publicação npm real, preservando as tags anteriores sem reescrita.
+No SDD Master, a release local `v0.3.0-alpha` serve para deixar o projeto pronto para revisão humana antes da publicação npm real, preservando as tags anteriores sem reescrita.
 
 ## Por que não publicar automaticamente
 
@@ -36,10 +36,10 @@ npm run check
 Também é permitido validar a publicação futura sem publicar:
 
 ```bash
-npm publish --dry-run --access public --tag prototype
+npm publish --dry-run --access public --tag alpha
 ```
 
-Para a versão prerelease `0.2.0-prototype`, a tag npm configurada é `prototype`.
+Para a versão prerelease `0.3.0-alpha`, a tag npm futura é `alpha`. Até a publicação real, a instalação pública recomendada continua `sdd-master@prototype`.
 
 ## GitHub Release draft
 
@@ -48,14 +48,14 @@ A criação de uma GitHub Release deve ser feita somente após:
 1. tag local existir;
 2. tag remota existir;
 3. `npm run check` passar;
-4. `npm publish --dry-run --access public --tag prototype` passar;
+4. `npm publish --dry-run --access public --tag alpha` passar;
 5. `sdd master git --pre-push` não retornar bloqueio;
 6. aprovação humana explícita.
 
 A primeira release pode ser criada como draft usando:
 
 ```bash
-gh release create v0.2.0-prototype --prerelease --title "v0.2.0-prototype" --notes-file releases/github-v0.2.0-prototype-notes.md
+gh release create v0.3.0-alpha --prerelease --title "v0.3.0-alpha" --notes-file releases/github-v0.3.0-alpha-notes.md
 ```
 
 Não publicar release final sem aprovação humana.

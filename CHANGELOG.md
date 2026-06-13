@@ -2,60 +2,55 @@
 
 ## [Unreleased]
 
-### Corrigido
-
-- Completa implementação do registry seguro de plugins/extensões iniciado no BLOCO 27.
-- Adicionada política de extensão, auditoria de supply chain e relatórios consolidados.
-- Corrigida integração de plugins/skills com `implement`, `status` e `doctor`.
+## [0.3.0-alpha] - 2026-06-13
 
 ### Adicionado
 
+- `sdd master release` como guard/checklist.
+- `sdd master deploy` como guard/checklist.
+- Implement assistido controlado em `sdd master implement`.
+- Handoff seguro para agentes de IA.
+- Manifesto de mudanças planejadas.
+- Contrato de testes antes da implementação.
+- `sdd master plugins`.
+- Registry local seguro para plugins/extensões.
+- Política de extensão e auditoria de supply chain.
+- `sdd master security`.
+- Segurança avançada opt-in com `gitleaks` e `trufflehog`, sem instalação automática.
+- Relatórios e auditorias de segurança com redaction.
+- Camada central de path safety.
+- Hardening multiambiente para Windows, Linux e macOS.
+- Proteção contra path traversal e escrita fora do projeto.
 - Comando `sdd master onboard`.
 - Onboarding guiado com próximos passos.
 - Documentação de exemplos práticos.
-- Camada central de mensagens e next actions.
-- Padronização progressiva das saídas de texto e JSON.
-- Camada central de path safety para Windows, Linux e macOS.
-- Escritas confinadas à raiz do projeto consumidor.
-- Diagnóstico `doctor --path-safety` e resumo no `status`.
-- Validação segura de `--allowed-files` e `--forbidden-files`.
-- Bloqueio de caminhos absolutos externos, traversal e symlinks perigosos.
-- Comando `sdd master security`.
-- Segurança avançada opcional com detecção de `gitleaks` e `trufflehog`.
-- Relatórios e auditorias de segurança redigidos.
-- Integração de segurança com `doctor`, `status`, `git --pre-push`, `release`, `deploy` e `implement`.
-- Implement assistido controlado em `sdd master implement`.
-- Comando `sdd master plugins`.
-- Sessões de implementação em `.sdd-master/implementation/sessions/`.
-- Manifestos de mudança planejada.
-- Contratos de testes antes da implementação.
-- Handoff seguro para agentes de IA.
-- Política de arquivos permitidos/proibidos para implementação.
-- Registry local de plugins e skills com política de supply chain.
-- Comando `sdd master release` como guard/checklist.
-- Comando `sdd master deploy` como guard/checklist.
-- Planos estruturados em `.sdd-master/releases/` e `.sdd-master/deliveries/`.
-- Checks de release/deploy em `status` e `doctor`.
-- Bloqueios contra publicação/deploy sem aprovação humana.
-- Auditoria final da fase `0.2.0-prototype`.
-- Inventário dos comandos implementados.
-- Matriz de maturidade do SDD Master.
-- Roadmap para `0.3.0-alpha`.
-- Auditoria de segurança da fase publicada.
-
-### Segurança
-
-- Erros de caminho estruturados e redigidos, sem exposição de paths locais.
-- `git --pre-push` bloqueia path safety inseguro e `.sdd-master/` na raiz do pacote.
-- Ferramentas externas não são instaladas automaticamente.
-- Scanners externos só rodam com opt-in explícito.
-- Valores sensíveis são redigidos em relatórios.
+- Padronização progressiva de mensagens, erros, help e JSON.
 
 ### Melhorado
 
+- `doctor` com categorias, próximos passos e checks ampliados.
+- `status` com onboarding, path safety, extensões e segurança.
+- `git --pre-push` com integrações adicionais de segurança.
+- `release`, `deploy` e `implement` com gates mais robustos.
+- `skills` integrado ao registry seguro de extensões.
 - Help global e help por comando.
-- Mensagens de erro comuns.
-- `status` e `doctor` com próximos passos.
+- Documentação de desenvolvimento, comandos e fluxo SDD.
+
+### Segurança
+
+- Release/deploy continuam sem execução perigosa automática.
+- Implement continua sem alterar código do consumidor.
+- Plugins/skills não executam código automaticamente.
+- Scanners externos só rodam com opt-in explícito.
+- Valores sensíveis são redigidos em relatórios.
+- Escritas em `.sdd-master/` e `.agents/` passam por validação de caminho.
+- `.env`, segredos, `.sdd-master/` na raiz e publish/deploy sem aprovação continuam bloqueados.
+
+### Observação
+
+- Esta versão marca a transição de prototype para alpha.
+- A instalação recomendada após publicação será `npm install -g sdd-master@alpha`.
+- Este bloco apenas prepara a release localmente; não publica no npm e não cria GitHub Release.
 
 ## [0.2.0-prototype] - 2026-06-13
 

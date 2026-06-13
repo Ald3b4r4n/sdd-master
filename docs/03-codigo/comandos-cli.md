@@ -210,4 +210,10 @@ sdd master deploy --yes --environment="staging" --provider="vercel" --strategy="
 
 `release` cria plano/checklist em `.sdd-master/releases/`, valida gates e registra readiness. Ele não cria tag, não publica npm e não publica GitHub Release.
 
+Para a preparação local de `0.3.0-alpha`, o dry-run de publicação futura deve usar:
+
+```bash
+npm publish --dry-run --access public --tag alpha
+```
+
 `deploy` cria plano/checklist em `.sdd-master/deliveries/`, valida riscos de ambiente, rollback, observability, env vars e secrets por nome. Ele não acessa servidor, não envia arquivos e não executa scripts remotos.

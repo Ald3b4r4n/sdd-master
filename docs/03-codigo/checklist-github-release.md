@@ -2,13 +2,13 @@
 
 ## Status
 
-Prerelease `v0.2.0-prototype` preparada.
+Prerelease `v0.3.0-alpha` preparada localmente. Ainda não publicada.
 
-A tag inicial `v0.1.0-prototype` e a tag `v0.1.0-prototype.1` devem ser preservadas sem reescrita. A versão corrente é `v0.2.0-prototype`.
+A tag inicial `v0.1.0-prototype`, a tag `v0.1.0-prototype.1` e a tag `v0.2.0-prototype` devem ser preservadas sem reescrita.
 
 ## Antes de publicar a release final
 
-- [ ] Confirmar tag remota `v0.2.0-prototype`.
+- [ ] Confirmar tag remota `v0.3.0-alpha` somente após autorização.
 - [ ] Confirmar que `v0.1.0-prototype` não foi movida ou reescrita.
 - [ ] Confirmar que a release será criada como prerelease.
 - [ ] Confirmar release notes seguras.
@@ -24,7 +24,7 @@ A tag inicial `v0.1.0-prototype` e a tag `v0.1.0-prototype.1` devem ser preserva
 A prerelease deve ser criada apenas com aprovação humana explícita.
 
 ```bash
-gh release create v0.2.0-prototype --prerelease --title "v0.2.0-prototype" --notes-file releases/github-v0.2.0-prototype-notes.md
+gh release create v0.3.0-alpha --prerelease --title "v0.3.0-alpha" --notes-file releases/github-v0.3.0-alpha-notes.md
 ```
 
 ## Regra

@@ -38,8 +38,8 @@ if (packageJson.license !== "MIT") failures.push("package.json license must be M
 if (packageJson.publishConfig?.access !== "public") {
   failures.push("package.json publishConfig.access must be public.");
 }
-if (packageJson.publishConfig?.tag !== "prototype") {
-  failures.push("package.json publishConfig.tag must be prototype.");
+if (packageJson.publishConfig?.tag !== "alpha") {
+  failures.push("package.json publishConfig.tag must be alpha.");
 }
 if (!["./dist/cli/main.js", "dist/cli/main.js"].includes(packageJson.bin?.sdd)) {
   failures.push("package.json bin.sdd must point to dist/cli/main.js.");
