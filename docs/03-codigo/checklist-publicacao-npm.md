@@ -2,31 +2,31 @@
 
 ## Status
 
-Publicação real concluída para `sdd-master@0.3.0-alpha`.
+Preparação de publicação beta para `sdd-master@0.5.0-beta`.
 
-Versão prerelease publicada: `0.3.0-alpha`.
+Versão prerelease preparada: `0.5.0-beta`.
 
 ## npm
 
 Publicado no npm:
 
 ```bash
-npm install -g sdd-master@alpha
+npm install -g sdd-master@beta
 ```
 
 Versão publicada:
 
 ```text
-sdd-master@0.3.0-alpha
+sdd-master@0.5.0-beta
 ```
 
 Dist-tag:
 
 ```text
-alpha
+beta
 ```
 
-Observação: a publicação foi feita com `npm publish --access public --tag alpha`. A instalação pública recomendada para este estágio é `sdd-master@alpha`.
+Observação: a publicação beta deve ser feita com `npm publish --access public --tag beta`. A instalação pública pretendida para este estágio é `sdd-master@beta`.
 
 Dist-tags verificadas:
 
@@ -47,23 +47,23 @@ até existir uma release estável.
 - [ ] Confirmar nome do pacote no npm.
 - [ ] Confirmar login npm.
 - [ ] Confirmar versão em `package.json`.
-- [x] Confirmar tag Git correspondente `v0.3.0-alpha` somente após autorização.
-- [x] Confirmar GitHub prerelease.
-- [x] Executar `npm run check`.
-- [x] Executar `npm publish --dry-run --access public --tag alpha`.
-- [x] Confirmar no output do dry-run que a tag npm planejada é `alpha`.
-- [x] Registrar que `latest` permanece em `0.1.0-prototype.1`.
-- [x] Executar `sdd master git --pre-push`.
-- [x] Confirmar ausência de `.env`.
-- [x] Confirmar ausência de segredos.
-- [x] Confirmar ausência de `.sdd-master/` na raiz.
-- [x] Confirmar que PDFs locais não entram no pacote.
-- [x] Confirmar aprovação humana explícita.
+- [ ] Confirmar tag Git correspondente `v0.5.0-beta` somente após autorização.
+- [ ] Confirmar GitHub prerelease.
+- [ ] Executar `npm run check`.
+- [ ] Executar `npm publish --dry-run --access public --tag beta`.
+- [ ] Confirmar no output do dry-run que a tag npm planejada é `beta`.
+- [ ] Registrar que `latest` permanece em `0.1.0-prototype.1`.
+- [ ] Executar `sdd master git --pre-push`.
+- [ ] Confirmar ausência de `.env`.
+- [ ] Confirmar ausência de segredos.
+- [ ] Confirmar ausência de `.sdd-master/` na raiz.
+- [ ] Confirmar que PDFs locais não entram no pacote.
+- [ ] Confirmar aprovação humana explícita.
 
 ## Comando de publicação real
 
 ```bash
-npm publish --access public --tag alpha
+npm publish --access public --tag beta
 ```
 
 ## Regra

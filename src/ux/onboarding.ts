@@ -3,7 +3,7 @@ import { join } from "node:path";
 import { safeWriteFile } from "../filesystem/safe-write.js";
 import { getNextActions } from "./next-actions.js";
 
-export type OnboardingProfile = "web" | "api" | "cli" | "mobile" | "desktop" | "library" | "generic";
+export type OnboardingProfile = "web" | "api" | "cli" | "mobile" | "desktop" | "library" | "ecommerce" | "generic";
 export type OnboardingAi = "codex" | "claude" | "cursor" | "gemini" | "copilot" | "windsurf" | "cline" | "roo" | "aider" | "continue" | "generic";
 export type OnboardingLanguage = "pt-BR" | "en" | "es";
 

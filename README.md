@@ -8,11 +8,11 @@
   <strong>Framework rígido para desenvolvimento de software com especificação, TDD, documentação, auditoria, rastreabilidade, segurança e agentes de IA.</strong>
 </p>
 
-![Version](https://img.shields.io/badge/version-0.3.0--alpha-blue)
+![Version](https://img.shields.io/badge/version-0.5.0--beta-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
 ![Node.js](https://img.shields.io/badge/Node.js-20%2B-43853d)
 ![TypeScript](https://img.shields.io/badge/TypeScript-ready-blue)
-![Status](https://img.shields.io/badge/status-alpha-orange)
+![Status](https://img.shields.io/badge/status-beta-orange)
 ![Security](https://img.shields.io/badge/security-first-critical)
 ![AI Agents](https://img.shields.io/badge/AI%20agents-ready-6f42c1)
 
@@ -71,7 +71,7 @@ até existir uma release estável.
 
 ## Estado atual
 
-A versão pública atual recomendada é:
+A versão pública atual recomendada continua sendo:
 
 ```bash
 npm install -g sdd-master@alpha
@@ -90,34 +90,37 @@ Status:
 - alpha, não estável;
 - dist-tag `alpha` publicada.
 
-## Prerelease alpha publicada
+## Próxima prerelease beta
 
-A prerelease publicada é:
+A versão beta preparada é:
 
 ```text
-0.3.0-alpha
+0.5.0-beta
 ```
 
 Ela consolida:
 
-- release/deploy guards;
-- implement assistido controlado;
-- plugins/extensões seguras;
-- segurança avançada opt-in;
-- path safety multiambiente;
-- onboarding guiado.
+- banner próprio da CLI;
+- presets oficiais de projeto;
+- preset `ecommerce`;
+- API pública de comandos;
+- contrato de comandos;
+- fluxo E2E beta;
+- documentação beta.
 
-Ela foi publicada com:
-
-```bash
-npm publish --access public --tag alpha
-```
-
-A instalação pública recomendada neste estágio é:
+A publicação pretendida deve usar:
 
 ```bash
-npm install -g sdd-master@alpha
+npm publish --access public --tag beta
 ```
+
+Após publicação, a instalação pretendida será:
+
+```bash
+npm install -g sdd-master@beta
+```
+
+A dist-tag `alpha` continuará disponível para `0.3.0-alpha`. Não use `latest` manualmente enquanto não houver release estável.
 
 ## O que mudou em 0.2.0-prototype
 
@@ -188,11 +191,27 @@ O SDD Master pode guiar os primeiros passos de um projeto.
 
 ```bash
 sdd master init
+sdd master init --preset="ecommerce"
 sdd master onboard --profile="web" --ai="codex"
 sdd master doctor
 ```
 
 O onboarding gera uma lista de próximos passos dentro de `.sdd-master/onboarding/` sem alterar código do projeto consumidor.
+
+## Presets oficiais
+
+Presets disponíveis:
+
+- `web`
+- `api`
+- `cli`
+- `mobile`
+- `desktop`
+- `library`
+- `ecommerce`
+- `generic`
+
+O preset `ecommerce` inclui atenção inicial a SEO, UI/UX, catálogo, checkout, frete, pagamento, segurança, LGPD, acessibilidade, performance, admin, deploy guard e rollback.
 
 ## Comandos atuais
 
@@ -596,7 +615,7 @@ O SDD Master possui:
 - GitHub prerelease;
 - publicação npm prototype;
 - publicação npm alpha;
-- validação local com `npm publish --dry-run --access public --tag alpha`.
+- preparação beta com `npm publish --dry-run --access public --tag beta`.
 
 A publicação final da GitHub Release exige aprovação humana explícita.
 
@@ -614,6 +633,9 @@ Nunca publique `.env`, tokens, credenciais, chaves privadas, certificados, dados
 - [Segurança e governança](docs/02-tecnica-arquitetura/seguranca-e-governanca.md)
 - [Path safety multiplataforma](docs/02-tecnica-arquitetura/path-safety-multiplataforma.md)
 - [Comandos CLI](docs/03-codigo/comandos-cli.md)
+- [API pública CLI](docs/03-codigo/api-publica-cli.md)
+- [Contrato de comandos](docs/03-codigo/contrato-comandos.md)
+- [Presets](docs/03-codigo/presets.md)
 - [Onboarding guiado](docs/03-codigo/onboarding-guiado.md)
 - [Exemplos práticos](docs/03-codigo/exemplos-praticos.md)
 - [Desenvolvimento local](docs/03-codigo/desenvolvimento-local.md)

@@ -2,6 +2,41 @@
 
 ## [Unreleased]
 
+## [0.5.0-beta] - 2026-06-13
+
+### Adicionado
+
+- Banner próprio do SDD Master na CLI.
+- Presets oficiais de projeto.
+- Preset `ecommerce`.
+- Comando `init --preset`.
+- API pública da CLI documentada.
+- Contrato público dos comandos.
+- Fluxo E2E beta/happy path.
+- Documentação beta de presets e comandos.
+
+### Melhorado
+
+- Help global e por comando.
+- Onboarding guiado.
+- Saídas JSON.
+- Mensagens de erro e próximos passos.
+- Integração entre doctor, status, release, deploy, implement, security e plugins.
+- Compatibilidade multiambiente e path safety.
+
+### Segurança
+
+- Banner não aparece em JSON/CI.
+- Presets não criam `.env`.
+- Happy path não executa deploy/publish.
+- Plugins/skills continuam sem execução automática.
+- Scanners externos continuam opt-in.
+
+### Observação
+
+- Esta versão é beta, não estável.
+- Instalação após publicação: `npm install -g sdd-master@beta`.
+
 ## [0.3.0-alpha] - 2026-06-13
 
 ### Adicionado

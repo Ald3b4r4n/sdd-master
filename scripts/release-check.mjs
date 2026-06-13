@@ -3,7 +3,7 @@ import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
 
 const rootDir = process.cwd();
-const expectedVersion = "0.3.0-alpha";
+const expectedVersion = "0.5.0-beta";
 const forbiddenPackPatterns = [
   /\.env$/,
   /\.env\.(local|production|development|staging|test|backup|old)$/,
@@ -28,6 +28,7 @@ const requiredFiles = [
   "assets/readme/sdd-master-hero.svg",
   "docs/01-negocio-requisitos/visao-do-produto.md",
   "docs/01-negocio-requisitos/maturidade-sdd-master.md",
+  "docs/01-negocio-requisitos/presets-produto.md",
   "docs/01-negocio-requisitos/roadmap-0.3.0-alpha.md",
   "docs/02-tecnica-arquitetura/auditoria-seguranca-0.2.0.md",
   "docs/02-tecnica-arquitetura/arquitetura-do-framework.md",
@@ -35,9 +36,12 @@ const requiredFiles = [
   "docs/02-tecnica-arquitetura/seguranca-e-governanca.md",
   "docs/03-codigo/checklist-github-release.md",
   "docs/03-codigo/checklist-publicacao-npm.md",
+  "docs/03-codigo/api-publica-cli.md",
   "docs/03-codigo/comandos-cli.md",
+  "docs/03-codigo/contrato-comandos.md",
   "docs/03-codigo/desenvolvimento-local.md",
   "docs/03-codigo/implement-assistido.md",
+  "docs/03-codigo/presets.md",
   "docs/03-codigo/release-local.md",
   "docs/03-codigo/publicacao-npm.md",
   "docs/03-codigo/release-deploy-guards.md",
@@ -50,6 +54,9 @@ const requiredFiles = [
   "releases/github-v0.3.0-alpha-notes.md",
   "releases/npm-v0.3.0-alpha-checklist.md",
   "releases/v0.3.0-alpha.md",
+  "releases/github-v0.5.0-beta-notes.md",
+  "releases/npm-v0.5.0-beta-checklist.md",
+  "releases/v0.5.0-beta.md",
   "releases/github-v0.1.0-prototype.md",
   "releases/github-v0.1.0-prototype-notes.md",
   "releases/github-v0.1.0-prototype.1.md",

@@ -10,7 +10,7 @@ import {
 } from "../../ux/onboarding.js";
 import { getNextActions } from "../../ux/next-actions.js";
 
-const profiles = new Set(["web", "api", "cli", "mobile", "desktop", "library", "generic"]);
+const profiles = new Set(["web", "api", "cli", "mobile", "desktop", "library", "ecommerce", "generic"]);
 const ais = new Set(["codex", "claude", "cursor", "gemini", "copilot", "windsurf", "cline", "roo", "aider", "continue", "generic"]);
 const languages = new Set(["pt-BR", "en", "es"]);
 

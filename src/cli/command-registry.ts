@@ -21,23 +21,30 @@ import { runUiuxCommand } from "../uiux/uiux-command.js";
 import { runUpdateCommand } from "../update/update-command.js";
 import { runWorkflowCommand } from "../workflow/workflow-runner.js";
 import { unknownCommandMessage } from "../ux/error-format.js";
+import { stripBannerFlags, withBanner } from "../ux/banner.js";
 
 export async function runCommand(
   args: string[],
   output: CliOutput,
   runtime: CliRuntime
 ): Promise<number> {
-  const command = parseArgs(args);
+  const command = parseArgs(stripBannerFlags(args));
+  const bannerOutput = {
+    stdout(message: string): void {
+      output.stdout(withBanner(message, args));
+    },
+    stderr: output.stderr
+  };
 
   switch (command.kind) {
     case "root-help":
-      output.stdout(getRootHelp());
+      bannerOutput.stdout(getRootHelp());
       return 0;
     case "version":
       output.stdout(getVersionOutput());
       return 0;
     case "master-help":
-      output.stdout(getMasterCommandHelp());
+      bannerOutput.stdout(getMasterCommandHelp());
       return 0;
     case "master-command-help":
       output.stdout(getMasterCommandHelp(command.command));
@@ -46,9 +53,9 @@ export async function runCommand(
       output.stdout(getStatusOutput(runtime.cwd, command.args.includes("--json")));
       return 0;
     case "master-init":
-      return runInitCommand(command.args, output, runtime);
+      return runInitCommand(command.args, bannerOutput, runtime);
     case "master-onboard":
-      return runOnboardCommand(command.args, output, runtime);
+      return runOnboardCommand(command.args, bannerOutput, runtime);
     case "master-doctor":
       return runDoctorCommand(command.args, output, runtime);
     case "master-agents":

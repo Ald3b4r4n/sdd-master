@@ -15,15 +15,19 @@ const requiredFiles = [
   "assets/readme/multi-ai-support.svg",
   "assets/readme/safety-gates.svg",
   "docs/01-negocio-requisitos/visao-do-produto.md",
+  "docs/01-negocio-requisitos/presets-produto.md",
   "docs/02-tecnica-arquitetura/arquitetura-do-framework.md",
   "docs/02-tecnica-arquitetura/compatibilidade-multi-ia.md",
   "docs/02-tecnica-arquitetura/seguranca-e-governanca.md",
   "docs/03-codigo/checklist-github-release.md",
   "docs/03-codigo/checklist-publicacao-npm.md",
+  "docs/03-codigo/api-publica-cli.md",
   "docs/03-codigo/comandos-cli.md",
+  "docs/03-codigo/contrato-comandos.md",
   "docs/03-codigo/desenvolvimento-local.md",
   "docs/03-codigo/governanca-sdd.md",
   "docs/03-codigo/implement-guard.md",
+  "docs/03-codigo/presets.md",
   "docs/03-codigo/publicacao-npm.md",
   "docs/03-codigo/quality-audit-blockers.md",
   "docs/03-codigo/release-local.md",
@@ -38,8 +42,8 @@ if (packageJson.license !== "MIT") failures.push("package.json license must be M
 if (packageJson.publishConfig?.access !== "public") {
   failures.push("package.json publishConfig.access must be public.");
 }
-if (packageJson.publishConfig?.tag !== "alpha") {
-  failures.push("package.json publishConfig.tag must be alpha.");
+if (packageJson.publishConfig?.tag !== "beta") {
+  failures.push("package.json publishConfig.tag must be beta.");
 }
 if (!["./dist/cli/main.js", "dist/cli/main.js"].includes(packageJson.bin?.sdd)) {
   failures.push("package.json bin.sdd must point to dist/cli/main.js.");

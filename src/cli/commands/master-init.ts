@@ -12,6 +12,7 @@ import { ensureExtensionInfrastructure, writeExtensionRegistry } from "../../ext
 import { formatUnsafePathError, resolveInsideProject, UnsafePathError } from "../../filesystem/path-safety.js";
 import { safeMkdir, safeWriteFile } from "../../filesystem/safe-write.js";
 import { formatNextActions, getNextActions } from "../../ux/next-actions.js";
+import { officialPresets, parsePreset, writePresetFiles, type ProjectPreset } from "../../ux/presets.js";
 
 type Language = AgentLanguage;
 type Agent = SupportedAgent | "other";
@@ -22,6 +23,8 @@ type InitOptions = {
   agent?: Agent;
   projectName?: string;
   projectType?: string;
+  preset?: ProjectPreset;
+  json: boolean;
 };
 
 const initAgents = new Set<Agent>([
@@ -126,7 +129,11 @@ export async function runInitCommand(
 
   try {
     const result = initializeSddMaster(runtime.cwd, options.options);
-    output.stdout(result);
+    if (options.options.json) {
+      output.stdout(`${JSON.stringify(result.json, null, 2)}\n`);
+    } else {
+      output.stdout(result.text);
+    }
     return 0;
   } catch (error) {
     if (error instanceof UnsafePathError) {
@@ -140,13 +147,18 @@ export async function runInitCommand(
 function parseInitArgs(args: string[]):
   | { ok: true; options: InitOptions }
   | { ok: false; error: string } {
-  const options: InitOptions = { yes: false };
+  const options: InitOptions = { yes: false, json: false };
 
   for (let index = 0; index < args.length; index += 1) {
     const arg = args[index];
 
     if (arg === "--yes" || arg === "-y") {
       options.yes = true;
+      continue;
+    }
+
+    if (arg === "--json") {
+      options.json = true;
       continue;
     }
 
@@ -167,7 +179,7 @@ function parseInitArgs(args: string[]):
       continue;
     }
 
-    if (arg === "--agent") {
+    if (arg === "--agent" || arg === "--ai") {
       index += 1;
       const value = args[index];
       const agent = parseAgent(value);
@@ -176,11 +188,27 @@ function parseInitArgs(args: string[]):
       continue;
     }
 
-    if (arg.startsWith("--agent=")) {
-      const value = arg.slice("--agent=".length);
+    if (arg.startsWith("--agent=") || arg.startsWith("--ai=")) {
+      const value = arg.includes("--agent=") ? arg.slice("--agent=".length) : arg.slice("--ai=".length);
       const agent = parseAgent(value);
       if (!agent) return { ok: false, error: getInvalidAgentMessage(value) };
       options.agent = agent;
+      continue;
+    }
+
+    if (arg === "--preset") {
+      index += 1;
+      const preset = parsePreset(args[index]);
+      if (!preset) return { ok: false, error: getInvalidPresetMessage(args[index]) };
+      options.preset = preset;
+      continue;
+    }
+
+    if (arg.startsWith("--preset=")) {
+      const value = arg.slice("--preset=".length);
+      const preset = parsePreset(value);
+      if (!preset) return { ok: false, error: getInvalidPresetMessage(value) };
+      options.preset = preset;
       continue;
     }
 
@@ -215,11 +243,11 @@ function parseInitArgs(args: string[]):
 function completeNonInteractiveOptions(
   options: InitOptions,
   cwd: string
-): { ok: true; options: Required<Pick<InitOptions, "language" | "agent" | "projectName">> } | {
+): { ok: true; options: Required<Pick<InitOptions, "language" | "agent" | "projectName">> & Pick<InitOptions, "preset" | "json"> } | {
   ok: false;
   error: string;
 } {
-  if (!options.language) {
+  if (!options.language && !options.preset) {
     return { ok: false, error: "Idioma obrigatório no modo não interativo: --language=pt-BR" };
   }
 
@@ -230,9 +258,11 @@ function completeNonInteractiveOptions(
   return {
     ok: true,
     options: {
-      language: options.language,
+      language: options.language ?? "pt-BR",
       agent: options.agent,
-      projectName: normalizeProjectName(options.projectName, cwd)
+      projectName: normalizeProjectName(options.projectName, cwd),
+      preset: options.preset,
+      json: options.json
     }
   };
 }
@@ -241,7 +271,7 @@ async function promptForOptions(
   options: InitOptions,
   runtime: CliRuntime
 ): Promise<
-  | { ok: true; options: Required<Pick<InitOptions, "language" | "agent" | "projectName">> }
+  | { ok: true; options: Required<Pick<InitOptions, "language" | "agent" | "projectName">> & Pick<InitOptions, "preset" | "json"> }
   | { ok: false; error: string }
 > {
   const readline = createInterface({
@@ -280,7 +310,9 @@ async function promptForOptions(
       options: {
         language: languageInput,
         agent: agentInput,
-        projectName: projectNameInput
+        projectName: projectNameInput,
+        preset: options.preset,
+        json: options.json
       }
     };
   } finally {
@@ -290,12 +322,12 @@ async function promptForOptions(
 
 function initializeSddMaster(
   cwd: string,
-  options: Required<Pick<InitOptions, "language" | "agent" | "projectName">>
-): string {
+  options: Required<Pick<InitOptions, "language" | "agent" | "projectName">> & Pick<InitOptions, "preset" | "json">
+): { text: string; json: Record<string, unknown> } {
   if (existsSync(resolveInsideProject(cwd, ".sdd-master"))) {
     const templates = writeOfficialTemplates(cwd);
 
-    return `Projeto já parece inicializado com SDD Master.
+    const text = `Projeto já parece inicializado com SDD Master.
 
 A pasta .sdd-master/ já existe.
 
@@ -309,6 +341,16 @@ Recomendação:
   sdd master status
   sdd master doctor
 `;
+    return {
+      text,
+      json: {
+        command: "init",
+        status: "already-initialized",
+        preset: options.preset ?? "generic",
+        files: [],
+        templates
+      }
+    };
   }
 
   for (const directory of sddDirectories) {
@@ -323,6 +365,7 @@ Recomendação:
     ".sdd-master/project-state.md",
     getProjectStateContent(cwd, options)
   );
+  const presetFiles = options.preset ? writePresetFiles(cwd, options.preset) : [];
   const templates = writeOfficialTemplates(cwd);
   ensureGitignore(cwd);
   ensureReadme(cwd, options.projectName);
@@ -339,7 +382,7 @@ Recomendação:
     agents.files.map((file) => file.path)
   );
 
-  return `SDD Master inicializado com sucesso.
+  const text = `SDD Master inicializado com sucesso.
 
 Projeto:
   ${options.projectName}
@@ -349,6 +392,9 @@ Idioma operacional:
 
 IA/agente principal:
   ${options.agent}
+
+Preset:
+  ${options.preset ?? "generic"}
 
 Estruturas criadas:
   .sdd-master/
@@ -365,12 +411,36 @@ Agentes / IAs:
   Arquivos criados: ${agents.created.length}
   Arquivos preservados: ${agents.preserved.length}
 
+Preset oficial:
+  Arquivos criados: ${presetFiles.length}
+
 Próximo comando recomendado:
   /sdd-master-discovery
 
 Próximos passos:
 ${formatNextActions(getNextActions("init"))}
 `;
+  return {
+    text,
+    json: {
+      command: "init",
+      status: "created",
+      preset: options.preset ?? "generic",
+      projectName: options.projectName,
+      language: options.language,
+      agent: options.agent,
+      files: [
+        ".sdd-master/",
+        "docs/01-negocio-requisitos/",
+        "docs/02-tecnica-arquitetura/",
+        "docs/03-codigo/",
+        ".agents/skills/",
+        ...presetFiles
+      ],
+      codeChanged: false,
+      nextActions: getNextActions("init")
+    }
+  };
 }
 
 function ensureGitignore(cwd: string): void {
@@ -454,14 +524,17 @@ Qualquer violação desta constituição deve gerar achado BLOCKER.
 
 function getProjectStateContent(
   cwd: string,
-  options: Required<Pick<InitOptions, "language" | "agent" | "projectName">>
+  options: Required<Pick<InitOptions, "language" | "agent" | "projectName">> & Pick<InitOptions, "preset" | "json">
 ): string {
+  const preset = options.preset ? officialPresets[options.preset] : officialPresets.generic;
   return `# SDD Master — Estado do Projeto
 
 ## Identificação
 - Nome do projeto: ${options.projectName}
 - Idioma operacional: ${options.language}
 - IA/agente principal: ${options.agent}
+- Preset oficial: ${preset.id}
+- Perfil recomendado: ${preset.profile}
 - Versão do SDD Master: ${version}
 - Data de inicialização: ${new Date().toISOString()}
 
@@ -472,6 +545,7 @@ function getProjectStateContent(
 - Data da instalação: ${new Date().toISOString()}
 - Último update:
 - Canal recomendado: prototype
+- Canal beta recomendado: beta
 
 ## Estado atual
 - Fase atual: PHASE-01 — Discovery
@@ -480,6 +554,8 @@ function getProjectStateContent(
 - Maturidade atual: M0 — Ideia
 - Maturidade alvo: M1 — Discovery
 - Estágio atual: Prototype
+- Preset UI/UX: ${preset.uiux}
+- Preset SEO: ${preset.seo}
 - Versão interna atual: ${version}
 
 ## Documentação
@@ -579,4 +655,18 @@ Valores aceitos:
   continue
   generic
   other`;
+}
+
+function getInvalidPresetMessage(value: string | undefined): string {
+  return `Preset inválido: ${value ?? ""}
+
+Valores aceitos:
+  web
+  api
+  cli
+  mobile
+  desktop
+  library
+  ecommerce
+  generic`;
 }

@@ -43,7 +43,7 @@ function runCli(args, cwd = rootDir, options = {}) {
   return spawnSync(process.execPath, [cliPath, ...args], {
     cwd,
     encoding: "utf8",
-    env: options.env
+    env: options.env ? { ...process.env, ...options.env } : undefined
   });
 }
 
@@ -113,6 +113,31 @@ describe("SDD Master package foundation", () => {
     assert.equal(result.status, 0);
     assert.match(result.stdout, /Uso:/);
     assert.match(result.stdout, /sdd master <command>/);
+  });
+
+  it("shows the SDD Master banner only in interactive text output", () => {
+    const rootHelp = runCli(["--help"]);
+    const masterHelp = runCli(["master", "help"]);
+    const statusJson = runCli(["master", "status", "--json"]);
+    const ciHelp = runCli(["--help"], rootDir, { env: { CI: "1" } });
+    const noColorHelp = runCli(["--help"], rootDir, { env: { NO_COLOR: "1" } });
+
+    assert.match(rootHelp.stdout, /SDD MASTER/);
+    assert.match(masterHelp.stdout, /SDD MASTER/);
+    assert.doesNotMatch(rootHelp.stdout, /Spec Kit/);
+    assert.doesNotMatch(masterHelp.stdout, /Spec Kit/);
+    assert.doesNotMatch(statusJson.stdout, /SDD MASTER/);
+    assert.doesNotMatch(statusJson.stdout, /Spec-Driven Development Framework/);
+    assert.doesNotThrow(() => JSON.parse(statusJson.stdout));
+    assert.doesNotMatch(ciHelp.stdout, /SDD MASTER/);
+    assert.doesNotMatch(noColorHelp.stdout, /SDD MASTER/);
+    assert.match(noColorHelp.stdout, /Uso:/);
+
+    withTempProject((projectDir) => {
+      const noBanner = runCli(["master", "init", "--no-banner", "-y", "--language=pt-BR", "--agent=codex"], projectDir);
+      assert.equal(noBanner.status, 0);
+      assert.doesNotMatch(noBanner.stdout, /SDD MASTER/);
+    });
   });
 
   it("prints the package version", () => {
@@ -360,6 +385,49 @@ describe("SDD Master package foundation", () => {
       assert.match(agentsMd, /\.sdd-master\/constitution.md/);
       assert.match(agentsMd, /\.sdd-master\/project-state.md/);
       assert.equal(existsSync(join(projectDir, ".env")), false);
+    });
+  });
+
+  it("initializes official presets with coherent onboarding metadata", () => {
+    const presets = ["web", "api", "cli", "mobile", "desktop", "library", "ecommerce", "generic"];
+
+    for (const preset of presets) {
+      withTempProject((projectDir) => {
+        const result = runCli(["master", "init", "--yes", `--preset=${preset}`, "--ai=codex", "--json"], projectDir);
+
+        assert.equal(result.status, 0, result.stderr);
+        const json = JSON.parse(result.stdout);
+        assert.equal(json.preset, preset);
+        assert.equal(json.codeChanged, false);
+        assert.equal(existsSync(join(projectDir, ".sdd-master", "onboarding", "preset.md")), true);
+
+        const state = readFileSync(join(projectDir, ".sdd-master", "project-state.md"), "utf8");
+        assert.match(state, new RegExp(`Preset oficial: ${preset}`));
+
+        const presetDoc = readFileSync(join(projectDir, ".sdd-master", "onboarding", "preset.md"), "utf8");
+        if (preset === "ecommerce") {
+          assert.match(presetDoc, /SEO\nrequired/);
+          assert.match(presetDoc, /UI\/UX\nrequired/);
+          assert.match(presetDoc, /checkout/);
+          assert.match(presetDoc, /pagamento/);
+          assert.match(presetDoc, /LGPD/);
+          assert.match(presetDoc, /rollback/);
+        }
+        if (preset === "api") {
+          assert.match(presetDoc, /UI\/UX\noptional/);
+          assert.match(presetDoc, /SEO\nnot-applicable/);
+        }
+        if (preset === "cli") {
+          assert.match(presetDoc, /UX textual/);
+        }
+      });
+    }
+
+    withTempProject((projectDir) => {
+      const invalid = runCli(["master", "init", "--yes", "--preset=invalid", "--ai=codex"], projectDir);
+      assert.notEqual(invalid.status, 0);
+      assert.match(invalid.stderr, /Preset inválido: invalid/);
+      assert.match(invalid.stderr, /ecommerce/);
     });
   });
 
@@ -1537,9 +1605,9 @@ describe("SDD Master package foundation", () => {
     const packageLock = JSON.parse(readFileSync(join(rootDir, "package-lock.json"), "utf8"));
 
     assert.equal(packageJson.license, "MIT");
-    assert.equal(packageJson.version, "0.3.0-alpha");
-    assert.equal(packageLock.version, "0.3.0-alpha");
-    assert.equal(packageLock.packages[""].version, "0.3.0-alpha");
+    assert.equal(packageJson.version, "0.5.0-beta");
+    assert.equal(packageLock.version, "0.5.0-beta");
+    assert.equal(packageLock.packages[""].version, "0.5.0-beta");
     assert.equal(packageJson.bin?.sdd, "dist/cli/main.js");
     assert.equal(packageJson.files.includes("dist/"), true);
     assert.equal(packageJson.files.includes("README.md"), true);
@@ -2678,7 +2746,93 @@ describe("SDD Master package foundation", () => {
     });
   });
 
-  it("includes published alpha release checks and documentation", () => {
+  it("runs the beta ecommerce happy path without changing consumer code or publishing", () => {
+    withTempProject((projectDir) => {
+      mkdirSync(join(projectDir, "src"), { recursive: true });
+      const marker = join(projectDir, "src", "consumer-code.ts");
+      writeFileSync(marker, "export const untouched = true;\n", "utf8");
+
+      const commands = [
+        ["master", "init", "--yes", "--preset=ecommerce", "--ai=codex"],
+        ["master", "onboard", "--yes", "--profile=ecommerce", "--ai=codex"],
+        ["master", "doctor", "--json"],
+        ["master", "discovery", "--yes"],
+        ["master", "requirements", "--yes"],
+        ["master", "spec", "--yes"],
+        ["master", "plan", "--yes"],
+        ["master", "tasks", "--yes"]
+      ];
+      const approvalTargets = ["discovery", "requirements", "spec", "plan", "tasks"];
+      const remainingCommands = [
+        ["master", "uiux", "--yes"],
+        ["master", "quality", "--yes"],
+        ["master", "audit", "--yes"],
+        ["master", "implement", "--yes", "--prepare", "--handoff", "--manifest", "--test-contract"],
+        ["master", "release", "--yes", "--version=0.5.0-beta", "--channel=beta", "--type=local", "--dry-run"],
+        ["master", "deploy", "--yes", "--environment=staging", "--provider=manual", "--strategy=manual", "--dry-run"],
+        ["master", "security", "--json"],
+        ["master", "status", "--json"]
+      ];
+
+      const outputs = commands.map((args) => {
+        const result = runCli(args, projectDir);
+        assert.equal(result.status, 0, `${args.join(" ")}\n${result.stderr}\n${result.stdout}`);
+        return { args, result };
+      });
+      const taskPath = join(projectDir, ".sdd-master", "tasks", "TASK-001.md");
+      writeFileSync(
+        taskPath,
+        readFileSync(taskPath, "utf8").replace(
+          "## Testes obrigatórios antes da implementação\n-",
+          "## Testes obrigatórios antes da implementação\n- Validar checkout beta sem publicar npm.\n- Validar rollback manual antes de deploy."
+        ),
+        "utf8"
+      );
+
+      for (const target of approvalTargets) {
+        const result = runCli(
+          [
+            "master",
+            "approve",
+            "--yes",
+            `--target=${target}`,
+            "--phase=PHASE-01",
+            "--decision=approved",
+            `--reason=${target} aprovado no fluxo beta de teste.`
+          ],
+          projectDir
+        );
+        assert.equal(result.status, 0, `approve ${target}\n${result.stderr}\n${result.stdout}`);
+        outputs.push({ args: ["master", "approve", `--target=${target}`], result });
+      }
+
+      for (const args of remainingCommands) {
+        const result = runCli(args, projectDir);
+        assert.equal(result.status, 0, `${args.join(" ")}\n${result.stderr}\n${result.stdout}`);
+        outputs.push({ args, result });
+      }
+
+      for (const { args, result } of outputs.filter((item) => item.args.includes("--json"))) {
+        assert.doesNotThrow(() => JSON.parse(result.stdout), args.join(" "));
+        assert.doesNotMatch(result.stdout, /SDD MASTER/);
+      }
+
+      const status = JSON.parse(outputs.at(-1).result.stdout);
+      assert.equal(Array.isArray(status.nextActions), true);
+      assert.equal(readFileSync(marker, "utf8"), "export const untouched = true;\n");
+      assert.equal(existsSync(join(projectDir, ".env")), false);
+      assert.equal(existsSync(join(projectDir, ".sdd-master", "onboarding", "preset.md")), true);
+      assert.match(readFileSync(join(projectDir, ".sdd-master", "onboarding", "preset.md"), "utf8"), /checkout/);
+
+      const allText = outputs.map((item) => `${item.result.stdout}\n${item.result.stderr}`).join("\n");
+      assert.doesNotMatch(allText, /npm publish|Publishing to/i);
+      assert.doesNotMatch(allText, /deploy executado|Deploy executado/i);
+      assert.doesNotMatch(allText, /sk-[A-Za-z0-9_-]{20,}/);
+      assert.doesNotMatch(allText, /BEGIN (RSA |EC |OPENSSH |)PRIVATE KEY/);
+    });
+  });
+
+  it("includes beta release checks and documentation", () => {
     const packageJson = JSON.parse(readFileSync(join(rootDir, "package.json"), "utf8"));
     const releaseDoc = readFileSync(join(rootDir, "releases", "v0.1.0-prototype.md"), "utf8");
     const githubReleaseDoc = readFileSync(join(rootDir, "releases", "github-v0.1.0-prototype.md"), "utf8");
@@ -2705,6 +2859,9 @@ describe("SDD Master package foundation", () => {
     const releaseDocAlpha = readFileSync(join(rootDir, "releases", "v0.3.0-alpha.md"), "utf8");
     const githubReleaseNotesAlpha = readFileSync(join(rootDir, "releases", "github-v0.3.0-alpha-notes.md"), "utf8");
     const npmChecklistAlpha = readFileSync(join(rootDir, "releases", "npm-v0.3.0-alpha-checklist.md"), "utf8");
+    const releaseDocBeta = readFileSync(join(rootDir, "releases", "v0.5.0-beta.md"), "utf8");
+    const githubReleaseNotesBeta = readFileSync(join(rootDir, "releases", "github-v0.5.0-beta-notes.md"), "utf8");
+    const npmChecklistBeta = readFileSync(join(rootDir, "releases", "npm-v0.5.0-beta-checklist.md"), "utf8");
     const commandInventoryV020 = readFileSync(
       join(rootDir, "docs", "03-codigo", "inventario-comandos-0.2.0.md"),
       "utf8"
@@ -2732,14 +2889,18 @@ describe("SDD Master package foundation", () => {
     const releaseAudit = readFileSync(join(rootDir, "releases", "v0.1.0-prototype-audit.md"), "utf8");
     const releaseLocal = readFileSync(join(rootDir, "docs", "03-codigo", "release-local.md"), "utf8");
     const npmPublish = readFileSync(join(rootDir, "docs", "03-codigo", "publicacao-npm.md"), "utf8");
+    const presetsDoc = readFileSync(join(rootDir, "docs", "03-codigo", "presets.md"), "utf8");
+    const productPresetsDoc = readFileSync(join(rootDir, "docs", "01-negocio-requisitos", "presets-produto.md"), "utf8");
+    const publicApiDoc = readFileSync(join(rootDir, "docs", "03-codigo", "api-publica-cli.md"), "utf8");
+    const commandContractDoc = readFileSync(join(rootDir, "docs", "03-codigo", "contrato-comandos.md"), "utf8");
     const readme = readFileSync(join(rootDir, "README.md"), "utf8");
     const changelog = readFileSync(join(rootDir, "CHANGELOG.md"), "utf8");
 
     assert.equal(existsSync(join(rootDir, "scripts", "release-check.mjs")), true);
     assert.equal(packageJson.scripts["release:check"], "node scripts/release-check.mjs");
-    assert.equal(packageJson.version, "0.3.0-alpha");
+    assert.equal(packageJson.version, "0.5.0-beta");
     assert.equal(packageJson.publishConfig?.access, "public");
-    assert.equal(packageJson.publishConfig?.tag, "alpha");
+    assert.equal(packageJson.publishConfig?.tag, "beta");
     assert.equal(packageJson.repository?.url, "git+https://github.com/Ald3b4r4n/sdd-master.git");
     assert.equal(packageJson.bugs?.url, "https://github.com/Ald3b4r4n/sdd-master/issues");
     assert.equal(packageJson.homepage, "https://github.com/Ald3b4r4n/sdd-master#readme");
@@ -2760,6 +2921,13 @@ describe("SDD Master package foundation", () => {
     assert.equal(existsSync(join(rootDir, "releases", "v0.3.0-alpha.md")), true);
     assert.equal(existsSync(join(rootDir, "releases", "github-v0.3.0-alpha-notes.md")), true);
     assert.equal(existsSync(join(rootDir, "releases", "npm-v0.3.0-alpha-checklist.md")), true);
+    assert.equal(existsSync(join(rootDir, "releases", "v0.5.0-beta.md")), true);
+    assert.equal(existsSync(join(rootDir, "releases", "github-v0.5.0-beta-notes.md")), true);
+    assert.equal(existsSync(join(rootDir, "releases", "npm-v0.5.0-beta-checklist.md")), true);
+    assert.equal(existsSync(join(rootDir, "docs", "03-codigo", "api-publica-cli.md")), true);
+    assert.equal(existsSync(join(rootDir, "docs", "03-codigo", "contrato-comandos.md")), true);
+    assert.equal(existsSync(join(rootDir, "docs", "03-codigo", "presets.md")), true);
+    assert.equal(existsSync(join(rootDir, "docs", "01-negocio-requisitos", "presets-produto.md")), true);
     assert.equal(existsSync(join(rootDir, "docs", "03-codigo", "inventario-comandos-0.2.0.md")), true);
     assert.equal(existsSync(join(rootDir, "docs", "01-negocio-requisitos", "maturidade-sdd-master.md")), true);
     assert.equal(existsSync(join(rootDir, "docs", "01-negocio-requisitos", "roadmap-0.3.0-alpha.md")), true);
@@ -2803,10 +2971,10 @@ describe("SDD Master package foundation", () => {
     assert.match(githubReleaseChecklist, /aprovação humana explícita/);
     assert.match(githubReleaseChecklist, /v0\.3\.0-alpha/);
     assert.match(githubReleaseChecklist, /v0\.1\.0-prototype\.1/);
-    assert.match(npmPublishChecklist, /npm publish --access public --tag alpha/);
+    assert.match(npmPublishChecklist, /npm publish --access public --tag beta/);
     assert.match(npmPublishChecklist, /aprovação humana explícita/);
-    assert.match(npmPublishChecklist, /0\.3\.0-alpha/);
-    assert.match(npmPublishChecklist, /npm install -g sdd-master@alpha/);
+    assert.match(npmPublishChecklist, /0\.5\.0-beta/);
+    assert.match(npmPublishChecklist, /npm install -g sdd-master@beta/);
     assert.match(releaseAudit, /v0\.1\.0-prototype/);
     assert.match(releaseAudit, /npm publish dry-run/);
     assert.match(releaseAudit, /npm publish real: não executado/);
@@ -2817,17 +2985,17 @@ describe("SDD Master package foundation", () => {
     assert.match(releaseLocal, /0\.3\.0-alpha/);
     assert.match(releaseLocal, /gh release create/);
     assert.match(releaseLocal, /aprovação humana/i);
-    assert.match(npmPublish, /npm publish --dry-run --access public --tag alpha/);
+    assert.match(npmPublish, /npm publish --dry-run --access public --tag beta/);
     assert.match(npmPublish, /tag npm `alpha`/);
     assert.match(npmPublish, /0\.2\.0-prototype/);
     assert.match(npmPublish, /0\.3\.0-alpha/);
-    assert.match(npmPublish, /--tag alpha/);
+    assert.match(npmPublish, /--tag beta/);
     assert.match(npmPublish, /npm install -g sdd-master@alpha/);
     assert.match(npmPublish, /alpha.*0\.3\.0-alpha/);
     assert.match(npmPublish, /latest.*0\.1\.0-prototype\.1/);
     assert.match(npmPublish, /aprovação humana/i);
     assert.match(readme, /0\.2\.0-prototype/);
-    assert.match(readme, /0\.3\.0-alpha/);
+    assert.match(readme, /0\.5\.0-beta/);
     assert.match(readme, /histórico Git/);
     assert.match(readme, /sem reescrita/);
     assert.match(readme, /npm run release:check/);
@@ -2837,22 +3005,22 @@ describe("SDD Master package foundation", () => {
     assert.match(readme, /plugins\/extensoes locais/);
     assert.match(readme, /publicação npm prototype/);
     assert.match(readme, /publicação npm alpha/);
-    assert.match(readme, /npm publish --access public --tag alpha/);
-    assert.match(readme, /GitHub prerelease `v0\.3\.0-alpha` publicada como prerelease/);
-    assert.match(readme, /npm publish real de `0\.3\.0-alpha` executado com a dist-tag `alpha`/);
-    assert.match(readme, /npm `alpha` aponta para `0\.3\.0-alpha`/);
-    assert.doesNotMatch(readme, /0\.3\.0-alpha.*ainda não publicada/i);
-    assert.doesNotMatch(readme, /0\.3\.0-alpha.*ainda não executado/i);
+    assert.match(readme, /npm publish --access public --tag beta/);
+    assert.match(readme, /npm install -g sdd-master@beta/);
+    assert.match(readme, /dist-tag `alpha` continuará disponível/);
     assert.match(readme, /GitHub Release/);
     assert.match(readme, /aprovação humana explícita/);
     assert.match(changelog, /## \[Unreleased\]/);
     assert.match(changelog, /## \[0\.3\.0-alpha\] - 2026-06-13/);
+    assert.match(changelog, /## \[0\.5\.0-beta\] - 2026-06-13/);
     assert.match(changelog, /## \[0\.2\.0-prototype\] - 2026-06-13/);
     assert.match(changelog, /sdd master update/);
     assert.match(changelog, /sdd master plugins/);
     assert.match(changelog, /transição de prototype para alpha/);
     assert.match(changelog, /npm publish real foi executado com a dist-tag `alpha`/);
     assert.match(changelog, /GitHub prerelease `v0\.3\.0-alpha` foi publicada como prerelease/);
+    assert.match(changelog, /Banner próprio do SDD Master/);
+    assert.match(changelog, /Presets oficiais de projeto/);
     assert.match(releaseDocV020, /0\.2\.0-prototype/);
     assert.match(releaseDocV020, /Workflow SDD inicial/);
     assert.match(releaseDocV020, /Update seguro/);
@@ -2880,6 +3048,25 @@ describe("SDD Master package foundation", () => {
     assert.match(npmChecklistAlpha, /npm publish --dry-run --access public --tag alpha/);
     assert.match(npmChecklistAlpha, /npm publish real somente após autorização/);
     assert.match(npmChecklistAlpha, /usar `latest` manualmente/);
+    assert.match(releaseDocBeta, /0\.5\.0-beta/);
+    assert.match(releaseDocBeta, /Beta prerelease/);
+    assert.match(releaseDocBeta, /npm install -g sdd-master@beta/);
+    assert.match(githubReleaseNotesBeta, /v0\.5\.0-beta/);
+    assert.match(githubReleaseNotesBeta, /Preset `ecommerce`/);
+    assert.match(npmChecklistBeta, /npm publish --access public --tag beta/);
+    assert.match(npmChecklistBeta, /Não usar `latest`/);
+    assert.match(presetsDoc, /ecommerce/);
+    assert.match(presetsDoc, /checkout/);
+    assert.match(productPresetsDoc, /ecommerce/);
+    assert.match(productPresetsDoc, /UI\/UX/);
+    for (const command of [
+      "init", "onboard", "doctor", "status", "update", "agents", "skills", "plugins", "security",
+      "discovery", "requirements", "clarify", "approve", "scope", "backlog", "spec", "plan", "tasks",
+      "quality", "audit", "docs", "blocker", "implement", "release", "deploy", "git", "version", "help"
+    ]) {
+      assert.match(publicApiDoc, new RegExp(`\`${command}\``));
+      assert.match(commandContractDoc, new RegExp(`\\| ${command} \\|`));
+    }
     assert.match(commandInventoryV020, /sdd master update/);
     assert.match(commandInventoryV020, /sdd master implement/);
     assert.match(commandInventoryV020, /sdd master skills/);
@@ -2899,8 +3086,11 @@ describe("SDD Master package foundation", () => {
       releaseDocV020,
       finalAuditV020,
       releaseDocAlpha,
+      releaseDocBeta,
       githubReleaseNotesAlpha,
+      githubReleaseNotesBeta,
       npmChecklistAlpha,
+      npmChecklistBeta,
       githubReleaseDocV020,
       githubReleaseNotesV020,
       commandInventoryV020,
@@ -2912,6 +3102,10 @@ describe("SDD Master package foundation", () => {
       releaseAudit,
       releaseLocal,
       npmPublish,
+      presetsDoc,
+      productPresetsDoc,
+      publicApiDoc,
+      commandContractDoc,
       readme,
       changelog
     ].join("\n");
@@ -2947,7 +3141,7 @@ describe("SDD Master package foundation", () => {
       });
 
       assert.notEqual(result.status, 0);
-      assert.match(result.stderr, /version must be 0\.3\.0-alpha/);
+      assert.match(result.stderr, /version must be 0\.5\.0-beta/);
     });
   });
 
