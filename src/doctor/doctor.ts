@@ -5,6 +5,7 @@ import {
   checkGovernance,
   checkImplementGuard,
   checkImplementReadiness,
+  checkDelivery,
   checkInternalStructure,
   checkPublicDocs,
   checkSkills,
@@ -33,6 +34,7 @@ export function runDoctor(cwd: string): DoctorReport {
   const update = checkUpdate(cwd);
   const implementReadiness = checkImplementReadiness(cwd);
   const implementGuard = checkImplementGuard(cwd);
+  const delivery = checkDelivery(cwd);
   const security = checkSensitiveFiles(cwd);
   const git = getGitInfo(cwd);
   const gitSecurity = runGitSecurityCheck(cwd, "default");
@@ -62,6 +64,7 @@ export function runDoctor(cwd: string): DoctorReport {
     update.check,
     implementReadiness.check,
     implementGuard.check,
+    delivery.check,
     gitignore,
     security.check,
     git.check,
@@ -87,6 +90,7 @@ export function runDoctor(cwd: string): DoctorReport {
     update: update.info,
     implementReadiness: implementReadiness.info,
     implementGuard: implementGuard.info,
+    delivery: delivery.info,
     gitSecurity: {
       status: gitSecurity.status,
       forbiddenFiles: gitSecurity.security.forbiddenFiles,

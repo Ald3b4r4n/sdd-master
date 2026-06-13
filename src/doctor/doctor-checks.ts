@@ -6,6 +6,7 @@ import { getGateStatus } from "../gates/gate-state.js";
 import { getImplementReadiness } from "../governance/blockers.js";
 import { getGovernanceStatus } from "../governance/governance-state.js";
 import { getImplementGuardStatus } from "../implementation/implement-readiness.js";
+import { getDeliveryStatus } from "../delivery/delivery-status.js";
 import { getSkillStatus } from "../skills/skill-registry.js";
 import { officialTemplates } from "../templates/official-templates.js";
 import { getUiuxStatus } from "../uiux/uiux-gates.js";
@@ -18,6 +19,7 @@ import type {
   DoctorGovernanceInfo,
   DoctorImplementGuardInfo,
   DoctorImplementReadinessInfo,
+  DoctorDeliveryInfo,
   DoctorSkillInfo,
   DoctorProjectState,
   DoctorSecurityInfo,
@@ -435,6 +437,34 @@ export function checkUpdate(cwd: string): {
       id: "update",
       label: "Update seguro",
       status: info.missingMetadata || info.conflicts > 0 ? "warn" : "pass",
+      details
+    },
+    info
+  };
+}
+
+export function checkDelivery(cwd: string): {
+  check: DoctorCheck;
+  info: DoctorDeliveryInfo;
+} {
+  const info = getDeliveryStatus(cwd);
+  const details = [
+    info.release.status === "not-started" ? "Release guard não iniciado." : "",
+    info.release.status === "blocked" ? `Release guard bloqueado: ${info.release.blockers} bloqueio(s).` : "",
+    info.deploy.status === "not-started" ? "Deploy guard não iniciado." : "",
+    info.deploy.status === "blocked" ? `Deploy guard bloqueado: ${info.deploy.blockers} bloqueio(s).` : "",
+    info.deploy.environment === "production" && info.deploy.status !== "ready"
+      ? "Plano de production deploy sem aprovação final."
+      : ""
+  ].filter(Boolean);
+
+  const hasBrokenProduction = info.deploy.environment === "production" && info.deploy.status === "blocked";
+
+  return {
+    check: {
+      id: "release-deploy",
+      label: "Release/Deploy guards",
+      status: hasBrokenProduction ? "fail" : details.length === 0 ? "pass" : "warn",
       details
     },
     info

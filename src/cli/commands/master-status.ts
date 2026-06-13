@@ -4,6 +4,7 @@ import { getRecognizedAgentFiles } from "../../agents/agent-writer.js";
 import { getGateStatus } from "../../gates/gate-state.js";
 import { runGitSecurityCheck } from "../../git/git-checks.js";
 import { getImplementReadiness } from "../../governance/blockers.js";
+import { getDeliveryStatus } from "../../delivery/delivery-status.js";
 import { getGovernanceStatus } from "../../governance/governance-state.js";
 import { getImplementGuardStatus } from "../../implementation/implement-readiness.js";
 import { getSkillStatus } from "../../skills/skill-registry.js";
@@ -45,6 +46,7 @@ function getInstalledStatus(cwd: string): string {
   const skills = getSkillStatus(cwd);
   const uiux = getUiuxStatus(cwd);
   const update = getUpdateStatus(cwd);
+  const delivery = getDeliveryStatus(cwd);
 
   return `SDD Master — Status
 
@@ -124,6 +126,17 @@ Update:
   Backup mais recente: ${update.latestBackup}
   Conflitos de update: ${update.conflicts}
 
+Release:
+  Último plano: ${delivery.release.latestPlan}
+  Status: ${formatDeliveryStatus(delivery.release.status)}
+  Bloqueios: ${delivery.release.blockers}
+
+Deploy:
+  Último plano: ${delivery.deploy.latestPlan}
+  Ambiente: ${delivery.deploy.environment}
+  Status: ${formatDeliveryStatus(delivery.deploy.status)}
+  Bloqueios: ${delivery.deploy.blockers}
+
 Implementação:
   Pronta: ${implementReadiness.ready ? "Sim" : "Não"}
   Bloqueios:
@@ -166,4 +179,11 @@ function formatMixedGate(value: boolean | "not-applicable" | "recommended"): str
   if (value === "not-applicable") return "not-applicable";
   if (value === "recommended") return "Recomendado";
   return value ? "OK" : "Pendente";
+}
+
+function formatDeliveryStatus(status: string): string {
+  if (status === "not-started") return "Não iniciado";
+  if (status === "ready") return "Pronto para autorização";
+  if (status === "blocked") return "Bloqueado";
+  return "Registrado";
 }

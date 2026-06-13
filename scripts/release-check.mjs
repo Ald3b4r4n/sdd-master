@@ -39,6 +39,7 @@ const requiredFiles = [
   "docs/03-codigo/desenvolvimento-local.md",
   "docs/03-codigo/release-local.md",
   "docs/03-codigo/publicacao-npm.md",
+  "docs/03-codigo/release-deploy-guards.md",
   "docs/03-codigo/inventario-comandos-0.2.0.md",
   "docs/03-codigo/workflow-sdd.md",
   "releases/github-v0.2.0-prototype.md",

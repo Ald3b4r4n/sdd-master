@@ -22,8 +22,8 @@ Transformar o SDD Master de prototype publicado em alpha operacional validado em
 
 ### 3. Release/deploy internos
 
-- Criar comando `sdd master release`.
-- Criar comando `sdd master deploy` apenas como checklist/guard.
+- Evoluir comando `sdd master release` como checklist/guard.
+- Evoluir comando `sdd master deploy` apenas como checklist/guard.
 - Nao automatizar deploy perigoso.
 
 ### 4. Plugins/skills

@@ -245,5 +245,11 @@ Gates:
 
 Próximo passo futuro:
   Uma implementação real só poderá acontecer após aprovação humana explícita e gates mínimos aprovados.
+  Após implementação real futura, execute:
+    sdd master quality
+    sdd master audit
+    sdd master docs
+    sdd master release
+    sdd master deploy
 `;
 }

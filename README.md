@@ -105,6 +105,26 @@ Esta versão adiciona o primeiro fluxo SDD funcional:
 - skills/UIUX;
 - update seguro.
 
+## Release e deploy guards
+
+O SDD Master possui comandos de preparação para release e deploy.
+
+Eles não publicam e não fazem deploy automaticamente.
+
+```bash
+sdd master release --yes --version="0.3.0-alpha" --channel="alpha" --type="local" --dry-run
+sdd master deploy --yes --environment="staging" --provider="vercel" --strategy="serverless" --dry-run
+```
+
+Regras:
+
+- release não cria tag automaticamente;
+- release não publica npm;
+- release não publica GitHub Release;
+- deploy não acessa servidor;
+- deploy não executa scripts remotos;
+- ambos registram plano, checklist, riscos e aprovações pendentes.
+
 ## Uso local durante desenvolvimento
 
 ```bash

@@ -136,6 +136,20 @@ export type DoctorImplementGuardInfo = {
   nextAction: string;
 };
 
+export type DoctorDeliveryInfo = {
+  release: {
+    latestPlan: string;
+    status: "not-started" | "blocked" | "ready" | "registered";
+    blockers: number;
+  };
+  deploy: {
+    latestPlan: string;
+    environment: string;
+    status: "not-started" | "blocked" | "ready" | "registered";
+    blockers: number;
+  };
+};
+
 export type DoctorReport = {
   status: DoctorStatus;
   checks: DoctorCheck[];
@@ -152,6 +166,7 @@ export type DoctorReport = {
   update: DoctorUpdateInfo;
   implementReadiness: DoctorImplementReadinessInfo;
   implementGuard: DoctorImplementGuardInfo;
+  delivery: DoctorDeliveryInfo;
   gitSecurity: {
     status: "clean" | "warning" | "blocked";
     forbiddenFiles: string[];

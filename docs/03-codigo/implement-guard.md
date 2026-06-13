@@ -54,6 +54,18 @@ Critérios mínimos:
 
 Uma implementação real deverá usar o manifesto `IMPLEMENT-XXX.md`, respeitar escopo aprovado e exigir autorização humana explícita.
 
+Depois de uma implementação real futura, execute:
+
+```bash
+sdd master quality
+sdd master audit
+sdd master docs
+sdd master release
+sdd master deploy
+```
+
+`release` e `deploy` continuam sendo guards/checklists: não publicam e não implantam automaticamente.
+
 ## Redução de risco
 
 O guard reduz o risco de IA codar sem autorização porque transforma readiness em checklist explícito, auditável e bloqueante.

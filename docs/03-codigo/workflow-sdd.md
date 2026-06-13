@@ -77,7 +77,13 @@ sdd master uiux --yes --type="responsiveness" --phase="PHASE-01" --profile="WEB"
 
 Skills externas podem ser propostas com `sdd master skills`, mas só são instaladas localmente como metadados após aprovação humana.
 
-## Comandos ainda pendentes
+## Release e deploy guards
 
-- `sdd master release`
-- `sdd master deploy`
+Depois de implementar no futuro e revalidar quality, audit e docs, prepare entrega com:
+
+```bash
+sdd master release --yes --version="0.3.0-alpha" --channel="alpha" --type="local" --dry-run
+sdd master deploy --yes --environment="staging" --provider="manual" --strategy="manual" --dry-run
+```
+
+Esses comandos sao guards/checklists. Eles nao publicam pacote, nao criam tag, nao publicam GitHub Release e nao fazem deploy real.

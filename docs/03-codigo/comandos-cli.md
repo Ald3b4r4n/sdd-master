@@ -151,3 +151,14 @@ Regras:
 - backup local é criado antes de alterações em arquivos existentes;
 - templates sem marcador gerenciado ou modificados localmente são preservados;
 - nenhum histórico é apagado.
+
+## Release e deploy guards
+
+```bash
+sdd master release --yes --version="0.3.0-alpha" --channel="alpha" --type="local" --dry-run
+sdd master deploy --yes --environment="staging" --provider="vercel" --strategy="serverless" --dry-run
+```
+
+`release` cria plano/checklist em `.sdd-master/releases/`, valida gates e registra readiness. Ele não cria tag, não publica npm e não publica GitHub Release.
+
+`deploy` cria plano/checklist em `.sdd-master/deliveries/`, valida riscos de ambiente, rollback, observability, env vars e secrets por nome. Ele não acessa servidor, não envia arquivos e não executa scripts remotos.

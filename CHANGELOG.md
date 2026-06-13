@@ -4,6 +4,11 @@
 
 ### Adicionado
 
+- Comando `sdd master release` como guard/checklist.
+- Comando `sdd master deploy` como guard/checklist.
+- Planos estruturados em `.sdd-master/releases/` e `.sdd-master/deliveries/`.
+- Checks de release/deploy em `status` e `doctor`.
+- Bloqueios contra publicação/deploy sem aprovação humana.
 - Auditoria final da fase `0.2.0-prototype`.
 - Inventário dos comandos implementados.
 - Matriz de maturidade do SDD Master.

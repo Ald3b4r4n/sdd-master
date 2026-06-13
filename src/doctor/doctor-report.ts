@@ -104,6 +104,17 @@ Update:
   Backup mais recente: ${report.update.latestBackup}
   Conflitos de update: ${report.update.conflicts}
 
+Release Guard:
+  Último plano: ${report.delivery.release.latestPlan}
+  Status: ${formatDeliveryStatus(report.delivery.release.status)}
+  Bloqueios: ${report.delivery.release.blockers}
+
+Deploy Guard:
+  Último plano: ${report.delivery.deploy.latestPlan}
+  Ambiente: ${report.delivery.deploy.environment}
+  Status: ${formatDeliveryStatus(report.delivery.deploy.status)}
+  Bloqueios: ${report.delivery.deploy.blockers}
+
 Implementação:
   Pronta: ${report.implementReadiness.ready ? "Sim" : "Não"}
   Bloqueios:
@@ -171,4 +182,11 @@ function formatMixedGate(value: boolean | "not-applicable" | "recommended"): str
   if (value === "not-applicable") return "not-applicable";
   if (value === "recommended") return "Recomendado";
   return value ? "OK" : "Pendente";
+}
+
+function formatDeliveryStatus(status: string): string {
+  if (status === "not-started") return "Não iniciado";
+  if (status === "ready") return "Pronto para autorização";
+  if (status === "blocked") return "Bloqueado";
+  return "Registrado";
 }

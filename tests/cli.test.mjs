@@ -110,7 +110,8 @@ describe("SDD Master package foundation", () => {
 
     assert.equal(result.status, 0);
     assert.match(result.stdout, /SDD Master — Namespace master/);
-    assert.match(result.stdout, /Comandos planejados/);
+    assert.match(result.stdout, /sdd master release/);
+    assert.match(result.stdout, /sdd master deploy/);
   });
 
   it("shows contextual help for init", () => {
@@ -2092,6 +2093,137 @@ describe("SDD Master package foundation", () => {
     const prePush = runCli(["master", "git", "--pre-push"], rootDir);
     assert.notEqual(prePush.stdout, "");
     assert.doesNotMatch(prePush.stdout, /Status geral:\s+blocked/);
+  });
+
+  it("implements release and deploy guards without publishing or deploying", () => {
+    withTempProject((projectDir) => {
+      const releaseWithoutInit = runCli(["master", "release"], projectDir);
+      const deployWithoutInit = runCli(["master", "deploy"], projectDir);
+
+      assert.notEqual(releaseWithoutInit.status, 0);
+      assert.notEqual(deployWithoutInit.status, 0);
+      assert.match(releaseWithoutInit.stderr, /SDD Master não inicializado/);
+      assert.match(deployWithoutInit.stderr, /SDD Master não inicializado/);
+
+      const releaseHelp = runCli(["master", "release", "--help"], projectDir);
+      const deployHelp = runCli(["master", "deploy", "--help"], projectDir);
+      const releaseMasterHelp = runCli(["master", "help", "release"], projectDir);
+      const deployMasterHelp = runCli(["master", "help", "deploy"], projectDir);
+
+      assert.equal(releaseHelp.status, 0);
+      assert.equal(deployHelp.status, 0);
+      assert.equal(releaseMasterHelp.status, 0);
+      assert.equal(deployMasterHelp.status, 0);
+      assert.match(releaseHelp.stdout, /não cria tag/);
+      assert.match(releaseHelp.stdout, /não publica npm/);
+      assert.match(deployHelp.stdout, /não executa deploy real/);
+      assert.match(deployHelp.stdout, /não acessa servidor/);
+
+      const init = initTempProject(projectDir);
+      assert.equal(init.status, 0, init.stderr);
+      assert.equal(runGit(["init"], projectDir).status, 0);
+      const tagsBefore = runGit(["tag", "--list"], projectDir).stdout;
+
+      const release = runCli(
+        [
+          "master",
+          "release",
+          "--yes",
+          "--phase=PHASE-01",
+          "--version=0.3.0-alpha",
+          "--channel=alpha",
+          "--type=local",
+          "--dry-run",
+          "--json"
+        ],
+        projectDir
+      );
+      const deploy = runCli(
+        [
+          "master",
+          "deploy",
+          "--yes",
+          "--phase=PHASE-01",
+          "--environment=staging",
+          "--provider=vercel",
+          "--strategy=serverless",
+          "--dry-run",
+          "--json"
+        ],
+        projectDir
+      );
+      const deployProduction = runCli(
+        ["master", "deploy", "--yes", "--environment=production", "--dry-run", "--json"],
+        projectDir
+      );
+      const tagsAfter = runGit(["tag", "--list"], projectDir).stdout;
+
+      assert.notEqual(release.status, 0);
+      assert.notEqual(deploy.status, 0);
+      assert.notEqual(deployProduction.status, 0);
+
+      const releaseJson = JSON.parse(release.stdout);
+      const deployJson = JSON.parse(deploy.stdout);
+      const productionJson = JSON.parse(deployProduction.stdout);
+
+      assert.equal(releaseJson.tagCreated, false);
+      assert.equal(releaseJson.published, false);
+      assert.equal(releaseJson.githubReleaseCreated, false);
+      assert.equal(deployJson.deployed, false);
+      assert.equal(deployJson.serverAccessed, false);
+      assert.equal(deployJson.remoteScriptsExecuted, false);
+      assert.equal(productionJson.status, "blocked");
+      assert.equal(productionJson.blockers.includes("Deploy production exige aprovação humana explícita."), true);
+      assert.equal(tagsAfter, tagsBefore);
+
+      const releaseFile = join(projectDir, ".sdd-master", "releases", "RELEASE-001.md");
+      const releaseChecklist = join(
+        projectDir,
+        ".sdd-master",
+        "releases",
+        "checklists",
+        "RELEASE-CHECKLIST-001.md"
+      );
+      const deployFile = join(projectDir, ".sdd-master", "deliveries", "DEPLOY-001.md");
+      const deployChecklist = join(
+        projectDir,
+        ".sdd-master",
+        "deliveries",
+        "checklists",
+        "DEPLOY-CHECKLIST-001.md"
+      );
+
+      assert.equal(existsSync(releaseFile), true);
+      assert.equal(existsSync(releaseChecklist), true);
+      assert.equal(existsSync(deployFile), true);
+      assert.equal(existsSync(deployChecklist), true);
+
+      const releaseContent = readFileSync(releaseFile, "utf8");
+      const deployContent = readFileSync(deployFile, "utf8");
+      assert.match(releaseContent, /Este comando não cria tag, não publica npm e não publica GitHub Release/);
+      assert.match(deployContent, /Este comando não executa deploy real/);
+      assert.doesNotMatch(deployContent, /\b(ssh|ftp|sftp|rsync|scp)\b/i);
+      assert.match(deployContent, /NODE_ENV/);
+      assert.match(deployContent, /APP_ENV/);
+      assert.doesNotMatch(deployContent, /NODE_ENV=/);
+      assert.doesNotMatch(deployContent, /APP_ENV=/);
+
+      const status = runCli(["master", "status"], projectDir);
+      assert.equal(status.status, 0);
+      assert.match(status.stdout, /Release:/);
+      assert.match(status.stdout, /Deploy:/);
+
+      const doctor = runCli(["master", "doctor", "--json"], projectDir);
+      assert.equal(doctor.status, 0);
+      const doctorJson = JSON.parse(doctor.stdout);
+      assert.equal(typeof doctorJson.delivery.release, "object");
+      assert.equal(typeof doctorJson.delivery.deploy, "object");
+
+      assert.equal(existsSync(join(projectDir, ".env")), false);
+      const allDeliveryText = `${releaseContent}\n${deployContent}`;
+      assert.doesNotMatch(allDeliveryText, /sk-[A-Za-z0-9_-]{20,}|BEGIN (RSA |EC |OPENSSH |)PRIVATE KEY/);
+      assert.equal(existsSync(join(rootDir, ".sdd-master")), false);
+    });
   });
 
   it("includes local prototype release checks and documentation", () => {

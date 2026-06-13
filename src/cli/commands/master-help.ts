@@ -298,19 +298,52 @@ const commandHelps: Record<string, CommandHelp> = {
   },
   release: {
     command: "release",
-    status: "Planejado.",
-    purpose: "Preparar releases com checks, changelog e evidências.",
-    whenUsed: "Será usado depois de qualidade e auditoria passarem.",
-    example: "sdd master release",
-    security: ["Não deve publicar pacote sem confirmação explícita."]
+    status: "Disponível no BLOCO 25 como guard/checklist.",
+    purpose: "Criar plano/checklist de release, validar gates e registrar readiness sem publicar.",
+    whenUsed: "Use depois de quality, audit, docs, blockers e implement guard para preparar uma release autorizável.",
+    example: 'sdd master release --yes --version="0.3.0-alpha" --channel="alpha" --type="local" --dry-run',
+    creates: [
+      ".sdd-master/releases/release-index.md",
+      ".sdd-master/releases/RELEASE-001.md",
+      ".sdd-master/releases/checklists/RELEASE-CHECKLIST-001.md"
+    ],
+    details: [
+      "Flags: --help, --json, --yes, -y, --phase, --title, --target, --environment, --dry-run, --version, --channel, --type, --checklist.",
+      "Dry-run é o comportamento padrão.",
+      "Mesmo sem --dry-run, este bloco continua sendo apenas guard/checklist.",
+      "Valida workflow, aprovações, clarificações, escopo, quality, audit, docs, blockers, implement guard, test gates, UI/UX, security/git, package check, npm dry-run e release notes."
+    ],
+    security: [
+      "Não cria tag automaticamente.",
+      "Não publica npm.",
+      "Não publica GitHub Release.",
+      "Release real exige autorização humana explícita fora deste comando."
+    ]
   },
   deploy: {
     command: "deploy",
-    status: "Planejado.",
-    purpose: "Preparar fluxos de entrega e implantação com segurança.",
-    whenUsed: "Será usado quando o projeto tiver destino de deploy definido.",
-    example: "sdd master deploy",
-    security: ["Não deve armazenar credenciais de deploy no repositório."]
+    status: "Disponível no BLOCO 25 como guard/checklist.",
+    purpose: "Criar plano/checklist de deploy, validar riscos e registrar readiness sem executar deploy.",
+    whenUsed: "Use depois de preparar release guard e antes de qualquer entrega real.",
+    example: 'sdd master deploy --yes --environment="staging" --provider="vercel" --strategy="serverless" --dry-run',
+    creates: [
+      ".sdd-master/deliveries/delivery-index.md",
+      ".sdd-master/deliveries/DEPLOY-001.md",
+      ".sdd-master/deliveries/checklists/DEPLOY-CHECKLIST-001.md"
+    ],
+    details: [
+      "Flags: --help, --json, --yes, -y, --phase, --title, --target, --environment, --dry-run, --provider, --strategy, --checklist.",
+      "Dry-run é o comportamento padrão.",
+      "Mesmo sem --dry-run, este bloco continua sendo apenas guard/checklist.",
+      "Valida release guard, security/git, env vars sem valores, secrets, database, rollback, observability, backup, documentation e aprovação humana."
+    ],
+    security: [
+      "Não acessa servidor.",
+      "Não executa scripts remotos.",
+      "Não usa SSH/SFTP/FTP/rsync/scp.",
+      "Não armazena credenciais ou valores de secrets.",
+      "Deploy real exige autorização humana explícita fora deste comando."
+    ]
   },
   agents: {
     command: "agents",
@@ -402,8 +435,6 @@ Comandos disponíveis:
   sdd master docs       Registra estado documental
   sdd master blocker    Gerencia blockers formais
   sdd master implement  Verifica readiness em modo guard/dry-run
-
-Comandos planejados:
   sdd master release
   sdd master deploy
 
