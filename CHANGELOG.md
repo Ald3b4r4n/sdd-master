@@ -31,6 +31,11 @@
 - Test gates para validar testes obrigatórios antes da implementação.
 - Registro `.sdd-master/implementation/`.
 - Bloqueio explícito contra implementação sem gates mínimos aprovados.
+- Comando `sdd master skills`.
+- Comando `sdd master uiux`.
+- Registro de skills candidatas, aprovadas, instaladas localmente e usadas.
+- Gates de UI/UX, design system, acessibilidade, SEO, responsividade e performance.
+- Integração dos gates de design com `status`, `doctor` e `implement`.
 
 ## [0.1.0-prototype.1] - 2026-06-11
 

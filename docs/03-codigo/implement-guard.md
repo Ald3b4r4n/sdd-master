@@ -24,8 +24,20 @@ O guard verifica:
 - audit;
 - docs;
 - blockers;
+- UI/UX aprovado quando o perfil exige interface;
+- design system quando o perfil exige interface;
+- acessibilidade quando o perfil exige interface;
+- SEO para `WEB`, `SAAS` e `E-COMMERCE`;
+- responsividade para perfis com tela;
+- relatório de skills usadas;
 - test gates;
 - segurança/Git.
+
+## Gates de design
+
+Design deve ser o carro-chefe do SDD Master. Para perfis com interface, `implement` bloqueia quando UI/UX, design system, acessibilidade ou responsividade estão pendentes. Para presença web pública, SEO também bloqueia.
+
+Perfis `API` e `AI-AGENT` aparecem como `not-applicable` para UI/UX visual. Perfil `CLI` mantém UX textual aplicável e não exige SEO visual.
 
 ## Test gates
 

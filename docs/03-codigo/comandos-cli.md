@@ -100,6 +100,30 @@ Comandos:
 
 `failed`, `BLOCKER`, `HIGH`, `CRITICAL`, `missing` e `outdated` alimentam `status`, `doctor` e readiness de implementação.
 
+## Skills locais
+
+```bash
+sdd master skills --yes --title="Antigravity UI polish" --category="uiux" --source="https://github.com/sickn33/antigravity-awesome-skills/"
+sdd master skills --yes --skill="SKILL-001" --approve
+sdd master skills --yes --skill="SKILL-001" --install-local
+sdd master skills --yes --skill="SKILL-001" --mark-used --phase="PHASE-01" --target="uiux-review"
+sdd master skills --json --report
+```
+
+`skills` registra candidatas, aprovação humana, instalação local como metadado e uso em relatório. O comando não instala globalmente, não baixa código remoto, não executa skill externa e não cria `.env`.
+
+## UI/UX e design gates
+
+```bash
+sdd master uiux --yes --phase="PHASE-01" --profile="WEB" --title="Revisão UI/UX inicial"
+sdd master uiux --yes --type="design-system" --phase="PHASE-01" --profile="WEB"
+sdd master uiux --yes --type="accessibility" --phase="PHASE-01" --profile="WEB"
+sdd master uiux --yes --type="seo" --phase="PHASE-01" --profile="WEB"
+sdd master uiux --yes --type="responsiveness" --phase="PHASE-01" --profile="WEB"
+```
+
+`uiux` cria registros de interface, design system, acessibilidade, SEO, responsividade e performance. Perfis `WEB`, `MOBILE`, `DESKTOP`, `SAAS` e `E-COMMERCE` são tratados como aplicáveis; `API` aparece como `not-applicable` para SEO visual.
+
 ## Implement Guard
 
 ```bash

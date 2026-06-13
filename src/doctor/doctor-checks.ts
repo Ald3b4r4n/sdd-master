@@ -6,7 +6,9 @@ import { getGateStatus } from "../gates/gate-state.js";
 import { getImplementReadiness } from "../governance/blockers.js";
 import { getGovernanceStatus } from "../governance/governance-state.js";
 import { getImplementGuardStatus } from "../implementation/implement-readiness.js";
+import { getSkillStatus } from "../skills/skill-registry.js";
 import { officialTemplates } from "../templates/official-templates.js";
+import { getUiuxStatus } from "../uiux/uiux-gates.js";
 import type {
   DoctorAgentInfo,
   DoctorCheck,
@@ -15,9 +17,11 @@ import type {
   DoctorGovernanceInfo,
   DoctorImplementGuardInfo,
   DoctorImplementReadinessInfo,
+  DoctorSkillInfo,
   DoctorProjectState,
   DoctorSecurityInfo,
-  DoctorTemplateInfo
+  DoctorTemplateInfo,
+  DoctorUiuxInfo
 } from "./doctor-types.js";
 import { getWorkflowStatus } from "../workflow/workflow-runner.js";
 
@@ -364,6 +368,51 @@ export function checkImplementGuard(cwd: string): {
       details
     },
     info: guard
+  };
+}
+
+export function checkSkills(cwd: string): {
+  check: DoctorCheck;
+  info: DoctorSkillInfo;
+} {
+  const info = getSkillStatus(cwd);
+  const details = [
+    info.candidates === 0 && info.approved === 0 && info.installedLocal === 0 && info.used === 0
+      ? "Skills não iniciadas."
+      : "",
+    info.used > 0 && info.usageReports === 0 ? "Skills usadas sem relatório." : ""
+  ].filter(Boolean);
+
+  return {
+    check: {
+      id: "skills",
+      label: "Skills locais",
+      status: info.used > 0 && info.usageReports === 0 ? "fail" : details.length === 0 ? "pass" : "warn",
+      details
+    },
+    info
+  };
+}
+
+export function checkUiux(cwd: string): {
+  check: DoctorCheck;
+  info: DoctorUiuxInfo;
+} {
+  const info = getUiuxStatus(cwd);
+  const details = info.applicable
+    ? info.blockers.length > 0
+      ? info.blockers
+      : []
+    : ["UI/UX visual not-applicable para este perfil."];
+
+  return {
+    check: {
+      id: "uiux",
+      label: "UI/UX e design gates",
+      status: info.applicable && info.blockers.length > 0 ? "warn" : "pass",
+      details
+    },
+    info
   };
 }
 

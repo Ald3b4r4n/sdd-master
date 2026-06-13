@@ -3,6 +3,8 @@ import { join } from "node:path";
 import { runGitSecurityCheck } from "../git/git-checks.js";
 import { getImplementReadiness } from "../governance/blockers.js";
 import { getGovernanceStatus } from "../governance/governance-state.js";
+import { getSkillStatus } from "../skills/skill-registry.js";
+import { getUiuxStatus } from "../uiux/uiux-gates.js";
 import { getWorkflowStatus } from "../workflow/workflow-runner.js";
 import type { ImplementGate, ImplementStatus } from "./implement-types.js";
 import { getTestGateStatus } from "./test-gates.js";
@@ -17,7 +19,9 @@ export function getImplementationReadiness(cwd: string, task = "TASK-001"): {
   const governance = getGovernanceStatus(cwd);
   const testGates = getTestGateStatus(cwd, task);
   const gitSecurity = runGitSecurityCheck(cwd, "default");
-  const blockers = [...base.blockers, ...testGates.reasons];
+  const uiux = getUiuxStatus(cwd);
+  const skills = getSkillStatus(cwd);
+  const blockers = [...base.blockers, ...testGates.reasons, ...uiux.blockers];
 
   if (gitSecurity.status === "blocked") {
     blockers.push("Git/Security bloqueado");
@@ -36,6 +40,13 @@ export function getImplementationReadiness(cwd: string, task = "TASK-001"): {
     gate("Audit", !base.blockers.some((item) => item.startsWith("Auditoria")), "Sem auditoria HIGH/CRITICAL/BLOCKER aberta"),
     gate("Docs", !base.blockers.includes("Documentação desatualizada"), "Sem docs missing/outdated"),
     gate("Blockers", !base.blockers.includes("Blockers ativos"), "Nenhum blocker ativo"),
+    gate("UI/UX", uiux.applicable ? uiux.uiuxApproved : true, uiux.applicable ? `Perfil ${uiux.profile}` : "not-applicable"),
+    gate("Design system", uiux.applicable ? uiux.designSystem : true, uiux.applicable ? ".sdd-master/uiux/design-system.md" : "not-applicable"),
+    gate("Accessibility", uiux.applicable ? uiux.accessibility : true, uiux.applicable ? ".sdd-master/uiux/accessibility-checklist.md" : "not-applicable"),
+    mixedGate("SEO", uiux.seo, ".sdd-master/uiux/seo-checklist.md"),
+    mixedGate("Responsiveness", uiux.responsiveness, ".sdd-master/uiux/responsiveness-checklist.md"),
+    mixedGate("Performance", uiux.performance, ".sdd-master/uiux/performance-checklist.md"),
+    gate("Skills usage report", skills.used === 0 || skills.usageReports > 0, `${skills.usageReports} relatório(s) para ${skills.used} skill(s) usada(s)`),
     gate("Test gates", testGates.ok, testGates.evidence),
     gate("Security/Git", gitSecurity.status !== "blocked", gitSecurity.recommendation)
   ];
@@ -92,6 +103,18 @@ function gate(name: string, ok: boolean, evidence: string): ImplementGate {
     status: ok ? "OK" : "Pendente",
     evidence
   };
+}
+
+function mixedGate(name: string, value: boolean | "not-applicable" | "recommended", evidence: string): ImplementGate {
+  if (value === "not-applicable") {
+    return { gate: name, status: "not-applicable", evidence: "not-applicable" };
+  }
+
+  if (value === "recommended") {
+    return { gate: name, status: "Recomendado", evidence };
+  }
+
+  return gate(name, value, evidence);
 }
 
 function allApprovalsPresent(approvedTargets: string[]): boolean {

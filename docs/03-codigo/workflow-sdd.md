@@ -63,6 +63,20 @@ sdd master implement --yes --phase="PHASE-01" --task="TASK-001" --dry-run
 
 Neste prototype, `implement` não altera código. Ele valida readiness, test gates e segurança antes de uma futura implementação real.
 
+## Design antes de implementar
+
+Para projetos com interface, rode os gates de design antes do implement:
+
+```bash
+sdd master uiux --yes --phase="PHASE-01" --profile="WEB" --title="Revisão UI/UX inicial" --status=approved
+sdd master uiux --yes --type="design-system" --phase="PHASE-01" --profile="WEB"
+sdd master uiux --yes --type="accessibility" --phase="PHASE-01" --profile="WEB"
+sdd master uiux --yes --type="seo" --phase="PHASE-01" --profile="WEB"
+sdd master uiux --yes --type="responsiveness" --phase="PHASE-01" --profile="WEB"
+```
+
+Skills externas podem ser propostas com `sdd master skills`, mas só são instaladas localmente como metadados após aprovação humana.
+
 ## Comandos ainda pendentes
 
 - `sdd master release`

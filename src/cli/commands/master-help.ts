@@ -322,11 +322,44 @@ const commandHelps: Record<string, CommandHelp> = {
   },
   skills: {
     command: "skills",
-    status: "Planejado.",
-    purpose: "Gerenciar instruções e habilidades reutilizáveis para agentes.",
-    whenUsed: "Será usado quando o projeto precisar de fluxos especializados.",
-    example: "sdd master skills",
-    security: ["Skills externas devem ser revisadas antes do uso."]
+    status: "Disponível no BLOCO 21.",
+    purpose: "Registrar, aprovar, instalar localmente como metadado e reportar uso de skills.",
+    whenUsed: "Use quando o projeto precisar propor skills externas ou registrar skills usadas por agentes.",
+    example: 'sdd master skills --yes --title="Skill de UI/UX" --category="uiux"',
+    creates: [".sdd-master/skills/SKILL-001.md", ".agents/skills/registry.md", ".agents/skills/installed/"],
+    details: [
+      "Flags: --help, --json, --yes, -y, --title, --phase, --type, --status, --category, --source, --skill, --reason, --approve, --install-local, --mark-used, --report, --target.",
+      "Instalação local cria apenas metadados.",
+      "Toda skill usada deve aparecer em relatório.",
+      "Skills alimentam UI/UX e implement readiness quando usadas."
+    ],
+    security: [
+      "Instalação global é proibida.",
+      "Skills externas exigem aprovação humana.",
+      "Não baixa nem executa código remoto.",
+      "Não cria .env real."
+    ]
+  },
+  uiux: {
+    command: "uiux",
+    status: "Disponível no BLOCO 21.",
+    purpose: "Criar registros e gates de UI/UX, design system, acessibilidade, SEO, responsividade e performance.",
+    whenUsed: "Use antes de implementar interfaces ou presença web pública.",
+    example: 'sdd master uiux --yes --phase="PHASE-01" --profile="WEB" --title="Revisão UI/UX inicial"',
+    creates: [
+      ".sdd-master/uiux/UIUX-001.md",
+      ".sdd-master/uiux/design-system.md",
+      ".sdd-master/uiux/accessibility-checklist.md",
+      ".sdd-master/uiux/seo-checklist.md",
+      ".sdd-master/uiux/responsiveness-checklist.md"
+    ],
+    details: [
+      "Flags: --help, --json, --yes, -y, --title, --phase, --type, --status, --category, --source, --skill, --reason, --profile, --target.",
+      "Perfis WEB, MOBILE, DESKTOP, SAAS e E-COMMERCE exigem UI/UX aprovado, design system, acessibilidade e responsividade.",
+      "WEB, SAAS e E-COMMERCE exigem SEO.",
+      "Perfil API aparece como not-applicable."
+    ],
+    security: ["Não executa implementação.", "Não instala dependências.", "Integra readiness do implement."]
   }
 };
 
@@ -342,6 +375,8 @@ Comandos disponíveis:
   sdd master doctor     Diagnostica a instalação SDD Master
   sdd master agents     Gera arquivos de instrução para IAs/agentes
   sdd master git        Diagnostica Git e segurança local
+  sdd master skills     Gerencia skills locais e relatórios de uso
+  sdd master uiux       Cria gates de design, accessibility, SEO e responsividade
   sdd master discovery  Cria discovery inicial
   sdd master requirements Cria requisitos iniciais
   sdd master spec       Cria especificação inicial
@@ -361,8 +396,6 @@ Comandos planejados:
   sdd master update
   sdd master release
   sdd master deploy
-  sdd master agents
-  sdd master skills
 
 Use:
   sdd master help <command>

@@ -76,6 +76,26 @@ export type DoctorImplementReadinessInfo = {
   blockers: string[];
 };
 
+export type DoctorSkillInfo = {
+  candidates: number;
+  approved: number;
+  installedLocal: number;
+  used: number;
+  usageReports: number;
+};
+
+export type DoctorUiuxInfo = {
+  applicable: boolean;
+  profile: string;
+  uiuxApproved: boolean;
+  designSystem: boolean;
+  accessibility: boolean;
+  seo: boolean | "not-applicable";
+  responsiveness: boolean | "not-applicable";
+  performance: boolean | "recommended";
+  blockers: string[];
+};
+
 export type DoctorGateInfo = {
   quality: {
     total: number;
@@ -118,6 +138,8 @@ export type DoctorReport = {
   workflow: DoctorWorkflowInfo;
   governance: DoctorGovernanceInfo;
   gates: DoctorGateInfo;
+  skills: DoctorSkillInfo;
+  uiux: DoctorUiuxInfo;
   implementReadiness: DoctorImplementReadinessInfo;
   implementGuard: DoctorImplementGuardInfo;
   gitSecurity: {

@@ -86,6 +86,8 @@ node dist/cli/main.js master help
 | `sdd master doctor` | Disponível | Diagnostica instalação |
 | `sdd master agents` | Disponível | Gera instruções multi-IA |
 | `sdd master git` | Disponível | Valida Git e segurança |
+| `sdd master skills` | Disponível | Gerencia skills locais e relatórios |
+| `sdd master uiux` | Disponível | Cria gates de design e interface |
 | `sdd master discovery` | Disponível | Cria discovery inicial |
 | `sdd master requirements` | Disponível | Cria requisitos iniciais |
 | `sdd master spec` | Disponível | Cria especificação inicial |
@@ -272,6 +274,27 @@ sdd master blocker --yes --title="Bloqueio formal" --phase="PHASE-01" --severity
 
 Blockers abertos impedem a futura implementação.
 
+## Skills locais e UI/UX
+
+O SDD Master trata design como diferencial do framework.
+
+Comandos:
+
+```bash
+sdd master skills --yes --title="Skill de UI/UX" --category="uiux" --source="https://github.com/sickn33/antigravity-awesome-skills/"
+sdd master skills --yes --skill="SKILL-001" --approve
+sdd master skills --yes --skill="SKILL-001" --install-local
+sdd master uiux --yes --phase="PHASE-01" --profile="WEB" --title="Revisão UI/UX inicial"
+```
+
+Regras:
+
+- skills são locais;
+- nada é instalado globalmente por padrão;
+- skills externas exigem aprovação humana;
+- toda skill usada aparece em relatório;
+- UI/UX, acessibilidade, SEO e responsividade bloqueiam implementação quando aplicável.
+
 ## Implement Guard
 
 O comando `sdd master implement` existe como guardião de implementação.
@@ -291,6 +314,8 @@ Ele verifica:
 - auditoria;
 - documentação;
 - blockers;
+- UI/UX, design system, acessibilidade, SEO e responsividade quando aplicável;
+- relatório de skills usadas;
 - testes obrigatórios antes da implementação;
 - segurança/Git.
 
@@ -393,6 +418,7 @@ Nunca publique `.env`, tokens, credenciais, chaves privadas, certificados, dados
 - [Comandos CLI](docs/03-codigo/comandos-cli.md)
 - [Desenvolvimento local](docs/03-codigo/desenvolvimento-local.md)
 - [Workflow SDD](docs/03-codigo/workflow-sdd.md)
+- [Skills locais e UI/UX](docs/03-codigo/skills-uiux.md)
 
 ## Roadmap
 

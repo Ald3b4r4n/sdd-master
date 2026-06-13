@@ -83,6 +83,20 @@ Blockers:
   Abertos: ${report.gates.blockers.open}
   Resolvidos: ${report.gates.blockers.resolved}
 
+Skills:
+  Candidatas: ${report.skills.candidates}
+  Aprovadas: ${report.skills.approved}
+  Instaladas localmente: ${report.skills.installedLocal}
+  Usadas: ${report.skills.used}
+
+UI/UX:
+  Aplicável: ${report.uiux.applicable ? "Sim" : "Não"}
+  Design system: ${report.uiux.designSystem ? "OK" : "Pendente"}
+  Acessibilidade: ${report.uiux.accessibility ? "OK" : "Pendente"}
+  SEO: ${formatMixedGate(report.uiux.seo)}
+  Responsividade: ${formatMixedGate(report.uiux.responsiveness)}
+  Performance: ${formatMixedGate(report.uiux.performance)}
+
 Implementação:
   Pronta: ${report.implementReadiness.ready ? "Sim" : "Não"}
   Bloqueios:
@@ -144,4 +158,10 @@ function formatImplementGuardStatus(status: string): string {
   if (status === "not-started") return "Não iniciado";
   if (status === "ready") return "Pronto para autorização";
   return "Bloqueado";
+}
+
+function formatMixedGate(value: boolean | "not-applicable" | "recommended"): string {
+  if (value === "not-applicable") return "not-applicable";
+  if (value === "recommended") return "Recomendado";
+  return value ? "OK" : "Pendente";
 }

@@ -503,6 +503,171 @@ describe("SDD Master package foundation", () => {
     });
   });
 
+  it("supports local skills and UI/UX gates without global installs or root state", () => {
+    withTempProject((projectDir) => {
+      const skillsWithoutInit = runCli(["master", "skills", "--yes", "--title=Skill"], projectDir);
+      const uiuxWithoutInit = runCli(["master", "uiux", "--yes", "--profile=WEB"], projectDir);
+
+      assert.notEqual(skillsWithoutInit.status, 0);
+      assert.match(skillsWithoutInit.stderr, /SDD Master não inicializado/);
+      assert.notEqual(uiuxWithoutInit.status, 0);
+      assert.match(uiuxWithoutInit.stderr, /sdd master init/);
+
+      assert.equal(initTempProject(projectDir).status, 0);
+      assert.equal(
+        runCli(["master", "discovery", "--yes", "--title=Web", "--project-type=web", "--profiles=WEB"], projectDir).status,
+        0
+      );
+
+      const skill = runCli(
+        [
+          "master",
+          "skills",
+          "--yes",
+          "--title=Antigravity UI polish",
+          "--category=uiux",
+          "--source=https://github.com/sickn33/antigravity-awesome-skills/",
+          "--reason=Avaliar boas práticas visuais."
+        ],
+        projectDir
+      );
+      assert.equal(skill.status, 0, skill.stderr);
+      assert.equal(existsSync(join(projectDir, ".sdd-master", "skills", "SKILL-001.md")), true);
+      assert.match(readFileSync(join(projectDir, ".sdd-master", "skills", "SKILL-001.md"), "utf8"), /Instalação global\nProibida/);
+
+      const skillJson = JSON.parse(runCli(["master", "skills", "--json", "--report"], projectDir).stdout);
+      assert.equal(skillJson.summary.candidates, 1);
+
+      const approve = runCli(
+        ["master", "skills", "--yes", "--skill=SKILL-001", "--approve", "--reason=Aprovada para uso local."],
+        projectDir
+      );
+      assert.equal(approve.status, 0, approve.stderr);
+      assert.match(readFileSync(join(projectDir, ".sdd-master", "skills", "SKILL-001.md"), "utf8"), /## Status\nAprovada/);
+
+      const install = runCli(["master", "skills", "--yes", "--skill=SKILL-001", "--install-local"], projectDir);
+      assert.equal(install.status, 0, install.stderr);
+      const installedSkill = readFileSync(join(projectDir, ".agents", "skills", "installed", "SKILL-001.md"), "utf8");
+      assert.match(installedSkill, /Ela não executa código automaticamente/);
+      assert.match(installedSkill, /Ela não baixou código remoto/);
+
+      const used = runCli(
+        ["master", "skills", "--yes", "--skill=SKILL-001", "--mark-used", "--phase=PHASE-01", "--target=uiux-review"],
+        projectDir
+      );
+      assert.equal(used.status, 0, used.stderr);
+      assert.equal(existsSync(join(projectDir, ".sdd-master", "skills", "usage", "SKILL-USAGE-001.md")), true);
+      assert.equal(existsSync(join(projectDir, ".env")), false);
+      assert.equal(existsSync(join(projectDir, "node_modules")), false);
+
+      const uiux = runCli(
+        ["master", "uiux", "--yes", "--phase=PHASE-01", "--profile=WEB", "--title=Revisão UI/UX inicial", "--status=approved"],
+        projectDir
+      );
+      assert.equal(uiux.status, 0, uiux.stderr);
+      assert.equal(existsSync(join(projectDir, ".sdd-master", "uiux", "UIUX-001.md")), true);
+
+      assert.equal(
+        runCli(["master", "uiux", "--yes", "--type=design-system", "--phase=PHASE-01", "--profile=WEB"], projectDir)
+          .status,
+        0
+      );
+      assert.equal(
+        runCli(["master", "uiux", "--yes", "--type=accessibility", "--phase=PHASE-01", "--profile=WEB"], projectDir)
+          .status,
+        0
+      );
+      assert.equal(runCli(["master", "uiux", "--yes", "--type=seo", "--phase=PHASE-01", "--profile=WEB"], projectDir).status, 0);
+      assert.equal(
+        runCli(["master", "uiux", "--yes", "--type=responsiveness", "--phase=PHASE-01", "--profile=WEB"], projectDir)
+          .status,
+        0
+      );
+      assert.equal(
+        runCli(["master", "uiux", "--yes", "--type=performance", "--phase=PHASE-01", "--profile=WEB"], projectDir)
+          .status,
+        0
+      );
+
+      const uiuxJson = JSON.parse(
+        runCli(["master", "uiux", "--json", "--yes", "--phase=PHASE-01", "--profile=WEB", "--title=JSON Review"], projectDir)
+          .stdout
+      );
+      assert.equal(uiuxJson.summary.seo, true);
+      assert.equal(existsSync(join(projectDir, "docs", "02-tecnica-arquitetura", "design-system.md")), true);
+      assert.equal(existsSync(join(projectDir, "docs", "02-tecnica-arquitetura", "acessibilidade.md")), true);
+      assert.equal(existsSync(join(projectDir, "docs", "02-tecnica-arquitetura", "seo.md")), true);
+      assert.equal(existsSync(join(projectDir, "docs", "02-tecnica-arquitetura", "responsividade.md")), true);
+
+      const status = runCli(["master", "status"], projectDir);
+      assert.equal(status.status, 0);
+      assert.match(status.stdout, /Skills:/);
+      assert.match(status.stdout, /UI\/UX:/);
+
+      const doctorJson = JSON.parse(runCli(["master", "doctor", "--json"], projectDir).stdout);
+      assert.equal(typeof doctorJson.skills, "object");
+      assert.equal(typeof doctorJson.uiux, "object");
+      assert.equal(doctorJson.uiux.seo, true);
+    });
+
+    withTempProject((projectDir) => {
+      assert.equal(initTempProject(projectDir).status, 0);
+      assert.equal(
+        runCli(["master", "discovery", "--yes", "--title=Web", "--project-type=web", "--profiles=WEB"], projectDir).status,
+        0
+      );
+      const webImplement = JSON.parse(
+        runCli(["master", "implement", "--json", "--yes", "--phase=PHASE-01", "--task=TASK-001"], projectDir).stdout
+      );
+      assert.equal(webImplement.blockers.includes("UI/UX aprovado pendente"), true);
+      assert.equal(webImplement.blockers.includes("Design system pendente"), true);
+      assert.equal(webImplement.blockers.includes("Acessibilidade pendente"), true);
+      assert.equal(webImplement.blockers.includes("SEO pendente"), true);
+      assert.equal(webImplement.blockers.includes("Responsividade pendente"), true);
+
+      assert.equal(
+        runCli(["master", "uiux", "--yes", "--profile=WEB", "--status=failed", "--title=Reprovado"], projectDir).status,
+        0
+      );
+      const failedUiux = JSON.parse(
+        runCli(["master", "implement", "--json", "--yes", "--phase=PHASE-01", "--task=TASK-001"], projectDir).stdout
+      );
+      assert.equal(failedUiux.blockers.includes("UI/UX aprovado pendente"), true);
+    });
+
+    withTempProject((projectDir) => {
+      assert.equal(initTempProject(projectDir).status, 0);
+      assert.equal(
+        runCli(["master", "discovery", "--yes", "--title=API", "--project-type=api", "--profiles=API"], projectDir).status,
+        0
+      );
+      const apiImplement = JSON.parse(
+        runCli(["master", "implement", "--json", "--yes", "--phase=PHASE-01", "--task=TASK-001"], projectDir).stdout
+      );
+      assert.equal(apiImplement.blockers.includes("SEO pendente"), false);
+      assert.equal(apiImplement.gates.find((gate) => gate.gate === "SEO")?.status, "not-applicable");
+    });
+
+    withTempProject((projectDir) => {
+      assert.equal(initTempProject(projectDir).status, 0);
+      assert.equal(
+        runCli(["master", "discovery", "--yes", "--title=CLI", "--project-type=cli", "--profiles=CLI"], projectDir).status,
+        0
+      );
+      const cliImplement = JSON.parse(
+        runCli(["master", "implement", "--json", "--yes", "--phase=PHASE-01", "--task=TASK-001"], projectDir).stdout
+      );
+      assert.equal(cliImplement.blockers.includes("SEO pendente"), false);
+      assert.equal(cliImplement.gates.find((gate) => gate.gate === "Responsiveness")?.status, "Pendente");
+    });
+
+    assert.equal(runCli(["master", "help", "skills"]).status, 0);
+    assert.equal(runCli(["master", "help", "uiux"]).status, 0);
+    assert.equal(runCli(["master", "skills", "--help"]).status, 0);
+    assert.equal(runCli(["master", "uiux", "--help"]).status, 0);
+    assert.equal(existsSync(join(rootDir, ".sdd-master")), false);
+  });
+
   it("agents command preserves existing files unless force is used", () => {
     withTempProject((projectDir) => {
       initTempProject(projectDir);

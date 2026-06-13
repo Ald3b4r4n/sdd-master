@@ -6,6 +6,8 @@ import { runGitSecurityCheck } from "../../git/git-checks.js";
 import { getImplementReadiness } from "../../governance/blockers.js";
 import { getGovernanceStatus } from "../../governance/governance-state.js";
 import { getImplementGuardStatus } from "../../implementation/implement-readiness.js";
+import { getSkillStatus } from "../../skills/skill-registry.js";
+import { getUiuxStatus } from "../../uiux/uiux-gates.js";
 import { getWorkflowStatus } from "../../workflow/workflow-runner.js";
 
 export function getStatusOutput(cwd: string): string {
@@ -39,6 +41,8 @@ function getInstalledStatus(cwd: string): string {
   const gates = getGateStatus(cwd);
   const implementReadiness = getImplementReadiness(cwd);
   const implementGuard = getImplementGuardStatus(cwd);
+  const skills = getSkillStatus(cwd);
+  const uiux = getUiuxStatus(cwd);
 
   return `SDD Master — Status
 
@@ -96,6 +100,21 @@ Blockers:
   Abertos: ${gates.blockers.open}
   Resolvidos: ${gates.blockers.resolved}
 
+Skills:
+  Candidatas: ${skills.candidates}
+  Aprovadas: ${skills.approved}
+  Instaladas localmente: ${skills.installedLocal}
+  Usadas: ${skills.used}
+
+UI/UX:
+  Aplicável: ${uiux.applicable ? "Sim" : "Não"}
+  Design system: ${formatMixedGate(uiux.designSystem)}
+  Acessibilidade: ${formatMixedGate(uiux.accessibility)}
+  SEO: ${formatMixedGate(uiux.seo)}
+  Responsividade: ${formatMixedGate(uiux.responsiveness)}
+  Performance: ${formatMixedGate(uiux.performance)}
+  Bloqueios: ${uiux.blockers.length}
+
 Implementação:
   Pronta: ${implementReadiness.ready ? "Sim" : "Não"}
   Bloqueios:
@@ -132,4 +151,10 @@ function formatImplementGuardStatus(status: string): string {
   if (status === "not-started") return "Não iniciado";
   if (status === "ready") return "Pronto para autorização";
   return "Bloqueado";
+}
+
+function formatMixedGate(value: boolean | "not-applicable" | "recommended"): string {
+  if (value === "not-applicable") return "not-applicable";
+  if (value === "recommended") return "Recomendado";
+  return value ? "OK" : "Pendente";
 }

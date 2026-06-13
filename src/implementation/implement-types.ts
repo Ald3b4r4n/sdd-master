@@ -9,7 +9,7 @@ export type ImplementOptions = {
 
 export type ImplementGate = {
   gate: string;
-  status: "OK" | "Pendente";
+  status: "OK" | "Pendente" | "not-applicable" | "Recomendado";
   evidence: string;
 };
 

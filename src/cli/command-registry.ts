@@ -12,6 +12,8 @@ import { getVersionOutput } from "./commands/master-version.js";
 import { runGateCommand } from "../gates/gate-runner.js";
 import { runGovernanceCommand } from "../governance/governance-runner.js";
 import { runImplementCommand } from "../implementation/implement-command.js";
+import { runSkillsCommand } from "../skills/skill-command.js";
+import { runUiuxCommand } from "../uiux/uiux-command.js";
 import { runWorkflowCommand } from "../workflow/workflow-runner.js";
 
 export async function runCommand(
@@ -45,6 +47,10 @@ export async function runCommand(
       return runAgentsCommand(command.args, output, runtime);
     case "master-git":
       return runMasterGitCommand(command.args, output, runtime);
+    case "master-skills":
+      return runSkillsCommand(command.args, output, runtime);
+    case "master-uiux":
+      return runUiuxCommand(command.args, output, runtime);
     case "master-workflow":
       return runWorkflowCommand(command.command, command.args, output, runtime);
     case "master-governance":
