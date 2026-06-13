@@ -15,22 +15,32 @@ const requiredFiles = [
   "assets/readme/multi-ai-support.svg",
   "assets/readme/safety-gates.svg",
   "docs/01-negocio-requisitos/visao-do-produto.md",
+  "docs/01-negocio-requisitos/prontidao-1.0.md",
   "docs/01-negocio-requisitos/presets-produto.md",
+  "docs/02-tecnica-arquitetura/auditoria-final-rc.md",
   "docs/02-tecnica-arquitetura/arquitetura-do-framework.md",
   "docs/02-tecnica-arquitetura/compatibilidade-multi-ia.md",
   "docs/02-tecnica-arquitetura/seguranca-e-governanca.md",
   "docs/03-codigo/checklist-github-release.md",
   "docs/03-codigo/checklist-publicacao-npm.md",
   "docs/03-codigo/api-publica-cli.md",
+  "docs/03-codigo/breaking-changes.md",
   "docs/03-codigo/comandos-cli.md",
+  "docs/03-codigo/compatibilidade-rc.md",
   "docs/03-codigo/contrato-comandos.md",
   "docs/03-codigo/desenvolvimento-local.md",
+  "docs/03-codigo/faq.md",
   "docs/03-codigo/governanca-sdd.md",
+  "docs/03-codigo/guia-completo.md",
+  "docs/03-codigo/guia-rapido.md",
   "docs/03-codigo/implement-guard.md",
+  "docs/03-codigo/migracao-para-1.0.md",
   "docs/03-codigo/presets.md",
   "docs/03-codigo/publicacao-npm.md",
   "docs/03-codigo/quality-audit-blockers.md",
   "docs/03-codigo/release-local.md",
+  "docs/03-codigo/suporte-e-politica-de-versao.md",
+  "docs/03-codigo/troubleshooting.md",
   "docs/03-codigo/workflow-sdd.md"
 ];
 const forbiddenFilesEntries = [".env", ".env.*", ".sdd-master/", "node_modules/", "*.pdf"];
@@ -42,8 +52,8 @@ if (packageJson.license !== "MIT") failures.push("package.json license must be M
 if (packageJson.publishConfig?.access !== "public") {
   failures.push("package.json publishConfig.access must be public.");
 }
-if (packageJson.publishConfig?.tag !== "beta") {
-  failures.push("package.json publishConfig.tag must be beta.");
+if (packageJson.publishConfig?.tag !== "rc") {
+  failures.push("package.json publishConfig.tag must be rc.");
 }
 if (!["./dist/cli/main.js", "dist/cli/main.js"].includes(packageJson.bin?.sdd)) {
   failures.push("package.json bin.sdd must point to dist/cli/main.js.");

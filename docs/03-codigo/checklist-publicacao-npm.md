@@ -1,5 +1,23 @@
 # Checklist de Publicação npm — SDD Master
 
+## RC 0.8.0
+
+Publicação pretendida: `sdd-master@0.8.0-rc`.
+
+Comando permitido:
+
+```bash
+npm publish --access public --tag rc
+```
+
+Instalação após publicação:
+
+```bash
+npm install -g sdd-master@rc
+```
+
+Regras: não usar `latest`, não mover tags antigas, não alterar `prototype`, `alpha` ou `beta` manualmente, e publicar somente após autorização humana explícita.
+
 ## Status
 
 Publicação beta concluída para `sdd-master@0.5.0-beta`.

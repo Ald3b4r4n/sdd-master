@@ -1,10 +1,12 @@
-# API Pública CLI — SDD Master Beta
+# API Publica CLI - SDD Master RC
 
 ## Status
 
-Esta API é pública para a fase beta `0.5.0-beta`. Breaking changes ainda são permitidos antes de `1.0.0`, mas devem ser documentados.
+A partir de `0.8.0-rc`, a CLI entra em congelamento de release candidate. Os comandos abaixo sao candidatos a estaveis para `1.0.0`.
 
-## Comandos públicos
+Breaking changes ainda podem ocorrer ate `1.0.0`, desde que documentados no CHANGELOG, cobertos por teste e justificados em `docs/03-codigo/breaking-changes.md`.
+
+## Comandos publicos candidatos a estaveis
 
 - `init`
 - `onboard`
@@ -35,14 +37,27 @@ Esta API é pública para a fase beta `0.5.0-beta`. Breaking changes ainda são 
 - `version`
 - `help`
 
+## Garantias RC
+
+- O banner proprio do SDD Master aparece apenas em saida textual interativa.
+- O banner nao aparece com `--json`, `CI=1`, `NO_COLOR=1`, `SDD_MASTER_NO_BANNER=1`, `--plain` ou `--no-banner`.
+- Saidas JSON devem ser parseaveis e livres de banner.
+- Comandos de release/deploy/implement nao publicam, nao fazem deploy e nao executam codigo externo.
+- Plugins e skills criam apenas metadados locais, sem instalacao global e sem execucao remota.
+- Path safety, redaction e bloqueio de `.env` permanecem obrigatorios.
+
 ## Contrato geral
 
-Cada comando público deve declarar status beta, entrada, flags principais, saída texto, saída JSON quando aplicável, arquivos gerados, riscos, compatibilidade esperada e limites de breaking changes antes de `1.0.0`.
+Cada comando publico deve manter:
 
-## Garantias beta
+- status `RC`;
+- flags publicas documentadas;
+- saida texto para humanos;
+- saida JSON quando aplicavel;
+- arquivos gerados previstos;
+- garantias e limitacoes;
+- comportamento proibido;
+- breaking changes permitidos ate `1.0.0`;
+- breaking changes proibidos apos `1.0.0`.
 
-- `--json` não imprime banner.
-- `CI=1` não imprime banner.
-- Erros devem apontar próximos passos quando possível.
-- Comandos de release/deploy não publicam nem fazem deploy.
-- Segurança e path safety continuam obrigatórios.
+Detalhamento operacional: `docs/03-codigo/contrato-comandos.md`.

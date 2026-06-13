@@ -1,40 +1,42 @@
-# Contrato Público dos Comandos — SDD Master Beta
+# Contrato Publico dos Comandos - SDD Master RC
 
 ## Regra
 
-Todos os comandos públicos abaixo são suportados na beta com compatibilidade evolutiva até `1.0.0`.
+Todos os comandos desta tabela entram em status `RC` em `0.8.0-rc`. Eles sao candidatos a API estavel de `1.0.0`.
 
-| Comando | Status beta | Entrada | Saída texto | JSON | Arquivos gerados | Riscos |
-|---|---|---|---|---|---|---|
-| init | público | flags de idioma, agente e preset | resumo de inicialização | sim | `.sdd-master/`, docs, agentes | criar estrutura fora de escopo, mitigado por path safety |
-| onboard | público | perfil, IA e idioma | onboarding guiado | sim | `.sdd-master/onboarding/` | nenhum código alterado |
-| doctor | público | flags de diagnóstico | relatório | sim | nenhum por padrão | exposição de path mitigada por redaction |
-| status | público | flags de status | resumo | sim | nenhum | leitura local |
-| update | público | dry-run/apply | plano | sim | backup e relatório | sobrescrita mitigada por backup |
-| agents | público | lista de agentes | resumo | sim | arquivos de agentes | sobrescrita exige force |
-| skills | público | metadados de skill | registro | sim | `.sdd-master/skills/`, `.agents/skills/` | execução externa proibida |
-| plugins | público | metadados de plugin | registro | sim | `.sdd-master/extensions/` | execução externa proibida |
-| security | público | scanner builtin/opt-in | relatório | sim | relatórios redigidos | scanners externos opt-in |
-| discovery | público | produto e perfil | documentos | sim | discovery e visão | preserva existentes |
-| requirements | público | requisitos | documentos | sim | requisitos | depende de discovery |
-| clarify | público | dúvida/decisão | registro | sim | clarifications | bloqueios abertos |
-| approve | público | decisão humana | registro | sim | approvals | aprovação não presumida |
-| scope | público | escopo/mudança | registro | sim | scope | mudanças abertas bloqueiam |
-| backlog | público | item futuro | registro | sim | backlog | não autoriza implementação |
-| spec | público | fase/título | documento | sim | specs | depende de requirements |
-| plan | público | fase/título | documento | sim | plans | depende de spec |
-| tasks | público | fase/título | documento | sim | tasks | depende de plan |
-| quality | público | revisão | registro | sim | quality | failed bloqueia |
-| audit | público | auditoria | registro | sim | audits | crítico bloqueia |
-| docs | público | validação docs | registro | sim | docs | missing bloqueia |
-| blocker | público | blocker | registro/lista | sim | blockers | blocker aberto impede avanço |
-| implement | público | prepare/dry-run | readiness | sim | implementation | não altera código consumidor |
-| release | público | versão/canal | checklist | sim | releases | não publica |
-| deploy | público | ambiente/provider | checklist | sim | deliveries | não faz deploy |
-| git | público | pre-commit/pre-push | segurança Git | sim | nenhum | não faz push |
-| version | público | nenhum | versão | não aplicável | nenhum | nenhum |
-| help | público | comando opcional | ajuda | não aplicável | nenhum | nenhum |
+| Comando | Status | Flags publicas | Saida texto | Saida JSON | Arquivos gerados | Garantias | Limitacoes | Proibido | Breaking changes ate 1.0 | Breaking changes apos 1.0 |
+|---|---|---|---|---|---|---|---|---|---|---|
+| `init` | RC | `--yes`, `-y`, `--json`, `--preset`, `--ai`, `--agent`, `--language`, `--project-name`, `--no-banner`, `--plain` | resumo de inicializacao | sim | `.sdd-master/`, docs, agentes | nao cria `.env`; path safety | nao configura servicos externos | escrever fora do projeto | flags e templates podem evoluir | remover flags ou mudar JSON sem major |
+| `onboard` | RC | `--yes`, `--json`, `--dry-run`, `--profile`, `--ai`, `--language` | proximos passos | sim | `.sdd-master/onboarding/` | nao altera codigo consumidor | exige projeto inicializado | inferir secrets | perfis podem ser ampliados | remover campos JSON |
+| `doctor` | RC | `--json`, `--path-safety`, `--strict` | diagnostico | sim | nenhum por padrao | redaction de paths/secrets | nao corrige automaticamente | expor valores sensiveis | checks podem crescer | remover checks publicos |
+| `status` | RC | `--json` | resumo do estado | sim | nenhum | leitura local segura | depende dos arquivos existentes | criar arquivos | campos podem crescer | quebrar campos existentes |
+| `update` | RC | `--help`, `--json`, `--yes`, `-y`, `--dry-run`, `--apply`, `--force`, `--templates`, `--agents`, `--docs`, `--project-state`, `--backup` | plano ou resultado | sim | backup e relatorio | backup antes de aplicar | nao migra codigo de negocio | apagar historico | estrategias podem evoluir | aplicar sem confirmacao |
+| `agents` | RC | `--help`, `--json`, `--yes`, `-y`, `--agents`, `--language`, `--force`, `--list` | agentes gerados/listados | sim | arquivos de agentes | sem instalacao externa | sobrescrita exige `--force` | criar `.env` | lista de agentes pode crescer | mudar destino sem aviso |
+| `skills` | RC | `--help`, `--json`, `--yes`, `-y`, `--title`, `--phase`, `--type`, `--status`, `--category`, `--source`, `--skill`, `--reason`, `--permission`, `--approve`, `--reject`, `--install-local`, `--mark-used`, `--report`, `--target` | registro/relatorio | sim | `.sdd-master/skills/`, `.agents/skills/` | metadado local apenas | nao instala globalmente | executar codigo remoto | campos podem crescer | instalar/baixar sem opt-in |
+| `plugins` | RC | `--help`, `--json`, `--yes`, `-y`, `--title`, `--phase`, `--id`, `--type`, `--status`, `--category`, `--source`, `--version`, `--reason`, `--permission`, `--approve`, `--reject`, `--audit`, `--install-local`, `--mark-used`, `--report`, `--target` | registro/relatorio | sim | `.sdd-master/extensions/` | supply chain local e redigido | nao executa plugin | baixar ou executar plugin | policy pode ampliar | relaxar aprovacao |
+| `security` | RC | `--help`, `--json`, `--detect-tools`, `--run-external`, `--tool`, `--strict`, `--report` | relatorio | sim | relatorios redigidos | builtin por padrao | externos sao opt-in | imprimir segredo bruto | detectores podem crescer | remover redaction |
+| `discovery` | RC | `--help`, `--json`, `--yes`, `-y`, `--title`, `--phase`, `--project-type`, `--profiles`, `--maturity` | discovery | sim | discovery e visao | preserva existentes | exige init | pular aprovacao humana | templates podem evoluir | mudar arquivos base sem major |
+| `requirements` | RC | `--help`, `--json`, `--yes`, `-y`, `--title`, `--phase` | requisitos | sim | requirements | rastreabilidade inicial | depende de discovery | sobrescrever aprovados | modelos podem evoluir | remover trilha RF/RNF |
+| `clarify` | RC | `--help`, `--json`, `--yes`, `-y`, `--title`, `--id`, `--type`, `--status`, `--reason`, `--phase` | duvidas/decisoes | sim | clarifications | duvidas abertas bloqueiam | exige init | inferir resposta humana | tipos podem crescer | ignorar blockers |
+| `approve` | RC | `--help`, `--json`, `--yes`, `-y`, `--target`, `--phase`, `--decision`, `--reason` | aprovacao | sim | approvals | aprovacao nunca presumida | registro local | aprovar automaticamente | targets podem crescer | mudar sem decisao humana |
+| `scope` | RC | `--help`, `--json`, `--yes`, `-y`, `--title`, `--type`, `--reason`, `--phase` | escopo | sim | scope | mudancas abertas bloqueiam | nao implementa | autorizar codigo | tipos podem crescer | remover bloqueio |
+| `backlog` | RC | `--help`, `--json`, `--yes`, `-y`, `--title`, `--type`, `--reason`, `--phase`, `--priority` | backlog | sim | backlog | nao autoriza implementacao | registro local | promover sem fluxo | prioridades podem crescer | mudar sem compatibilidade |
+| `spec` | RC | `--help`, `--json`, `--yes`, `-y`, `--phase`, `--title` | especificacao | sim | specs | depende de requisitos | nao aprova sozinha | pular gates | formato pode evoluir | remover pre-condicao |
+| `plan` | RC | `--help`, `--json`, `--yes`, `-y`, `--phase`, `--title` | plano | sim | plans e docs tecnicos | depende de spec | nao executa codigo | executar comandos | secoes podem crescer | remover rastreabilidade |
+| `tasks` | RC | `--help`, `--json`, `--yes`, `-y`, `--phase`, `--title` | tarefas | sim | tasks | exige testes antes de implement | nao executa testes | implementar | template pode evoluir | remover contrato de testes |
+| `quality` | RC | `--help`, `--json`, `--yes`, `-y`, `--title`, `--phase`, `--target`, `--status`, `--reason` | gate | sim | quality | failed bloqueia | nao corrige | ocultar falha | categorias podem crescer | ignorar status failed |
+| `audit` | RC | `--help`, `--json`, `--yes`, `-y`, `--phase`, `--type`, `--title`, `--severity`, `--reason` | auditoria | sim | audits | severidade alta aparece em readiness | evidencia local | expor segredo | severidades podem crescer | remover bloqueios criticos |
+| `docs` | RC | `--help`, `--json`, `--yes`, `-y`, `--phase`, `--target`, `--title`, `--status`, `--reason` | gate documental | sim | docs | missing/outdated bloqueia | nao escreve conteudo final | aprovar automaticamente | targets podem crescer | ignorar docs faltantes |
+| `blocker` | RC | `--help`, `--json`, `--yes`, `-y`, `--title`, `--phase`, `--severity`, `--id`, `--status`, `--reason` | blocker/lista | sim | blockers | blocker aberto impede avancos | exige resolucao explicita | resolver sem motivo | campos podem crescer | ignorar blocker aberto |
+| `implement` | RC | `--help`, `--json`, `--yes`, `-y`, `--phase`, `--task`, `--dry-run`, `--prepare`, `--handoff`, `--manifest`, `--test-contract`, `--agent`, `--allowed-files` | readiness/handoff | sim | implementation | nao altera codigo consumidor | prepara, nao codifica | escrever fora de allowlist | manifestos podem evoluir | executar codigo automaticamente |
+| `release` | RC | `--help`, `--json`, `--yes`, `-y`, `--phase`, `--title`, `--target`, `--environment`, `--dry-run`, `--version`, `--channel`, `--type`, `--checklist` | checklist | sim | releases | nao publica npm/GitHub | depende de autorizacao fora do comando | criar tag/publicar | checks podem crescer | publicar sem autorizacao |
+| `deploy` | RC | `--help`, `--json`, `--yes`, `-y`, `--phase`, `--title`, `--target`, `--environment`, `--dry-run`, `--provider`, `--strategy`, `--checklist` | checklist | sim | deliveries | nao faz deploy | manual/dry-run | acessar servidor | providers podem crescer | executar deploy |
+| `git` | RC | `--json`, `--pre-commit`, `--pre-push` | check Git/security | sim | nenhum | nao faz add/commit/push | leitura local | push automatico | checks podem crescer | reduzir bloqueios |
+| `version` | RC | `--version`, `-v`, `master version` | versao | nao | nenhum | imprime `package.json.version` | sem JSON publico | banner | formato pode ficar mais explicito | mudar sem major |
+| `help` | RC | `--help`, `-h`, `master help`, `master help <command>` | ajuda | nao | nenhum | sem efeito colateral | texto pode evoluir | criar arquivos | exemplos podem mudar | remover comandos publicos |
 
-## Breaking changes
+## Politica de quebra
 
-Antes de `1.0.0`, mudanças de flags, arquivos e JSON são permitidas quando documentadas no CHANGELOG e acompanhadas por testes de regressão.
+Permitido ate `1.0.0`: adicionar flags opcionais, novos campos JSON, novos checks, novos templates e mensagens mais claras.
+
+Proibido apos `1.0.0` sem major: remover comando publico, remover flag publica, trocar significado de uma flag, quebrar JSON documentado, enfraquecer path safety/redaction ou permitir publish/deploy/plugin automatico.

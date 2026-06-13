@@ -96,3 +96,18 @@ Antes de uma publicação real:
 ## Publicação real
 
 Novas publicações reais exigem fase própria, aprovação humana e comando manual intencional. Este documento registra a publicação prototype já realizada em `0.2.0-prototype`, com `prototype` apontando para `0.2.0-prototype`, a publicação alpha de `0.3.0-alpha`, com `alpha` apontando para `0.3.0-alpha`, e a publicação beta de `0.5.0-beta`, com `beta` apontando para `0.5.0-beta`. `latest` permanece em `0.1.0-prototype.1`. Não autoriza novas publicações.
+# Publicação npm RC
+
+Para `0.8.0-rc`, publicar somente com:
+
+```bash
+npm publish --access public --tag rc
+```
+
+Validacao previa:
+
+```bash
+npm publish --dry-run --access public --tag rc
+```
+
+Nao usar `latest` manualmente. As dist-tags `prototype`, `alpha` e `beta` continuam disponiveis e nao devem ser alteradas neste bloco. A instalacao apos publicacao sera `npm install -g sdd-master@rc`.

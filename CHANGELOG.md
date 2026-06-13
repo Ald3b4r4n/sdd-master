@@ -2,6 +2,37 @@
 
 ## [Unreleased]
 
+## [0.8.0-rc] - 2026-06-13
+
+### Adicionado
+
+- Banner CLI com crédito público do idealizador/desenvolvedor.
+- Documentação de compatibilidade RC.
+- Contrato de comandos candidato a estável.
+- Auditoria final RC.
+- Guia rápido, guia completo, FAQ e troubleshooting.
+- Documentação de migração para 1.0.
+- Teste E2E RC cobrindo o fluxo completo.
+
+### Melhorado
+
+- README como página principal de produto.
+- Help e onboarding.
+- Documentação de comandos.
+- Segurança, path safety, release/deploy e implement assistido.
+- Regressão multiambiente.
+
+### Segurança
+
+- Banner não aparece em JSON/CI.
+- Nenhum fluxo RC executa deploy/publish/plugin automaticamente.
+- Path safety, redaction e supply chain permanecem obrigatórios.
+
+### Observação
+
+- Esta versão é release candidate, não estável.
+- Instalação após publicação: `npm install -g sdd-master@rc`.
+
 ## [0.5.0-beta] - 2026-06-13
 
 ### Adicionado

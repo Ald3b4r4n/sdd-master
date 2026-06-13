@@ -12,7 +12,12 @@ const bannerText = `SDD MASTER
 ╚══════╝╚═════╝ ╚═════╝     ╚═╝     ╚═╝╚═╝  ╚═╝╚══════╝   ╚═╝   ╚══════╝╚═╝  ╚═╝
 
 Spec-Driven Development Framework
-Governance • Tests • Security • Multi-AI • Delivery`;
+Governance • Tests • Security • Multi-AI • Delivery
+
+Idealizado e desenvolvido por Antonio Rafael Souza Cruz de Noronha
+AR Software Development
+https://www.antoniorafael.com.br/
+https://www.arsoftwaredevelopment.com.br/`;
 
 export function stripBannerFlags(args: string[]): string[] {
   return args.filter((arg) => arg !== "--no-banner" && arg !== "--plain");

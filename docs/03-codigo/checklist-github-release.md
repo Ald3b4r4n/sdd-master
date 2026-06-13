@@ -1,5 +1,17 @@
 # Checklist de GitHub Release — SDD Master
 
+## RC 0.8.0
+
+Prerelease planejada: `v0.8.0-rc`.
+
+Comando permitido somente após autorização humana:
+
+```bash
+gh release create v0.8.0-rc --prerelease --title "v0.8.0-rc" --notes-file releases/github-v0.8.0-rc-notes.md
+```
+
+Nao criar release estavel neste bloco.
+
 ## Status
 
 Prerelease `v0.5.0-beta` publicada no GitHub.

@@ -8,11 +8,11 @@
   <strong>Framework rígido para desenvolvimento de software com especificação, TDD, documentação, auditoria, rastreabilidade, segurança e agentes de IA.</strong>
 </p>
 
-![Version](https://img.shields.io/badge/version-0.5.0--beta-blue)
+![Version](https://img.shields.io/badge/version-0.8.0--rc-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
 ![Node.js](https://img.shields.io/badge/Node.js-20%2B-43853d)
 ![TypeScript](https://img.shields.io/badge/TypeScript-ready-blue)
-![Status](https://img.shields.io/badge/status-beta-orange)
+![Status](https://img.shields.io/badge/status-rc-orange)
 ![Security](https://img.shields.io/badge/security-first-critical)
 ![AI Agents](https://img.shields.io/badge/AI%20agents-ready-6f42c1)
 
@@ -49,17 +49,17 @@ O SDD Master combina:
 ## Instalação via npm
 
 ```bash
-npm install -g sdd-master@beta
+npm install -g sdd-master@rc
 sdd master help
 ```
 
-O pacote está publicado como beta e ainda não representa uma release estável. Use a dist-tag `beta` para instalar esta versão.
+A versão pretendida para publicação deste bloco é `0.8.0-rc`. Ela ainda não é estável. Após publicação, use a dist-tag `rc` para instalar esta versão.
 
 ```text
-sdd-master@0.5.0-beta
+sdd-master@0.8.0-rc
 ```
 
-O registry mantém `latest` apontando para `0.1.0-prototype.1`. A dist-tag `prototype` aponta para `0.2.0-prototype`, a dist-tag `alpha` aponta para `0.3.0-alpha`, a dist-tag `beta` aponta para `0.5.0-beta`, e a instalação recomendada para este estágio é `sdd-master@beta`.
+O registry mantém `latest` apontando para `0.1.0-prototype.1`. A dist-tag `prototype` aponta para `0.2.0-prototype`, a dist-tag `alpha` aponta para `0.3.0-alpha`, a dist-tag `beta` aponta para `0.5.0-beta`, e após publicação a instalação recomendada para este estágio será `sdd-master@rc`.
 
 Evite usar:
 
@@ -74,21 +74,57 @@ até existir uma release estável.
 A versão pública atual recomendada continua sendo:
 
 ```bash
-npm install -g sdd-master@beta
+npm install -g sdd-master@rc
 ```
 
 Versão:
 
 ```text
-0.5.0-beta
+0.8.0-rc
 ```
 
 Status:
 
 - npm publicado;
 - GitHub prerelease publicada;
-- beta, não estável;
-- dist-tag `beta` publicada.
+- release candidate, não estável;
+- dist-tag `rc` planejada.
+
+## Banner e crédito
+
+O banner da CLI é próprio do SDD Master e inclui:
+
+```text
+SDD MASTER
+
+Spec-Driven Development Framework
+Governance • Tests • Security • Multi-AI • Delivery
+
+Idealizado e desenvolvido por Antonio Rafael Souza Cruz de Noronha
+AR Software Development
+https://www.antoniorafael.com.br/
+https://www.arsoftwaredevelopment.com.br/
+```
+
+O banner não aparece com `--json`, `CI=1`, `NO_COLOR=1`, `SDD_MASTER_NO_BANNER=1`, `--plain` ou `--no-banner`.
+
+## Release candidate 0.8.0-rc
+
+`0.8.0-rc` congela a API pública de comandos como candidata a estável, finaliza a documentação de uso e prepara o caminho para `1.0.0`.
+
+Instalação após publicação:
+
+```bash
+npm install -g sdd-master@rc
+```
+
+Regras do RC:
+
+- não usar `latest` manualmente;
+- `beta`, `alpha` e `prototype` continuam disponíveis;
+- `release` e `deploy` continuam guards sem publicação ou deploy real;
+- plugins e skills continuam sem execução automática;
+- a versão ainda não é estável.
 
 ## Prerelease beta
 
@@ -556,6 +592,13 @@ O check executa:
 - validação de pacote;
 - dry-run do npm pack.
 
+Para o RC, valide também:
+
+```bash
+npm publish --dry-run --access public --tag rc
+node dist/cli/main.js master git --pre-push
+```
+
 ## Validação de pacote
 
 ```bash
@@ -615,7 +658,8 @@ O SDD Master possui:
 - GitHub prerelease;
 - publicação npm prototype;
 - publicação npm alpha;
-- publicação npm beta com `npm publish --access public --tag beta`.
+- publicação npm beta com `npm publish --access public --tag beta`;
+- publicação npm RC planejada com `npm publish --access public --tag rc`.
 
 A publicação final da GitHub Release exige aprovação humana explícita.
 
@@ -635,6 +679,14 @@ Nunca publique `.env`, tokens, credenciais, chaves privadas, certificados, dados
 - [Comandos CLI](docs/03-codigo/comandos-cli.md)
 - [API pública CLI](docs/03-codigo/api-publica-cli.md)
 - [Contrato de comandos](docs/03-codigo/contrato-comandos.md)
+- [Compatibilidade RC](docs/03-codigo/compatibilidade-rc.md)
+- [Breaking changes](docs/03-codigo/breaking-changes.md)
+- [Guia rápido](docs/03-codigo/guia-rapido.md)
+- [Guia completo](docs/03-codigo/guia-completo.md)
+- [FAQ](docs/03-codigo/faq.md)
+- [Troubleshooting](docs/03-codigo/troubleshooting.md)
+- [Migração para 1.0](docs/03-codigo/migracao-para-1.0.md)
+- [Suporte e política de versão](docs/03-codigo/suporte-e-politica-de-versao.md)
 - [Presets](docs/03-codigo/presets.md)
 - [Onboarding guiado](docs/03-codigo/onboarding-guiado.md)
 - [Exemplos práticos](docs/03-codigo/exemplos-praticos.md)
