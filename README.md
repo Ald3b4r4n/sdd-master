@@ -12,7 +12,7 @@
 ![License](https://img.shields.io/badge/license-MIT-green)
 ![Node.js](https://img.shields.io/badge/Node.js-20%2B-43853d)
 ![TypeScript](https://img.shields.io/badge/TypeScript-ready-blue)
-![Status](https://img.shields.io/badge/status-prototype-orange)
+![Status](https://img.shields.io/badge/status-alpha-orange)
 ![Security](https://img.shields.io/badge/security-first-critical)
 ![AI Agents](https://img.shields.io/badge/AI%20agents-ready-6f42c1)
 
@@ -49,17 +49,17 @@ O SDD Master combina:
 ## Instalação via npm
 
 ```bash
-npm install -g sdd-master@prototype
+npm install -g sdd-master@alpha
 sdd master help
 ```
 
-O pacote está publicado como prototype e ainda não representa uma release estável. Use a dist-tag `prototype` para instalar esta versão.
+O pacote está publicado como alpha e ainda não representa uma release estável. Use a dist-tag `alpha` para instalar esta versão.
 
 ```text
-sdd-master@0.2.0-prototype
+sdd-master@0.3.0-alpha
 ```
 
-O registry mantém `latest` apontando para `0.1.0-prototype.1`. A dist-tag `prototype` aponta para `0.2.0-prototype`, e a instalação recomendada para este estágio continua sendo `sdd-master@prototype`.
+O registry mantém `latest` apontando para `0.1.0-prototype.1`. A dist-tag `prototype` aponta para `0.2.0-prototype`, a dist-tag `alpha` aponta para `0.3.0-alpha`, e a instalação recomendada para este estágio é `sdd-master@alpha`.
 
 Evite usar:
 
@@ -71,28 +71,28 @@ até existir uma release estável.
 
 ## Estado atual
 
-A versão pública atual recomendada continua sendo:
+A versão pública atual recomendada é:
 
 ```bash
-npm install -g sdd-master@prototype
+npm install -g sdd-master@alpha
 ```
 
 Versão:
 
 ```text
-0.2.0-prototype
+0.3.0-alpha
 ```
 
 Status:
 
 - npm publicado;
 - GitHub prerelease publicada;
-- prototype, não estável;
-- próxima prerelease preparada localmente: `0.3.0-alpha`.
+- alpha, não estável;
+- dist-tag `alpha` publicada.
 
-## Próxima prerelease preparada
+## Prerelease alpha publicada
 
-A próxima prerelease em preparação é:
+A prerelease publicada é:
 
 ```text
 0.3.0-alpha
@@ -107,16 +107,16 @@ Ela consolida:
 - path safety multiambiente;
 - onboarding guiado.
 
-A publicação futura deverá usar:
+Ela foi publicada com:
 
 ```bash
 npm publish --access public --tag alpha
 ```
 
-Até a publicação real, a instalação pública recomendada continua:
+A instalação pública recomendada neste estágio é:
 
 ```bash
-npm install -g sdd-master@prototype
+npm install -g sdd-master@alpha
 ```
 
 ## O que mudou em 0.2.0-prototype
@@ -564,13 +564,13 @@ npm run release:check
 npm publish --dry-run --access public --tag alpha
 ```
 
-Esta versão alpha preparada deve usar a tag npm `alpha`, não `latest`. Use `--tag alpha` explicitamente em dry-runs e em qualquer publicação futura aprovada.
+Esta versão alpha usa a tag npm `alpha`, não `latest`. Use `--tag alpha` explicitamente em dry-runs e em qualquer publicação futura aprovada.
 
-Nenhuma publicação real de `0.3.0-alpha` foi realizada neste bloco.
+Publicação real de `0.3.0-alpha` realizada com autorização humana explícita usando `npm publish --access public --tag alpha`.
 
 ## GitHub Release
 
-A prerelease local preparada para futura publicação é:
+A prerelease publicada é:
 
 ```text
 v0.3.0-alpha
@@ -581,20 +581,21 @@ Status:
 - Tag inicial `v0.1.0-prototype` preservada sem reescrita.
 - Tag `v0.1.0-prototype.1` preservada sem reescrita.
 - Tag `v0.2.0-prototype` preservada sem reescrita.
-- GitHub prerelease `v0.3.0-alpha` ainda não publicada.
-- npm publish real de `0.3.0-alpha` ainda não executado.
+- GitHub prerelease `v0.3.0-alpha` publicada como prerelease.
+- npm publish real de `0.3.0-alpha` executado com a dist-tag `alpha`.
 - npm `latest` permanece em `0.1.0-prototype.1`.
 - npm `prototype` aponta para `0.2.0-prototype`.
-- npm `alpha` será usado somente após autorização humana futura.
+- npm `alpha` aponta para `0.3.0-alpha`.
 
-A release atual é um prototype e não representa versão final estável.
+A release atual é alpha e não representa versão final estável.
 
 ## Publicação
 
 O SDD Master possui:
 
-- GitHub Release draft;
+- GitHub prerelease;
 - publicação npm prototype;
+- publicação npm alpha;
 - validação local com `npm publish --dry-run --access public --tag alpha`.
 
 A publicação final da GitHub Release exige aprovação humana explícita.

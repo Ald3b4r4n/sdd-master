@@ -49,8 +49,10 @@
 ### Observação
 
 - Esta versão marca a transição de prototype para alpha.
-- A instalação recomendada após publicação será `npm install -g sdd-master@alpha`.
-- Este bloco apenas prepara a release localmente; não publica no npm e não cria GitHub Release.
+- npm publish real foi executado com a dist-tag `alpha`.
+- GitHub prerelease `v0.3.0-alpha` foi publicada como prerelease.
+- A instalação recomendada é `npm install -g sdd-master@alpha`.
+- A dist-tag `latest` permanece em `0.1.0-prototype.1`.
 
 ## [0.2.0-prototype] - 2026-06-13
 

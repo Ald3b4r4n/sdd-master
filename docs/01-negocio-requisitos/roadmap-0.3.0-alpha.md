@@ -2,7 +2,7 @@
 
 ## Objetivo
 
-Transformar o SDD Master de prototype publicado em alpha operacional preparado localmente e depois validado em projetos reais.
+Transformar o SDD Master de prototype publicado em alpha operacional publicado e validado em projetos reais.
 
 ## Prioridades
 
@@ -62,4 +62,5 @@ O BLOCO 27A completa o registry seguro de extensões antes do avanço para segur
 O BLOCO 28 adiciona segurança avançada opt-in com redaction e gates integrados.
 O BLOCO 29 adicionou hardening multiambiente e path safety.
 O BLOCO 30 adiciona onboarding guiado, help e próximos passos centralizados.
-O BLOCO 31 prepara `0.3.0-alpha` localmente, com dry-run de publicação e sem publicar npm/GitHub Release.
+O BLOCO 31 preparou `0.3.0-alpha` localmente, com dry-run de publicação e sem publicar npm/GitHub Release.
+O BLOCO 32 publicou `0.3.0-alpha` no npm com dist-tag `alpha` e criou a GitHub prerelease.
