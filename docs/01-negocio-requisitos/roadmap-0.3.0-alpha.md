@@ -15,10 +15,11 @@ Transformar o SDD Master de prototype publicado em alpha operacional validado em
 
 ### 2. Implement assistido controlado
 
-- Definir contrato do implement real.
+- Evoluir contrato do implement assistido.
 - Continuar sem executar comandos perigosos.
 - Exigir escopo, testes, approval, audit e security gates.
 - Criar manifesto antes de alteracoes de codigo.
+- Validar handoff seguro para agentes em projeto real.
 
 ### 3. Release/deploy internos
 

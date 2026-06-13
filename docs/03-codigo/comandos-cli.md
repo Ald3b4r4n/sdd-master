@@ -129,9 +129,12 @@ sdd master uiux --yes --type="responsiveness" --phase="PHASE-01" --profile="WEB"
 ```bash
 sdd master implement --yes --phase="PHASE-01" --task="TASK-001" --dry-run
 sdd master implement --json --yes --phase="PHASE-01" --target="TASK-001"
+sdd master implement --yes --prepare --handoff --manifest --test-contract --agent="codex" --allowed-files="src/**,tests/**,docs/**"
 ```
 
 `implement` não altera código nesta versão prototype. Ele cria apenas registros internos em `.sdd-master/implementation/`, verifica readiness, valida test gates e informa bloqueios antes de qualquer implementação real futura.
+
+Com `--prepare`, `--handoff`, `--manifest` e `--test-contract`, ele cria pacote de implementação assistida: sessão, manifesto de mudanças, contrato de testes, handoff para agente, aprovação pendente e riscos. Arquivos proibidos como `.env`, `.sdd-master/**`, `secrets/**`, `node_modules/**` e `dist/**` continuam bloqueados.
 
 ## Update
 

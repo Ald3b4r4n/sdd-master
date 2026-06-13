@@ -126,6 +126,16 @@ Implement Guard:
   Código alterado pelo implement: ${report.implementGuard.codeChanged ? "Sim" : "Não"}
   Próxima ação: ${report.implementGuard.nextAction}
 
+Implement Assistido:
+  Última sessão: ${report.assistedImplement.latestSession}
+  Status: ${formatAssistedImplementStatus(report.assistedImplement.status)}
+  Handoff: ${report.assistedImplement.handoff}
+  Test contract: ${report.assistedImplement.testContract}
+  Manifest: ${report.assistedImplement.manifest}
+  Código alterado: ${report.assistedImplement.codeChanged ? "Sim" : "Não"}
+  Aprovação humana: ${report.assistedImplement.humanApproval}
+  Política forbidden: ${report.assistedImplement.forbiddenPolicy}
+
 Estado do projeto:
   Fase atual: ${report.projectState.currentPhase ?? "não detectado"}
   Próximo comando permitido: ${report.projectState.nextCommand ?? "não detectado"}
@@ -189,4 +199,10 @@ function formatDeliveryStatus(status: string): string {
   if (status === "ready") return "Pronto para autorização";
   if (status === "blocked") return "Bloqueado";
   return "Registrado";
+}
+
+function formatAssistedImplementStatus(status: string): string {
+  if (status === "not-started") return "Não iniciado";
+  if (status === "blocked") return "Bloqueado";
+  return "Preparada";
 }

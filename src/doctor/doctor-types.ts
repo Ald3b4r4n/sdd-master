@@ -136,6 +136,17 @@ export type DoctorImplementGuardInfo = {
   nextAction: string;
 };
 
+export type DoctorAssistedImplementInfo = {
+  latestSession: string;
+  status: "not-started" | "blocked" | "prepared";
+  handoff: "not-started" | "created" | "missing";
+  testContract: "not-started" | "created" | "missing";
+  manifest: "not-started" | "created" | "missing";
+  codeChanged: false;
+  humanApproval: "not-started" | "Pendente";
+  forbiddenPolicy: "not-started" | "OK" | "missing";
+};
+
 export type DoctorDeliveryInfo = {
   release: {
     latestPlan: string;
@@ -166,6 +177,7 @@ export type DoctorReport = {
   update: DoctorUpdateInfo;
   implementReadiness: DoctorImplementReadinessInfo;
   implementGuard: DoctorImplementGuardInfo;
+  assistedImplement: DoctorAssistedImplementInfo;
   delivery: DoctorDeliveryInfo;
   gitSecurity: {
     status: "clean" | "warning" | "blocked";

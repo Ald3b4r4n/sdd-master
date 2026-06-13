@@ -37,6 +37,7 @@ const requiredFiles = [
   "docs/03-codigo/checklist-publicacao-npm.md",
   "docs/03-codigo/comandos-cli.md",
   "docs/03-codigo/desenvolvimento-local.md",
+  "docs/03-codigo/implement-assistido.md",
   "docs/03-codigo/release-local.md",
   "docs/03-codigo/publicacao-npm.md",
   "docs/03-codigo/release-deploy-guards.md",

@@ -5,6 +5,13 @@ export type ImplementOptions = {
   task: string;
   target?: string;
   dryRun: boolean;
+  prepare: boolean;
+  handoff: boolean;
+  manifest: boolean;
+  testContract: boolean;
+  agent: string;
+  allowedFiles: string[];
+  forbiddenFiles: string[];
 };
 
 export type ImplementGate = {
@@ -21,7 +28,7 @@ export type TestGateStatus = {
 
 export type ImplementResult = {
   status: "blocked" | "ready";
-  mode: "guard";
+  mode: "guard" | "assisted-guard";
   phase: string;
   task: string;
   ready: boolean;
@@ -29,6 +36,8 @@ export type ImplementResult = {
   gates: ImplementGate[];
   createdFiles: string[];
   updatedFiles: string[];
+  allowedFiles: string[];
+  forbiddenFiles: string[];
   codeChanged: false;
   nextActions: string[];
 };
@@ -39,4 +48,15 @@ export type ImplementStatus = {
   testGates: "not-started" | "OK" | "Pendente";
   codeChanged: false;
   nextAction: string;
+};
+
+export type AssistedImplementStatus = {
+  latestSession: string;
+  status: "not-started" | "blocked" | "prepared";
+  handoff: "not-started" | "created" | "missing";
+  testContract: "not-started" | "created" | "missing";
+  manifest: "not-started" | "created" | "missing";
+  codeChanged: false;
+  humanApproval: "not-started" | "Pendente";
+  forbiddenPolicy: "not-started" | "OK" | "missing";
 };

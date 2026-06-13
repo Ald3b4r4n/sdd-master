@@ -5,7 +5,7 @@ import { getRecognizedAgentFiles } from "../agents/agent-writer.js";
 import { getGateStatus } from "../gates/gate-state.js";
 import { getImplementReadiness } from "../governance/blockers.js";
 import { getGovernanceStatus } from "../governance/governance-state.js";
-import { getImplementGuardStatus } from "../implementation/implement-readiness.js";
+import { getAssistedImplementStatus, getImplementGuardStatus } from "../implementation/implement-readiness.js";
 import { getDeliveryStatus } from "../delivery/delivery-status.js";
 import { getSkillStatus } from "../skills/skill-registry.js";
 import { officialTemplates } from "../templates/official-templates.js";
@@ -17,6 +17,7 @@ import type {
   DoctorGateInfo,
   DoctorGitInfo,
   DoctorGovernanceInfo,
+  DoctorAssistedImplementInfo,
   DoctorImplementGuardInfo,
   DoctorImplementReadinessInfo,
   DoctorDeliveryInfo,
@@ -372,6 +373,31 @@ export function checkImplementGuard(cwd: string): {
       details
     },
     info: guard
+  };
+}
+
+export function checkAssistedImplement(cwd: string): {
+  check: DoctorCheck;
+  info: DoctorAssistedImplementInfo;
+} {
+  const info = getAssistedImplementStatus(cwd);
+  const details = [
+    info.status === "not-started" ? "Implement assistido não iniciado." : "",
+    info.handoff === "missing" ? "Handoff ausente." : "",
+    info.testContract === "missing" ? "Test contract ausente." : "",
+    info.manifest === "missing" ? "Manifest ausente." : "",
+    info.forbiddenPolicy === "missing" ? "Política de arquivos proibidos ausente." : "",
+    info.codeChanged ? "Código alterado pelo implement assistido." : ""
+  ].filter(Boolean);
+
+  return {
+    check: {
+      id: "assisted-implement",
+      label: "Implement assistido",
+      status: info.codeChanged ? "fail" : info.status === "not-started" ? "warn" : details.length === 0 ? "pass" : "warn",
+      details
+    },
+    info
   };
 }
 

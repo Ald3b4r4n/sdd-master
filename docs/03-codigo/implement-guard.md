@@ -54,6 +54,18 @@ Critérios mínimos:
 
 Uma implementação real deverá usar o manifesto `IMPLEMENT-XXX.md`, respeitar escopo aprovado e exigir autorização humana explícita.
 
+## Implement assistido controlado
+
+O comando também pode preparar um pacote assistido:
+
+```bash
+sdd master implement --yes --prepare --handoff --manifest --test-contract --agent="codex" --allowed-files="src/**,tests/**,docs/**"
+```
+
+Esse pacote cria sessão, manifesto, contrato de testes, handoff, aprovação pendente e riscos em `.sdd-master/implementation/`.
+
+Mesmo nesse modo, nenhum código do consumidor é alterado automaticamente.
+
 Depois de uma implementação real futura, execute:
 
 ```bash

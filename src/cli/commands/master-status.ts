@@ -6,7 +6,7 @@ import { runGitSecurityCheck } from "../../git/git-checks.js";
 import { getImplementReadiness } from "../../governance/blockers.js";
 import { getDeliveryStatus } from "../../delivery/delivery-status.js";
 import { getGovernanceStatus } from "../../governance/governance-state.js";
-import { getImplementGuardStatus } from "../../implementation/implement-readiness.js";
+import { getAssistedImplementStatus, getImplementGuardStatus } from "../../implementation/implement-readiness.js";
 import { getSkillStatus } from "../../skills/skill-registry.js";
 import { getUiuxStatus } from "../../uiux/uiux-gates.js";
 import { getUpdateStatus } from "../../update/update-state.js";
@@ -43,6 +43,7 @@ function getInstalledStatus(cwd: string): string {
   const gates = getGateStatus(cwd);
   const implementReadiness = getImplementReadiness(cwd);
   const implementGuard = getImplementGuardStatus(cwd);
+  const assistedImplement = getAssistedImplementStatus(cwd);
   const skills = getSkillStatus(cwd);
   const uiux = getUiuxStatus(cwd);
   const update = getUpdateStatus(cwd);
@@ -148,6 +149,15 @@ Implement Guard:
   Código alterado pelo implement: ${implementGuard.codeChanged ? "Sim" : "Não"}
   Próxima ação: ${implementGuard.nextAction}
 
+Implement Assistido:
+  Última sessão: ${assistedImplement.latestSession}
+  Status: ${formatAssistedImplementStatus(assistedImplement.status)}
+  Handoff: ${assistedImplement.handoff}
+  Test contract: ${assistedImplement.testContract}
+  Manifest: ${assistedImplement.manifest}
+  Código alterado: ${assistedImplement.codeChanged ? "Sim" : "Não"}
+  Aprovação humana: ${assistedImplement.humanApproval}
+
 Próximo comando recomendado:
   ${workflow.nextCommand}
 `;
@@ -186,4 +196,10 @@ function formatDeliveryStatus(status: string): string {
   if (status === "ready") return "Pronto para autorização";
   if (status === "blocked") return "Bloqueado";
   return "Registrado";
+}
+
+function formatAssistedImplementStatus(status: string): string {
+  if (status === "not-started") return "Não iniciado";
+  if (status === "blocked") return "Bloqueado";
+  return "Preparada";
 }

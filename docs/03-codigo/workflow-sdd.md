@@ -63,6 +63,14 @@ sdd master implement --yes --phase="PHASE-01" --task="TASK-001" --dry-run
 
 Neste prototype, `implement` não altera código. Ele valida readiness, test gates e segurança antes de uma futura implementação real.
 
+Para preparar handoff assistido sem alterar código:
+
+```bash
+sdd master implement --yes --prepare --handoff --manifest --test-contract --agent="codex"
+```
+
+O pacote assistido fica em `.sdd-master/implementation/` e continua exigindo aprovação humana antes de qualquer execução real.
+
 ## Design antes de implementar
 
 Para projetos com interface, rode os gates de design antes do implement:

@@ -125,6 +125,25 @@ Regras:
 - deploy não executa scripts remotos;
 - ambos registram plano, checklist, riscos e aprovações pendentes.
 
+## Implement assistido controlado
+
+O `sdd master implement` prepara implementação assistida sem alterar código automaticamente.
+
+```bash
+sdd master implement --yes --prepare --handoff --manifest --test-contract --agent="codex" --allowed-files="src/**,tests/**,docs/**"
+```
+
+Ele gera:
+
+- sessão de implementação;
+- manifesto de mudanças;
+- contrato de testes;
+- handoff para agente;
+- aprovação humana pendente;
+- riscos.
+
+Nesta fase, `implement` continua sem modificar código do projeto consumidor.
+
 ## Uso local durante desenvolvimento
 
 ```bash

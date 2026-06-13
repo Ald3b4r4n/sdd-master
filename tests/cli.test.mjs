@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
 import {
   existsSync,
+  mkdirSync,
   mkdtempSync,
   readdirSync,
   readFileSync,
@@ -2093,6 +2094,112 @@ describe("SDD Master package foundation", () => {
     const prePush = runCli(["master", "git", "--pre-push"], rootDir);
     assert.notEqual(prePush.stdout, "");
     assert.doesNotMatch(prePush.stdout, /Status geral:\s+blocked/);
+  });
+
+  it("prepares controlled assisted implementation handoff without changing consumer code", () => {
+    withTempProject((projectDir) => {
+      const withoutInit = runCli(["master", "implement", "--prepare"], projectDir);
+      assert.notEqual(withoutInit.status, 0);
+      assert.match(withoutInit.stderr, /SDD Master não inicializado/);
+
+      const help = runCli(["master", "implement", "--help"], projectDir);
+      const masterHelp = runCli(["master", "help", "implement"], projectDir);
+      assert.equal(help.status, 0);
+      assert.equal(masterHelp.status, 0);
+      assert.match(help.stdout, /--prepare/);
+      assert.match(help.stdout, /--handoff/);
+      assert.match(help.stdout, /--allowed-files/);
+      assert.match(help.stdout, /não altera código/);
+
+      const init = initTempProject(projectDir);
+      assert.equal(init.status, 0, init.stderr);
+      mkdirSync(join(projectDir, "src"), { recursive: true });
+      const consumerCode = join(projectDir, "src", "app.ts");
+      writeFileSync(consumerCode, "export const value = 1;\n", "utf8");
+
+      const result = runCli(
+        [
+          "master",
+          "implement",
+          "--yes",
+          "--prepare",
+          "--handoff",
+          "--manifest",
+          "--test-contract",
+          "--agent=codex",
+          "--allowed-files=.env,src/**,tests/**,docs/**",
+          "--forbidden-files=",
+          "--output=json"
+        ],
+        projectDir
+      );
+
+      assert.notEqual(result.status, 0);
+      const json = JSON.parse(result.stdout);
+      assert.equal(json.mode, "assisted-guard");
+      assert.equal(json.codeChanged, false);
+      assert.equal(json.allowedFiles.includes("src/**"), true);
+      assert.equal(json.allowedFiles.includes("tests/**"), true);
+      assert.equal(json.allowedFiles.includes(".env"), false);
+      assert.equal(json.forbiddenFiles.includes(".env"), true);
+      assert.equal(json.forbiddenFiles.includes(".sdd-master/**"), true);
+      assert.equal(json.forbiddenFiles.includes("secrets/**"), true);
+      assert.equal(json.createdFiles.every((file) => file.startsWith(".sdd-master/implementation/")), true);
+
+      const sessionPath = join(projectDir, ".sdd-master", "implementation", "sessions", "IMPLEMENT-SESSION-001.md");
+      const manifestPath = join(projectDir, ".sdd-master", "implementation", "manifests", "CHANGE-MANIFEST-001.md");
+      const testContractPath = join(
+        projectDir,
+        ".sdd-master",
+        "implementation",
+        "test-contracts",
+        "TEST-CONTRACT-001.md"
+      );
+      const handoffPath = join(projectDir, ".sdd-master", "implementation", "handoffs", "AGENT-HANDOFF-001.md");
+      const approvalPath = join(
+        projectDir,
+        ".sdd-master",
+        "implementation",
+        "approvals",
+        "IMPLEMENT-APPROVAL-001.md"
+      );
+      const riskPath = join(projectDir, ".sdd-master", "implementation", "risks", "IMPLEMENT-RISK-001.md");
+
+      assert.equal(existsSync(sessionPath), true);
+      assert.equal(existsSync(manifestPath), true);
+      assert.equal(existsSync(testContractPath), true);
+      assert.equal(existsSync(handoffPath), true);
+      assert.equal(existsSync(approvalPath), true);
+      assert.equal(existsSync(riskPath), true);
+
+      const manifest = readFileSync(manifestPath, "utf8");
+      const testContract = readFileSync(testContractPath, "utf8");
+      const handoff = readFileSync(handoffPath, "utf8");
+      assert.match(manifest, /Arquivos explicitamente proibidos/);
+      assert.match(manifest, /\.env/);
+      assert.match(manifest, /\.sdd-master\/\*\*/);
+      assert.match(testContract, /Nenhuma implementação deve ocorrer antes de definir testes/);
+      assert.match(handoff, /Regras não negociáveis/);
+      assert.match(handoff, /Não altere arquivos proibidos/);
+      assert.match(handoff, /Não execute deploy/);
+
+      assert.equal(readFileSync(consumerCode, "utf8"), "export const value = 1;\n");
+      assert.equal(existsSync(join(projectDir, ".env")), false);
+      assert.doesNotMatch(`${manifest}\n${testContract}\n${handoff}`, /sk-[A-Za-z0-9_-]{20,}|BEGIN (RSA |EC |OPENSSH |)PRIVATE KEY/);
+
+      const status = runCli(["master", "status"], projectDir);
+      assert.equal(status.status, 0);
+      assert.match(status.stdout, /Implement Assistido:/);
+
+      const doctor = runCli(["master", "doctor", "--json"], projectDir);
+      assert.equal(doctor.status, 0);
+      const doctorJson = JSON.parse(doctor.stdout);
+      assert.equal(typeof doctorJson.assistedImplement, "object");
+      assert.equal(doctorJson.assistedImplement.codeChanged, false);
+      assert.equal(doctorJson.assistedImplement.forbiddenPolicy, "OK");
+
+      assert.equal(existsSync(join(rootDir, ".sdd-master")), false);
+    });
   });
 
   it("implements release and deploy guards without publishing or deploying", () => {

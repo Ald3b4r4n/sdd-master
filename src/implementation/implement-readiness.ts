@@ -6,7 +6,7 @@ import { getGovernanceStatus } from "../governance/governance-state.js";
 import { getSkillStatus } from "../skills/skill-registry.js";
 import { getUiuxStatus } from "../uiux/uiux-gates.js";
 import { getWorkflowStatus } from "../workflow/workflow-runner.js";
-import type { ImplementGate, ImplementStatus } from "./implement-types.js";
+import type { AssistedImplementStatus, ImplementGate, ImplementStatus } from "./implement-types.js";
 import { getTestGateStatus } from "./test-gates.js";
 
 export function getImplementationReadiness(cwd: string, task = "TASK-001"): {
@@ -97,6 +97,57 @@ export function getImplementGuardStatus(cwd: string): ImplementStatus {
   };
 }
 
+export function getAssistedImplementStatus(cwd: string): AssistedImplementStatus {
+  const implementationDir = join(cwd, ".sdd-master", "implementation");
+  const sessionsDir = join(implementationDir, "sessions");
+  const manifestsDir = join(implementationDir, "manifests");
+  const contractsDir = join(implementationDir, "test-contracts");
+  const handoffsDir = join(implementationDir, "handoffs");
+
+  if (!existsSync(sessionsDir)) {
+    return {
+      latestSession: "não iniciado",
+      status: "not-started",
+      handoff: "not-started",
+      testContract: "not-started",
+      manifest: "not-started",
+      codeChanged: false,
+      humanApproval: "not-started",
+      forbiddenPolicy: "not-started"
+    };
+  }
+
+  const latestSession = latestFile(sessionsDir, "IMPLEMENT-SESSION-");
+  if (!latestSession) {
+    return {
+      latestSession: "não iniciado",
+      status: "not-started",
+      handoff: "not-started",
+      testContract: "not-started",
+      manifest: "not-started",
+      codeChanged: false,
+      humanApproval: "not-started",
+      forbiddenPolicy: "not-started"
+    };
+  }
+
+  const content = readFileSync(join(sessionsDir, latestSession), "utf8");
+  const status = content.includes("## Status\nBloqueada") ? "blocked" : "prepared";
+  const forbiddenPolicy =
+    content.includes(".env") && content.includes(".sdd-master/**") ? "OK" : "missing";
+
+  return {
+    latestSession: latestSession.replace(".md", ""),
+    status,
+    handoff: latestFile(handoffsDir, "AGENT-HANDOFF-") ? "created" : "missing",
+    testContract: latestFile(contractsDir, "TEST-CONTRACT-") ? "created" : "missing",
+    manifest: latestFile(manifestsDir, "CHANGE-MANIFEST-") ? "created" : "missing",
+    codeChanged: false,
+    humanApproval: "Pendente",
+    forbiddenPolicy
+  };
+}
+
 function gate(name: string, ok: boolean, evidence: string): ImplementGate {
   return {
     gate: name,
@@ -119,4 +170,12 @@ function mixedGate(name: string, value: boolean | "not-applicable" | "recommende
 
 function allApprovalsPresent(approvedTargets: string[]): boolean {
   return ["discovery", "requirements", "spec", "plan", "tasks"].every((target) => approvedTargets.includes(target));
+}
+
+function latestFile(directory: string, prefix: string): string | undefined {
+  if (!existsSync(directory)) return undefined;
+  return readdirSync(directory)
+    .filter((file) => file.startsWith(prefix) && file.endsWith(".md"))
+    .sort()
+    .at(-1);
 }
