@@ -2,7 +2,7 @@
 
 ## Status
 
-Publicação estável preparada para `sdd-master@1.0.0`.
+Publicação estável concluída para `sdd-master@1.0.0` com dist-tag `latest`.
 
 ## Comando
 
@@ -28,3 +28,10 @@ npm install -g sdd-master
 ## Resultado
 
 `latest` aponta para `1.0.0` após a publicação estável.
+
+Verificação pós-publicação:
+
+```bash
+npm view sdd-master@1.0.0 version --json
+npm view sdd-master dist-tags --json
+```

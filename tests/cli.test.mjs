@@ -3146,7 +3146,7 @@ describe("SDD Master package foundation", () => {
     assert.match(npmChecklistBeta, /Não usar `latest`/);
     assert.match(releaseDocStable, /v1\.0\.0/);
     assert.match(releaseDocStable, /Release estável/);
-    assert.match(finalAuditStable, /Release pronta para publicação estável/);
+    assert.match(finalAuditStable, /Release estável publicada/);
     assert.match(githubReleaseNotesStable, /v1\.0\.0/);
     assert.match(githubReleaseNotesStable, /stable release/i);
     assert.match(npmChecklistStable, /npm publish --access public --tag latest/);
