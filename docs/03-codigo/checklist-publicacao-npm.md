@@ -2,7 +2,7 @@
 
 ## RC 0.8.0
 
-Publicação pretendida: `sdd-master@0.8.0-rc`.
+Publicação concluída: `sdd-master@0.8.0-rc`.
 
 Comando permitido:
 
@@ -10,13 +10,13 @@ Comando permitido:
 npm publish --access public --tag rc
 ```
 
-Instalação após publicação:
+Instalação:
 
 ```bash
 npm install -g sdd-master@rc
 ```
 
-Regras: não usar `latest`, não mover tags antigas, não alterar `prototype`, `alpha` ou `beta` manualmente, e publicar somente após autorização humana explícita.
+Resultado: `npm publish --access public --tag rc` executado após autorização humana explícita. A dist-tag `rc` aponta para `0.8.0-rc`; `latest`, `prototype`, `alpha` e `beta` foram preservadas.
 
 ## Status
 

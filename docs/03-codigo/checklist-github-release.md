@@ -2,15 +2,17 @@
 
 ## RC 0.8.0
 
-Prerelease planejada: `v0.8.0-rc`.
+Prerelease publicada: `v0.8.0-rc`.
 
-Comando permitido somente após autorização humana:
+Comando executado após autorização humana:
 
 ```bash
 gh release create v0.8.0-rc --prerelease --title "v0.8.0-rc" --notes-file releases/github-v0.8.0-rc-notes.md
 ```
 
-Nao criar release estavel neste bloco.
+Resultado: https://github.com/Ald3b4r4n/sdd-master/releases/tag/v0.8.0-rc
+
+Nao foi criada release estavel neste bloco.
 
 ## Status
 

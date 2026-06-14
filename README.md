@@ -53,13 +53,13 @@ npm install -g sdd-master@rc
 sdd master help
 ```
 
-A versão pretendida para publicação deste bloco é `0.8.0-rc`. Ela ainda não é estável. Após publicação, use a dist-tag `rc` para instalar esta versão.
+A versão publicada neste bloco é `0.8.0-rc`. Ela ainda não é estável. Use a dist-tag `rc` para instalar esta versão.
 
 ```text
 sdd-master@0.8.0-rc
 ```
 
-O registry mantém `latest` apontando para `0.1.0-prototype.1`. A dist-tag `prototype` aponta para `0.2.0-prototype`, a dist-tag `alpha` aponta para `0.3.0-alpha`, a dist-tag `beta` aponta para `0.5.0-beta`, e após publicação a instalação recomendada para este estágio será `sdd-master@rc`.
+O registry mantém `latest` apontando para `0.1.0-prototype.1`. A dist-tag `prototype` aponta para `0.2.0-prototype`, a dist-tag `alpha` aponta para `0.3.0-alpha`, a dist-tag `beta` aponta para `0.5.0-beta`, e a dist-tag `rc` aponta para `0.8.0-rc`.
 
 Evite usar:
 
@@ -88,7 +88,7 @@ Status:
 - npm publicado;
 - GitHub prerelease publicada;
 - release candidate, não estável;
-- dist-tag `rc` planejada.
+- dist-tag `rc` publicada.
 
 ## Banner e crédito
 
@@ -112,7 +112,7 @@ O banner não aparece com `--json`, `CI=1`, `NO_COLOR=1`, `SDD_MASTER_NO_BANNER=
 
 `0.8.0-rc` congela a API pública de comandos como candidata a estável, finaliza a documentação de uso e prepara o caminho para `1.0.0`.
 
-Instalação após publicação:
+Instalação:
 
 ```bash
 npm install -g sdd-master@rc
@@ -659,7 +659,7 @@ O SDD Master possui:
 - publicação npm prototype;
 - publicação npm alpha;
 - publicação npm beta com `npm publish --access public --tag beta`;
-- publicação npm RC planejada com `npm publish --access public --tag rc`.
+- publicação npm RC realizada com `npm publish --access public --tag rc`.
 
 A publicação final da GitHub Release exige aprovação humana explícita.
 

@@ -24,7 +24,7 @@ O RC congela a API publica dos comandos listados em `api-publica-cli.md` como ca
 - Templates e documentos gerados podem receber secoes novas.
 - Checks de seguranca podem ficar mais restritivos.
 
-## Instalacao pretendida apos publicacao
+## Instalacao publicada
 
 ```bash
 npm install -g sdd-master@rc

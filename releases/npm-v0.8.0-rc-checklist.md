@@ -2,7 +2,7 @@
 
 ## Status
 
-Publicacao planejada para `sdd-master@0.8.0-rc` com dist-tag `rc`.
+Publicacao concluida para `sdd-master@0.8.0-rc` com dist-tag `rc`.
 
 ## Comando autorizado
 
@@ -12,16 +12,16 @@ npm publish --access public --tag rc
 
 ## Antes de publicar
 
-- [ ] `npm whoami`
-- [ ] `npm view sdd-master name version dist-tags --json`
-- [ ] `npm view sdd-master@0.8.0-rc version --json` retorna E404 esperado
-- [ ] `npm run check`
-- [ ] `npm publish --dry-run --access public --tag rc`
-- [ ] `node dist/cli/main.js master git --pre-push`
-- [ ] Confirmar ausencia de `.env`
-- [ ] Confirmar ausencia de `.sdd-master/` na raiz
-- [ ] Confirmar que PDFs nao foram recriados
-- [ ] Obter autorizacao humana exata
+- [x] `npm whoami`
+- [x] `npm view sdd-master name version dist-tags --json`
+- [x] `npm view sdd-master@0.8.0-rc version --json`
+- [x] `npm run check`
+- [x] `npm publish --dry-run --access public --tag rc`
+- [x] `node dist/cli/main.js master git --pre-push`
+- [x] Confirmar ausencia de `.env`
+- [x] Confirmar ausencia de `.sdd-master/` na raiz
+- [x] Confirmar que PDFs nao foram recriados
+- [x] Obter autorizacao humana exata
 
 ## Regras
 
@@ -29,3 +29,9 @@ npm publish --access public --tag rc
 - Nao alterar `prototype`, `alpha` ou `beta` manualmente.
 - Nao mover tags antigas.
 - Nao publicar release estavel.
+
+## Resultado
+
+- `npm publish --access public --tag rc`: executado.
+- `rc`: `0.8.0-rc`.
+- `latest`: preservada em `0.1.0-prototype.1`.

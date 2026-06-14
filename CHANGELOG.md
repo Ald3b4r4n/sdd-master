@@ -31,7 +31,10 @@
 ### Observação
 
 - Esta versão é release candidate, não estável.
-- Instalação após publicação: `npm install -g sdd-master@rc`.
+- npm publish real foi executado com a dist-tag `rc`.
+- GitHub prerelease `v0.8.0-rc` foi publicada como prerelease.
+- Instalação recomendada: `npm install -g sdd-master@rc`.
+- A dist-tag `latest` permanece em `0.1.0-prototype.1`.
 
 ## [0.5.0-beta] - 2026-06-13
 
