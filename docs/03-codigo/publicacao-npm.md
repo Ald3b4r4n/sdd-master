@@ -1,8 +1,47 @@
 # Publicação npm
 
-A publicação npm controlada atual do SDD Master é a versão beta `0.5.0-beta`.
+A publicação npm controlada atual do SDD Master é a versão estável `1.0.0`.
 
-Ela foi publicada com autorização humana explícita usando `npm publish --access public --tag beta`.
+Ela foi publicada com autorização humana explícita usando `npm publish --access public --tag latest`.
+
+## npm estável
+
+Publicado no npm:
+
+```bash
+npm install -g sdd-master
+```
+
+Versão publicada:
+
+```text
+sdd-master@1.0.0
+```
+
+Dist-tag:
+
+```text
+latest
+```
+
+`1.0.0` foi publicado com `npm publish --access public --tag latest`. A instalação recomendada agora é `sdd-master`, porque a versão é estável.
+
+Estado real das dist-tags após publicação:
+
+- `latest`: `1.0.0`
+- `prototype`: `0.2.0-prototype`
+- `alpha`: `0.3.0-alpha`
+- `beta`: `0.5.0-beta`
+
+Evite usar:
+
+```bash
+npm install -g sdd-master@rc
+```
+
+até o histórico RC ser explicitamente necessário.
+
+## Histórico npm
 
 ## npm
 

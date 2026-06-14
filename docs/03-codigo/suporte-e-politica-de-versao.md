@@ -1,20 +1,20 @@
-# Suporte e Politica de Versao
+# Suporte e Política de Versão
 
 ## Canais npm
 
-- `prototype`: linha historica de prototipos.
-- `alpha`: linha alpha.
-- `beta`: linha beta.
-- `rc`: release candidate `0.8.0-rc`.
-- `latest`: reservado para release estavel.
+- `prototype`
+- `alpha`
+- `beta`
+- `rc`
+- `latest`
 
-## Regras
+## Política estável
 
-- Nao mover `latest` manualmente durante RC.
-- Nao alterar `prototype`, `alpha` ou `beta` manualmente neste bloco.
-- Publicar RC somente com `npm publish --access public --tag rc`.
-- Criar GitHub Release do RC como prerelease.
+- `latest` aponta para `1.0.0`.
+- Canais antigos permanecem preservados.
+- Breaking changes após `1.0.0` exigem major.
+- Publish estável usa `npm publish --access public --tag latest`.
 
 ## Suporte
 
-Durante o RC, bugs de seguranca, path safety, redaction, release/deploy guards e quebra de JSON publico tem prioridade maxima.
+`1.0.0` é a primeira versão estável. A prioridade continua sendo segurança, path safety, redaction e supply chain.

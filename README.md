@@ -8,11 +8,11 @@
   <strong>Framework rígido para desenvolvimento de software com especificação, TDD, documentação, auditoria, rastreabilidade, segurança e agentes de IA.</strong>
 </p>
 
-![Version](https://img.shields.io/badge/version-0.8.0--rc-blue)
+![Version](https://img.shields.io/badge/version-1.0.0-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
 ![Node.js](https://img.shields.io/badge/Node.js-20%2B-43853d)
 ![TypeScript](https://img.shields.io/badge/TypeScript-ready-blue)
-![Status](https://img.shields.io/badge/status-rc-orange)
+![Status](https://img.shields.io/badge/status-stable-success)
 ![Security](https://img.shields.io/badge/security-first-critical)
 ![AI Agents](https://img.shields.io/badge/AI%20agents-ready-6f42c1)
 
@@ -49,46 +49,38 @@ O SDD Master combina:
 ## Instalação via npm
 
 ```bash
-npm install -g sdd-master@rc
+npm install -g sdd-master
 sdd master help
 ```
 
-A versão publicada neste bloco é `0.8.0-rc`. Ela ainda não é estável. Use a dist-tag `rc` para instalar esta versão.
+A versão publicada neste bloco é `1.0.0`. Ela é estável e usa a dist-tag `latest`.
 
 ```text
-sdd-master@0.8.0-rc
+sdd-master@1.0.0
 ```
 
-O registry mantém `latest` apontando para `0.1.0-prototype.1`. A dist-tag `prototype` aponta para `0.2.0-prototype`, a dist-tag `alpha` aponta para `0.3.0-alpha`, a dist-tag `beta` aponta para `0.5.0-beta`, e a dist-tag `rc` aponta para `0.8.0-rc`.
+O registry mantém `prototype`, `alpha` e `beta` para histórico. A dist-tag `latest` aponta para `1.0.0`.
 
-Evite usar:
+## Estado atual
+
+A versão pública atual recomendada é:
 
 ```bash
 npm install -g sdd-master
 ```
 
-até existir uma release estável.
-
-## Estado atual
-
-A versão pública atual recomendada continua sendo:
-
-```bash
-npm install -g sdd-master@rc
-```
-
 Versão:
 
 ```text
-0.8.0-rc
+1.0.0
 ```
 
 Status:
 
 - npm publicado;
-- GitHub prerelease publicada;
-- release candidate, não estável;
-- dist-tag `rc` publicada.
+- GitHub release publicada;
+- release estável;
+- dist-tag `latest` publicada.
 
 ## Banner e crédito
 
@@ -108,23 +100,23 @@ https://www.arsoftwaredevelopment.com.br/
 
 O banner não aparece com `--json`, `CI=1`, `NO_COLOR=1`, `SDD_MASTER_NO_BANNER=1`, `--plain` ou `--no-banner`.
 
-## Release candidate 0.8.0-rc
+## Release estável 1.0.0
 
-`0.8.0-rc` congela a API pública de comandos como candidata a estável, finaliza a documentação de uso e prepara o caminho para `1.0.0`.
+`1.0.0` congela a API pública de comandos como contrato estável, finaliza a documentação de uso e passa `latest` a apontar para a versão estável.
 
 Instalação:
 
 ```bash
-npm install -g sdd-master@rc
+npm install -g sdd-master
 ```
 
-Regras do RC:
+Regras da versão estável:
 
-- não usar `latest` manualmente;
-- `beta`, `alpha` e `prototype` continuam disponíveis;
+- usar `latest` como canal recomendado;
+- `beta`, `alpha` e `prototype` continuam disponíveis para histórico;
 - `release` e `deploy` continuam guards sem publicação ou deploy real;
 - plugins e skills continuam sem execução automática;
-- a versão ainda não é estável.
+- a versão é estável.
 
 ## Prerelease beta
 
@@ -156,7 +148,7 @@ A instalação recomendada é:
 npm install -g sdd-master@beta
 ```
 
-A dist-tag `alpha` continua disponível para `0.3.0-alpha`. Não use `latest` manualmente enquanto não houver release estável.
+As dist-tags `alpha` e `beta` continuam disponíveis como histórico de prereleases.
 
 ## O que mudou em 0.2.0-prototype
 
@@ -181,7 +173,7 @@ O SDD Master possui comandos de preparação para release e deploy.
 Eles não publicam e não fazem deploy automaticamente.
 
 ```bash
-sdd master release --yes --version="0.3.0-alpha" --channel="alpha" --type="local" --dry-run
+sdd master release --yes --version="1.0.0" --channel="stable" --type="local" --dry-run
 sdd master deploy --yes --environment="staging" --provider="vercel" --strategy="serverless" --dry-run
 ```
 
@@ -268,7 +260,6 @@ O preset `ecommerce` inclui atenção inicial a SEO, UI/UX, catálogo, checkout,
 | `sdd master spec` | Disponível | Cria especificação inicial |
 | `sdd master plan` | Disponível | Cria plano técnico inicial |
 | `sdd master tasks` | Disponível | Cria tarefas iniciais |
-| `sdd master update` | Planejado | Atualizará templates/estrutura |
 
 ## Fluxo visual
 
@@ -592,10 +583,10 @@ O check executa:
 - validação de pacote;
 - dry-run do npm pack.
 
-Para o RC, valide também:
+Para a release estável, valide também:
 
 ```bash
-npm publish --dry-run --access public --tag rc
+npm publish --dry-run --access public --tag latest
 node dist/cli/main.js master git --pre-push
 ```
 
@@ -608,9 +599,9 @@ npm run pack:dry-run
 
 Esses scripts verificam se o pacote contém os arquivos necessários para uso via CLI e se arquivos proibidos ficam fora do empacotamento npm.
 
-## Release local alpha
+## Histórico de release alpha
 
-A versão local preparada é:
+A versão histórica alpha foi:
 
 ```text
 0.3.0-alpha
@@ -649,7 +640,7 @@ Status:
 - npm `prototype` aponta para `0.2.0-prototype`.
 - npm `alpha` aponta para `0.3.0-alpha`.
 
-A release atual é alpha e não representa versão final estável.
+Este trecho permanece como histórico da alpha e não descreve a versão estável atual.
 
 ## Publicação
 
@@ -659,7 +650,7 @@ O SDD Master possui:
 - publicação npm prototype;
 - publicação npm alpha;
 - publicação npm beta com `npm publish --access public --tag beta`;
-- publicação npm RC realizada com `npm publish --access public --tag rc`.
+- publicação npm estável com `npm publish --access public --tag latest`.
 
 A publicação final da GitHub Release exige aprovação humana explícita.
 
@@ -679,7 +670,7 @@ Nunca publique `.env`, tokens, credenciais, chaves privadas, certificados, dados
 - [Comandos CLI](docs/03-codigo/comandos-cli.md)
 - [API pública CLI](docs/03-codigo/api-publica-cli.md)
 - [Contrato de comandos](docs/03-codigo/contrato-comandos.md)
-- [Compatibilidade RC](docs/03-codigo/compatibilidade-rc.md)
+- [Compatibilidade 1.0.0](docs/03-codigo/compatibilidade-rc.md)
 - [Breaking changes](docs/03-codigo/breaking-changes.md)
 - [Guia rápido](docs/03-codigo/guia-rapido.md)
 - [Guia completo](docs/03-codigo/guia-completo.md)

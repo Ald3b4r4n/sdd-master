@@ -4,7 +4,7 @@
 
 Apto para avançar para 1.0.0: sim
 
-## Condicoes atendidas no RC
+## Condições atendidas
 
 - Banner proprio com credito publico do idealizador/desenvolvedor.
 - API publica dos comandos congelada como candidata a estavel.
@@ -17,10 +17,10 @@ Apto para avançar para 1.0.0: sim
 
 ## Pendencias nao bloqueantes
 
-- Publicar `0.8.0-rc` no npm com tag `rc`.
-- Criar GitHub prerelease `v0.8.0-rc`.
-- Coletar feedback real antes de `1.0.0`.
+- Publicar `1.0.0` no npm com tag `latest`.
+- Criar GitHub release estável `v1.0.0`.
+- Coletar feedback real pós-1.0.0 para evoluções incrementais.
 
 ## Criterio para o bloco 35
 
-Avancar para `1.0.0` somente apos validacao do RC publicado e autorizacoes humanas para latest/release estavel.
+Bloco 35 concluído: `1.0.0` é a versão estável ativa.

@@ -6,7 +6,7 @@ SDD Master e um framework CLI para desenvolvimento guiado por especificacao, tes
 
 ## Banner
 
-O banner textual do RC exibe `SDD MASTER`, a tagline do framework e o credito:
+O banner textual da versao estavel exibe `SDD MASTER`, a tagline do framework e o credito:
 
 ```text
 Idealizado e desenvolvido por Antonio Rafael Souza Cruz de Noronha
@@ -35,10 +35,10 @@ Use `init`, `onboard`, `doctor`, `status`, `discovery`, `requirements`, `clarify
 
 ## Publicacao
 
-O RC deve ser publicado somente com:
+A release estavel deve ser publicada somente com:
 
 ```bash
-npm publish --access public --tag rc
+npm publish --access public --tag latest
 ```
 
-Nao usar `latest` manualmente.
+Usar `latest` como canal recomendado.

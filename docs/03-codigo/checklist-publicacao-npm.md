@@ -1,5 +1,23 @@
 # Checklist de Publicação npm — SDD Master
 
+## Stable 1.0.0
+
+Publicação concluída: `sdd-master@1.0.0`.
+
+Comando permitido:
+
+```bash
+npm publish --access public --tag latest
+```
+
+Instalação:
+
+```bash
+npm install -g sdd-master
+```
+
+Resultado: `npm publish --access public --tag latest` executado após autorização humana explícita. A dist-tag `latest` aponta para `1.0.0`; `prototype`, `alpha`, `beta` e `rc` foram preservadas como histórico.
+
 ## RC 0.8.0
 
 Publicação concluída: `sdd-master@0.8.0-rc`.

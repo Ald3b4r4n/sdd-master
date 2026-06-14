@@ -1,6 +1,6 @@
 {
   "name": "sdd-master",
-  "version": "0.8.0-rc",
+  "version": "1.0.0",
   "description": "SDD Master — specification-driven development framework for AI-assisted software projects",
   "license": "MIT",
   "author": "Mike honor",
@@ -21,7 +21,7 @@
   ],
   "publishConfig": {
     "access": "public",
-    "tag": "rc"
+    "tag": "latest"
   },
   "repository": {
     "type": "git",

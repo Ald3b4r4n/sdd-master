@@ -2,7 +2,7 @@
 
 ## Banner apareceu em JSON
 
-Use `--json` no comando final e valide se nao ha wrapper de shell injetando texto. O RC tem teste garantindo JSON sem banner.
+Use `--json` no comando final e valide se nao ha wrapper de shell injetando texto. A versao estavel tem teste garantindo JSON sem banner.
 
 ## TLS falhou no npm publish dry-run
 
@@ -10,7 +10,7 @@ Nao use `strict-ssl=false`. Se necessario no Windows, use somente:
 
 ```powershell
 $env:NODE_OPTIONS="--use-system-ca"
-npm publish --dry-run --access public --tag rc
+npm publish --dry-run --access public --tag latest
 ```
 
 ## O comando bloqueou por `.env`

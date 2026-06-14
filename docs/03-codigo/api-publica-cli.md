@@ -1,12 +1,10 @@
-# API Publica CLI - SDD Master RC
+# API Pública CLI - SDD Master 1.0.0
 
 ## Status
 
-A partir de `0.8.0-rc`, a CLI entra em congelamento de release candidate. Os comandos abaixo sao candidatos a estaveis para `1.0.0`.
+A API pública do SDD Master está estável em `1.0.0`.
 
-Breaking changes ainda podem ocorrer ate `1.0.0`, desde que documentados no CHANGELOG, cobertos por teste e justificados em `docs/03-codigo/breaking-changes.md`.
-
-## Comandos publicos candidatos a estaveis
+## Comandos estáveis
 
 - `init`
 - `onboard`
@@ -37,27 +35,15 @@ Breaking changes ainda podem ocorrer ate `1.0.0`, desde que documentados no CHAN
 - `version`
 - `help`
 
-## Garantias RC
+## Garantias
 
-- O banner proprio do SDD Master aparece apenas em saida textual interativa.
-- O banner nao aparece com `--json`, `CI=1`, `NO_COLOR=1`, `SDD_MASTER_NO_BANNER=1`, `--plain` ou `--no-banner`.
-- Saidas JSON devem ser parseaveis e livres de banner.
-- Comandos de release/deploy/implement nao publicam, nao fazem deploy e nao executam codigo externo.
-- Plugins e skills criam apenas metadados locais, sem instalacao global e sem execucao remota.
-- Path safety, redaction e bloqueio de `.env` permanecem obrigatorios.
+- `update` é funcional e estável.
+- `--json` não imprime banner.
+- `CI=1`, `NO_COLOR=1`, `SDD_MASTER_NO_BANNER=1`, `--plain` e `--no-banner` não exibem banner.
+- `release`, `deploy` e `implement` continuam sem executar ações perigosas automaticamente.
+- `plugins` e `skills` seguem sem execução automática.
+- Path safety, redaction e bloqueio de `.env` continuam obrigatórios.
 
-## Contrato geral
+## Compatibilidade
 
-Cada comando publico deve manter:
-
-- status `RC`;
-- flags publicas documentadas;
-- saida texto para humanos;
-- saida JSON quando aplicavel;
-- arquivos gerados previstos;
-- garantias e limitacoes;
-- comportamento proibido;
-- breaking changes permitidos ate `1.0.0`;
-- breaking changes proibidos apos `1.0.0`.
-
-Detalhamento operacional: `docs/03-codigo/contrato-comandos.md`.
+Mudanças quebrando contrato pós-1.0 exigem versão major.

@@ -3,7 +3,7 @@ import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
 
 const rootDir = process.cwd();
-const expectedVersion = "0.8.0-rc";
+const expectedVersion = "1.0.0";
 const forbiddenPackPatterns = [
   /\.env$/,
   /\.env\.(local|production|development|staging|test|backup|old)$/,
@@ -27,13 +27,13 @@ const requiredFiles = [
   ".github/workflows/ci.yml",
   "assets/readme/sdd-master-hero.svg",
   "docs/01-negocio-requisitos/visao-do-produto.md",
-  "docs/01-negocio-requisitos/prontidao-1.0.md",
+  "docs/01-negocio-requisitos/encerramento-1.0.0.md",
   "docs/01-negocio-requisitos/maturidade-sdd-master.md",
   "docs/01-negocio-requisitos/presets-produto.md",
   "docs/01-negocio-requisitos/roadmap-0.3.0-alpha.md",
   "docs/02-tecnica-arquitetura/auditoria-seguranca-0.2.0.md",
+  "docs/02-tecnica-arquitetura/auditoria-final-1.0.0.md",
   "docs/02-tecnica-arquitetura/arquitetura-do-framework.md",
-  "docs/02-tecnica-arquitetura/auditoria-final-rc.md",
   "docs/02-tecnica-arquitetura/compatibilidade-multi-ia.md",
   "docs/02-tecnica-arquitetura/seguranca-e-governanca.md",
   "docs/03-codigo/checklist-github-release.md",
@@ -67,6 +67,10 @@ const requiredFiles = [
   "releases/github-v0.5.0-beta-notes.md",
   "releases/npm-v0.5.0-beta-checklist.md",
   "releases/v0.5.0-beta.md",
+  "releases/github-v1.0.0-notes.md",
+  "releases/npm-v1.0.0-checklist.md",
+  "releases/v1.0.0.md",
+  "releases/v1.0.0-final-audit.md",
   "releases/github-v0.8.0-rc-notes.md",
   "releases/npm-v0.8.0-rc-checklist.md",
   "releases/v0.8.0-rc.md",

@@ -3,10 +3,10 @@
 ## Instalar
 
 ```bash
-npm install -g sdd-master@rc
+npm install -g sdd-master
 ```
 
-`0.8.0-rc` e release candidate, nao estavel.
+`1.0.0` e a release estavel atual.
 
 ## Comecar um projeto
 
@@ -46,7 +46,7 @@ sdd master implement --yes --prepare --handoff --manifest --test-contract
 ## Release e deploy seguros
 
 ```bash
-sdd master release --yes --version="0.8.0-rc" --channel="rc" --type="local" --dry-run
+sdd master release --yes --version="1.0.0" --channel="stable" --type="local" --dry-run
 sdd master deploy --yes --environment="staging" --provider="manual" --strategy="manual" --dry-run
 ```
 

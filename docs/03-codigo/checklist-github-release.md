@@ -1,5 +1,19 @@
 # Checklist de GitHub Release — SDD Master
 
+## Stable 1.0.0
+
+Release publicada: `v1.0.0`.
+
+Comando executado após autorização humana:
+
+```bash
+gh release create v1.0.0 --title "v1.0.0" --notes-file releases/github-v1.0.0-notes.md
+```
+
+Resultado: https://github.com/Ald3b4r4n/sdd-master/releases/tag/v1.0.0
+
+Essa é a release estável. As tags `v0.1.0-prototype`, `v0.1.0-prototype.1`, `v0.2.0-prototype`, `v0.3.0-alpha`, `v0.5.0-beta` e `v0.8.0-rc` permanecem preservadas.
+
 ## RC 0.8.0
 
 Prerelease publicada: `v0.8.0-rc`.

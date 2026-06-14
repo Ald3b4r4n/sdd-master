@@ -2,6 +2,25 @@
 
 ## [Unreleased]
 
+## [1.0.0] - 2026-06-13
+
+### Adicionado
+
+- Release estável do SDD Master.
+- Documentação final de encerramento, auditoria e publicação.
+- Artefatos finais de release GitHub e npm para `1.0.0`.
+
+### Melhorado
+
+- README principal alinhado com a versão estável.
+- `update` tratado como comando estável no contrato público.
+- Checks de release e pacote atualizados para `latest`.
+
+### Observação
+
+- `latest` passa a apontar para `1.0.0`.
+- Histórico de prototype, alpha, beta e RC foi preservado.
+
 ## [0.8.0-rc] - 2026-06-13
 
 ### Adicionado

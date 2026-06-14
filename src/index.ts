@@ -1,2 +1,2 @@
 export const name = "SDD Master";
-export const version = "0.8.0-rc";
+export const version = "1.0.0";

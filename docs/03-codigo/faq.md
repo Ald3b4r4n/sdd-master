@@ -1,18 +1,18 @@
 # FAQ
 
-## O RC e estavel?
+## A versao atual e estavel?
 
-Nao. `0.8.0-rc` e candidato a release estavel, mas ainda nao e `1.0.0`.
+Sim. `1.0.0` e a versao estavel atual.
 
-## Como instalar o RC?
+## Como instalar a versao atual?
 
 ```bash
-npm install -g sdd-master@rc
+npm install -g sdd-master
 ```
 
 ## Posso usar `npm install -g sdd-master`?
 
-Evite ate `1.0.0`, porque `latest` nao deve ser movida manualmente durante o RC.
+Sim. `latest` agora aponta para `1.0.0`.
 
 ## O SDD Master executa deploy?
 

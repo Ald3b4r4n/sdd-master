@@ -1,32 +1,22 @@
 # Breaking Changes
 
-## Politica ate 1.0.0
+## Política pós-1.0
 
-Durante `0.8.0-rc`, breaking changes ainda sao permitidos quando:
+Em `1.0.0`, o contrato público está estável.
 
-- corrigem risco de seguranca;
-- reforcam path safety, redaction ou supply chain;
-- alinham contrato publico antes de `1.0.0`;
-- possuem teste de regressao;
-- aparecem no CHANGELOG.
+Qualquer breaking change daqui para frente exige nova versão major.
 
-## Permitidos ate 1.0.0
+## Permitido
 
 - Adicionar flags opcionais.
 - Adicionar campos JSON.
+- Melhorar mensagens e templates.
 - Tornar checks mais restritivos.
-- Ajustar nomes de documentos gerados quando a migracao estiver documentada.
-- Refinar saida textual.
 
-## proibidos após 1.0
+## Proibido sem major
 
-- Remover comando publico sem major.
-- Remover flag publica sem major.
-- Quebrar JSON documentado sem major.
-- Relaxar bloqueios de `.env`, secrets, path traversal ou publish/deploy automatico.
-- Executar plugin externo sem opt-in explicito.
-- Publicar npm, criar tag, fazer push ou criar GitHub Release por comando automatico.
-
-## Registro RC
-
-Nenhum breaking change bloqueante conhecido permanece aberto em `0.8.0-rc`.
+- Remover comando público.
+- Remover flag pública.
+- Quebrar JSON documentado.
+- Enfraquecer path safety, redaction ou supply chain.
+- Executar publish, deploy ou plugin automaticamente.

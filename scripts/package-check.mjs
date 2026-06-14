@@ -17,7 +17,7 @@ const requiredFiles = [
   "docs/01-negocio-requisitos/visao-do-produto.md",
   "docs/01-negocio-requisitos/prontidao-1.0.md",
   "docs/01-negocio-requisitos/presets-produto.md",
-  "docs/02-tecnica-arquitetura/auditoria-final-rc.md",
+  "docs/02-tecnica-arquitetura/auditoria-final-1.0.0.md",
   "docs/02-tecnica-arquitetura/arquitetura-do-framework.md",
   "docs/02-tecnica-arquitetura/compatibilidade-multi-ia.md",
   "docs/02-tecnica-arquitetura/seguranca-e-governanca.md",
@@ -52,8 +52,8 @@ if (packageJson.license !== "MIT") failures.push("package.json license must be M
 if (packageJson.publishConfig?.access !== "public") {
   failures.push("package.json publishConfig.access must be public.");
 }
-if (packageJson.publishConfig?.tag !== "rc") {
-  failures.push("package.json publishConfig.tag must be rc.");
+if (packageJson.publishConfig?.tag !== "latest") {
+  failures.push("package.json publishConfig.tag must be latest.");
 }
 if (!["./dist/cli/main.js", "dist/cli/main.js"].includes(packageJson.bin?.sdd)) {
   failures.push("package.json bin.sdd must point to dist/cli/main.js.");
